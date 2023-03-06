@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/scheduler.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:ulimo/pages/thank_you_page.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:ulimo/services/stripe_services.dart';
 
 class PrivateRidePage extends StatefulWidget {
   const PrivateRidePage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _PrivateRidePageState createState() => _PrivateRidePageState();
 }
 
@@ -26,6 +29,8 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
   TimeOfDay _pickupTime = TimeOfDay.now();
   TimeOfDay _returnTime = TimeOfDay.now();
   bool _isLoading = false;
+
+  Map<String, dynamic>? paymentIntent;
 
   Future<bool> checkConnectivity() async {
     final connectivityResult = await Connectivity().checkConnectivity();
@@ -69,30 +74,34 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
       'referral_code': _referralCodeController.text.trim(),
     };
 
-    final databaseRef = FirebaseDatabase.instance.ref('privateRide');
-    await databaseRef.push().set(rideDetails);
+    try {
+      await makePayment();
+
+      final databaseRef = FirebaseDatabase.instance.ref('privateRide');
+      await databaseRef.push().set(rideDetails);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Private ride details submitted successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        _formKey.currentState!.reset();
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const ThankYouPage(),
+          ),
+        );
+      });
+    } catch (e) {
+      print('makePayment() was canceled');
+    }
 
     setState(() {
       _isLoading = false;
-    });
-
-    // Show success message and reset form
-    // ignore: use_build_context_synchronously
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Private ride details submitted successfully'),
-        backgroundColor: Colors.green,
-      ),
-    );
-
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      _formKey.currentState!.reset();
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const ThankYouPage(),
-        ),
-      );
     });
   }
 
@@ -134,6 +143,25 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
     }
   }
 
+  Future<void> makePayment() async {
+    paymentIntent = await StripeServices.createPaymentIntent(
+      '120000',
+      'USD',
+    );
+    await StripeServices.displayPaymentSheet(
+      paymentIntent!['client_secret'],
+      _firstNameController.text.trim(),
+      _emailController.text.trim(),
+      '12000',
+    );
+    await StripeServices.savePaymentToFirebase(
+      '9876678',
+      _firstNameController.text.trim(),
+      _emailController.text.trim(),
+      '12000',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -143,158 +171,157 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: _buildForm(),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'First Name'),
+                  controller: _firstNameController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your first name';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16.0),
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'Last Name'),
+                  controller: _lastNameController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your last name';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16.0),
+                GestureDetector(
+                  onTap: () => _selectDate(context),
+                  child: AbsorbPointer(
+                    child: TextFormField(
+                      decoration: const InputDecoration(labelText: 'Date'),
+                      keyboardType: TextInputType.datetime,
+                      controller: TextEditingController(
+                          text: DateFormat('dd-MM-yyyy').format(_date)),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter the date';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                GestureDetector(
+                  onTap: () => _selectPickupTime(context),
+                  child: AbsorbPointer(
+                    child: TextFormField(
+                      decoration:
+                          const InputDecoration(labelText: 'Pickup Time'),
+                      keyboardType: TextInputType.datetime,
+                      controller: TextEditingController(
+                          text: _pickupTime.format(context)),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter the pickup time';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                GestureDetector(
+                  onTap: () => _selectReturnTime(context),
+                  child: AbsorbPointer(
+                    child: TextFormField(
+                      decoration:
+                          const InputDecoration(labelText: 'Return Time'),
+                      keyboardType: TextInputType.datetime,
+                      controller: TextEditingController(
+                          text: _returnTime.format(context)),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter the return time';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                TextFormField(
+                  decoration:
+                      const InputDecoration(labelText: 'Pickup Address'),
+                  controller: _pickupAddressController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the pickup address';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16.0),
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'Destination'),
+                  controller: _destinationController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the destination';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16.0),
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'Phone Number'),
+                  keyboardType: TextInputType.phone,
+                  controller: _phoneNumberController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your phone number';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16.0),
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'Email'),
+                  keyboardType: TextInputType.emailAddress,
+                  controller: _emailController,
+                ),
+                const SizedBox(height: 16.0),
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'Passengers'),
+                  keyboardType: TextInputType.number,
+                  controller: _passengersController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the number of passengers';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16.0),
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'Referral Code'),
+                  controller: _referralCodeController,
+                ),
+                const SizedBox(height: 16.0),
+                ElevatedButton(
+                  onPressed: _isLoading ? null : _submitForm,
+                  child: _isLoading
+                      ? const CircularProgressIndicator()
+                      : const Text('Submit'),
+                ),
+              ],
+            ),
+          ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildForm() {
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          TextFormField(
-            decoration: const InputDecoration(labelText: 'First Name'),
-            controller: _firstNameController,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your first name';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 16.0),
-          TextFormField(
-            decoration: const InputDecoration(labelText: 'Last Name'),
-            controller: _lastNameController,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your last name';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 16.0),
-          GestureDetector(
-            onTap: () => _selectDate(context),
-            child: AbsorbPointer(
-              child: TextFormField(
-                decoration: const InputDecoration(labelText: 'Date'),
-                keyboardType: TextInputType.datetime,
-                controller: TextEditingController(
-                    text: DateFormat('dd-MM-yyyy').format(_date)),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the date';
-                  }
-                  return null;
-                },
-              ),
-            ),
-          ),
-          const SizedBox(height: 16.0),
-          GestureDetector(
-            onTap: () => _selectPickupTime(context),
-            child: AbsorbPointer(
-              child: TextFormField(
-                decoration: const InputDecoration(labelText: 'Pickup Time'),
-                keyboardType: TextInputType.datetime,
-                controller:
-                    TextEditingController(text: _pickupTime.format(context)),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the pickup time';
-                  }
-                  return null;
-                },
-              ),
-            ),
-          ),
-          const SizedBox(height: 16.0),
-          GestureDetector(
-            onTap: () => _selectReturnTime(context),
-            child: AbsorbPointer(
-              child: TextFormField(
-                decoration: const InputDecoration(labelText: 'Return Time'),
-                keyboardType: TextInputType.datetime,
-                controller:
-                    TextEditingController(text: _returnTime.format(context)),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the return time';
-                  }
-                  return null;
-                },
-              ),
-            ),
-          ),
-          const SizedBox(height: 16.0),
-          TextFormField(
-            decoration: const InputDecoration(labelText: 'Pickup Address'),
-            controller: _pickupAddressController,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter the pickup address';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 16.0),
-          TextFormField(
-            decoration: const InputDecoration(labelText: 'Destination'),
-            controller: _destinationController,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter the destination';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 16.0),
-          TextFormField(
-            decoration: const InputDecoration(labelText: 'Phone Number'),
-            keyboardType: TextInputType.phone,
-            controller: _phoneNumberController,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your phone number';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 16.0),
-          TextFormField(
-            decoration: const InputDecoration(labelText: 'Email'),
-            keyboardType: TextInputType.emailAddress,
-            controller: _emailController,
-          ),
-          const SizedBox(height: 16.0),
-          TextFormField(
-            decoration: const InputDecoration(labelText: 'Passengers'),
-            keyboardType: TextInputType.number,
-            controller: _passengersController,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter the number of passengers';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 16.0),
-          TextFormField(
-            decoration: const InputDecoration(labelText: 'Referral Code'),
-            controller: _referralCodeController,
-          ),
-          const SizedBox(height: 16.0),
-          ElevatedButton(
-            onPressed: _isLoading ? null : _submitForm,
-            child: _isLoading
-                ? const CircularProgressIndicator()
-                : const Text('Submit'),
-          ),
-        ],
       ),
     );
   }

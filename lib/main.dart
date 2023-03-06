@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:ulimo/pages/phone_login_pages.dart';
-import 'package:ulimo/pages/stripe_page.dart';
 
 void main() async {
   // Initialize Firebase app
@@ -22,7 +21,8 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const StripePay(),
+      // home: StripePay(documentId: "123213", name: "aldo", email: "aldo@gmail.com", amount: "150000", currency: "USD", description: "payment for car"),
+      home: const PhoneLoginPage(),
     );
   }
 }

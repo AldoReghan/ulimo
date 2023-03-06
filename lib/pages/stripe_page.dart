@@ -1,10 +1,23 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:http/http.dart' as http;
+import 'package:ulimo/services/stripe_services.dart';
 
+// ignore: must_be_immutable
 class StripePay extends StatefulWidget {
-  const StripePay({Key? key}) : super(key: key);
+  String documentId;
+  String name;
+  String email;
+  String amount;
+  String currency;
+  String description;
+  StripePay({
+    Key? key,
+    required this.documentId,
+    required this.name,
+    required this.email,
+    required this.amount,
+    required this.currency,
+    required this.description,
+  }) : super(key: key);
 
   @override
   _StripePayState createState() => _StripePayState();
@@ -12,6 +25,25 @@ class StripePay extends StatefulWidget {
 
 class _StripePayState extends State<StripePay> {
   Map<String, dynamic>? paymentIntent;
+
+  Future<void> makePayment() async {
+    paymentIntent = await StripeServices.createPaymentIntent(
+      widget.amount,
+      widget.currency,
+    );
+    await StripeServices.displayPaymentSheet(
+      paymentIntent!['client_secret'],
+      widget.name,
+      widget.email,
+      widget.amount,
+    );
+    await StripeServices.savePaymentToFirebase(
+      widget.documentId,
+      widget.name,
+      widget.email,
+      widget.amount,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,78 +65,5 @@ class _StripePayState extends State<StripePay> {
         ),
       ),
     );
-  }
-
-  Future<void> makePayment() async {
-    try {
-      paymentIntent = await createPaymentIntent('10000', 'GBP');
-
-      var gpay = const PaymentSheetGooglePay(
-          merchantCountryCode: "GB", currencyCode: "GBP", testEnv: true);
-
-      // var applePay = PaymentSheetApplePay(
-      //   merchantCountryCode: 'GB',
-      //   paymentSummaryItems: [
-      //     ApplePayCartSummaryItem.fromJson({
-      //       'label': 'Abhi',
-      //       'amount': '10000',
-      //     }),
-      //   ],
-      // );
-
-      //STEP 2: Initialize Payment Sheet
-      await Stripe.instance
-          .initPaymentSheet(
-              paymentSheetParameters: SetupPaymentSheetParameters(
-            paymentIntentClientSecret:
-                paymentIntent!['client_secret'], //Gotten from payment intent
-            style: ThemeMode.light,
-            merchantDisplayName: 'Abhi',
-            googlePay: gpay,
-            // applePay: applePay,
-            billingDetails: const BillingDetails(
-              name: 'Abhi',
-              email: 'a@a.com'
-            )
-          ))
-          .then((value) {});
-
-      //STEP 3: Display Payment sheet
-      displayPaymentSheet();
-    } catch (err) {
-      print(err);
-    }
-  }
-
-  displayPaymentSheet() async {
-    try {
-      await Stripe.instance.presentPaymentSheet().then((value) {
-        print("Payment Successfully");
-      });
-    } catch (e) {
-      print('$e');
-    }
-  }
-
-  createPaymentIntent(String amount, String currency) async {
-    try {
-      Map<String, dynamic> body = {
-        'amount': amount,
-        'currency': currency,
-      };
-
-      var response = await http.post(
-        Uri.parse('https://api.stripe.com/v1/payment_intents'),
-        headers: {
-          'Authorization':
-              'Bearer sk_test_51GztTrAJNtmvbtbwTSoCoPt9t5v2uBfKuFqjNJGt2doLFMw5t8XJImVVUvmF6GNeQsyFul3ceYEwqTgr2fBUboiz00Gvax70aG',
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: body,
-      );
-      return json.decode(response.body);
-    } catch (err) {
-      throw Exception(err.toString());
-    }
   }
 }
