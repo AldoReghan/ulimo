@@ -134,8 +134,10 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
   Future<void> _selectReturnTime(BuildContext context) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
+      useRootNavigator: false, // set useRootNavigator to false
       initialTime: _returnTime,
     );
+
     if (picked != null && picked != _returnTime) {
       setState(() {
         _returnTime = picked;

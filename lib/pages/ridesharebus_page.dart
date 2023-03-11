@@ -42,6 +42,7 @@ class _RideShareBusPageState extends State<RideShareBusPage> {
         });
       }
     } else {
+      // ignore: use_build_context_synchronously
       showDialog(
         context: context,
         builder: (BuildContext context) {

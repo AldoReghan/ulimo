@@ -122,6 +122,7 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                           setState(() {
                             _selectedTime =
                                 _destinationList[index]['time'] as String?;
+                            _quantityController.text = '0';
                           });
                         },
                         child: Container(
@@ -188,56 +189,84 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                   const SizedBox(height: 8),
                                   Row(
                                     children: [
-                                      IconButton(
-                                        onPressed: () {
-                                          if (_quantityController
-                                              .text.isNotEmpty) {
-                                            int currentValue = int.parse(
-                                                _quantityController.text);
-                                            setState(() {
-                                              currentValue--;
-                                              _quantityController.text =
-                                                  (currentValue > 0
-                                                          ? currentValue
-                                                          : 0)
-                                                      .toString();
-                                            });
-                                          }
-                                        },
-                                        icon: const Icon(Icons.remove),
-                                      ),
+                                      (_quantityController.text == '0')
+                                          ? Container()
+                                          : IconButton(
+                                              onPressed: () {
+                                                if (_quantityController
+                                                    .text.isNotEmpty) {
+                                                  int currentValue = int.parse(
+                                                      _quantityController.text);
+                                                  setState(() {
+                                                    currentValue--;
+                                                    _quantityController.text =
+                                                        (currentValue > 0
+                                                                ? currentValue
+                                                                : 0)
+                                                            .toString();
+                                                  });
+                                                }
+                                              },
+                                              icon: const Icon(Icons.remove),
+                                            ),
+                                      const SizedBox(width: 8),
                                       Expanded(
                                         child: TextFormField(
-                                          keyboardType: TextInputType.number,
                                           controller: _quantityController,
+                                          keyboardType: TextInputType.number,
                                           decoration: const InputDecoration(
-                                            labelText: 'Quantity',
-                                            hintText: 'Enter the quantity',
+                                            border: OutlineInputBorder(),
+                                            hintText: 'Enter quantity',
                                           ),
+                                          enabled: false,
                                           validator: (value) {
                                             if (value == null ||
                                                 value.isEmpty) {
                                               return 'Please enter a quantity';
                                             }
+                                            int? parsedValue =
+                                                int.tryParse(value);
+                                            if (parsedValue == null ||
+                                                parsedValue <= 0) {
+                                              return 'Please enter a valid quantity';
+                                            }
+                                            if (parsedValue >
+                                                int.parse(
+                                                    _destinationList[index]
+                                                        ['quantity'])) {
+                                              return 'Exceeds available quantity';
+                                            }
                                             return null;
                                           },
                                         ),
                                       ),
-                                      IconButton(
-                                        onPressed: () {
-                                          if (_quantityController
-                                              .text.isNotEmpty) {
-                                            int currentValue = int.parse(
-                                                _quantityController.text);
-                                            setState(() {
-                                              currentValue++;
-                                              _quantityController.text =
-                                                  currentValue.toString();
-                                            });
-                                          }
-                                        },
-                                        icon: const Icon(Icons.add),
-                                      ),
+                                      const SizedBox(width: 8),
+                                      (_quantityController.text ==
+                                              _destinationList[index]
+                                                  ['quantity'])
+                                          ? Container()
+                                          : IconButton(
+                                              onPressed: () {
+                                                if (_quantityController
+                                                    .text.isNotEmpty) {
+                                                  int currentValue = int.parse(
+                                                      _quantityController.text);
+                                                  if (currentValue <
+                                                      int.parse(
+                                                          _destinationList[
+                                                                  index]
+                                                              ['quantity'])) {
+                                                    setState(() {
+                                                      currentValue++;
+                                                      _quantityController.text =
+                                                          currentValue
+                                                              .toString();
+                                                    });
+                                                  }
+                                                }
+                                              },
+                                              icon: const Icon(Icons.add),
+                                            ),
                                     ],
                                   ),
                                   const SizedBox(height: 16),
