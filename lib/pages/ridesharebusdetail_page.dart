@@ -14,7 +14,7 @@ class RideShareBusDetailPage extends StatefulWidget {
 
 class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
   late List<Map<dynamic, dynamic>> _destinationList;
-  final _databaseRef = FirebaseDatabase.instance.ref('rideShareBusTicket');
+  final _databaseRef = FirebaseDatabase.instance;
   String? _selectedTime;
 
   final _formKey = GlobalKey<FormState>();
@@ -89,10 +89,15 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
   }
 
   void _saveData(String quantity) async {
-    await _databaseRef.push().set({
+    final total_price = double.parse(_destinationList[0]['price'].toString()) *
+        int.parse(quantity);
+    await _databaseRef.ref('cart').push().set({
       'destination_id': _destinationList[0]['destination_id'],
       'time': _selectedTime,
+      'user_id': _destinationList[0]['destination_id'],
       'quantity': quantity,
+      'price': total_price,
+      'status': 'waiting',
     });
     setState(() {
       _selectedTime = null;
@@ -221,7 +226,8 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                           enabled: false,
                                           validator: (value) {
                                             if (value == null ||
-                                                value.isEmpty) {
+                                                value.isEmpty ||
+                                                value == '0') {
                                               return 'Please enter a quantity';
                                             }
                                             int? parsedValue =
@@ -282,7 +288,7 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                         ),
                                       ),
                                       Text(
-                                        '\$${NumberFormat("#,##0.00", "en_US").format((_destinationList[index]['price'] ?? 0) * int.parse(_quantityController.text))}',
+                                        '\$ ${NumberFormat("#,##0.00", "en_US").format((_destinationList[index]['price'] ?? 0) * int.parse(_quantityController.text))}',
                                         style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 18,
@@ -297,13 +303,7 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                     child: ElevatedButton(
                                       onPressed: () {
                                         // redirect to thank you page
-                                        Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const ThankYouPage(),
-                                          ),
-                                        );
+                                        _saveData(_quantityController.text);
                                       },
                                       child: const Text('Add to Cart'),
                                     ),

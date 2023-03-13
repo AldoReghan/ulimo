@@ -1,6 +1,7 @@
 import 'package:connectivity/connectivity.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:ulimo/pages/ridesharebusdetail_page.dart';
 
 class RideShareBusPage extends StatefulWidget {
@@ -11,34 +12,70 @@ class RideShareBusPage extends StatefulWidget {
 }
 
 class _RideShareBusPageState extends State<RideShareBusPage> {
-  late List<Map<dynamic, dynamic>> _destinationList;
-  final _databaseRef = FirebaseDatabase.instance.ref('rideShareBusDestination');
+  late List _destinationIds;
+  final _databaseRef = FirebaseDatabase.instance.ref();
+  late String _selectedDate;
+  final DateFormat _dateFormat = DateFormat('dd-MM-yyyy');
 
   @override
   void initState() {
     super.initState();
-    _destinationList = [];
+    _destinationIds = [];
+    _selectedDate = _dateFormat.format(DateTime.now());
     _fetchData();
   }
 
   Future<void> _fetchData() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult != ConnectivityResult.none) {
-      final snapshot = await _databaseRef.once();
-      final Map<dynamic, dynamic>? data = snapshot.snapshot.value as Map?;
-      if (data != null) {
-        final List<Map<String, dynamic>> tempList = [];
-        data.forEach((key, value) {
-          if (value['destination_description'] != null &&
-              value['destination_name'] != null) {
-            tempList.add({
-              'documentId': key, // add documentId to the map
-              ...value, // add all other fields from the value map
+      final ticketSnapshot = await _databaseRef
+          .child('rideShareBusTicketOrder')
+          .orderByChild('date')
+          .equalTo(_selectedDate)
+          .once();
+
+      final Map<dynamic, dynamic>? ticketData =
+          ticketSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+      final List tempList = [];
+
+      if (ticketData != null) {
+        ticketData.forEach((key, value) async {
+          final ridesharebusticket = await _databaseRef
+              .child('rideShareBusTicket')
+              .orderByKey()
+              .equalTo(value['rideShareBusTicket_id'])
+              .once();
+
+          final Map<dynamic, dynamic>? ridesharebusticketData =
+              ridesharebusticket.snapshot.value as Map<dynamic, dynamic>?;
+
+          if (ridesharebusticketData != null) {
+            ridesharebusticketData.forEach((key, value) async {
+              final destinationSnapshot = await _databaseRef
+                  .child('rideShareBusDestination')
+                  .orderByKey()
+                  .equalTo(value['destination_id'])
+                  .once();
+
+              final Map<dynamic, dynamic>? destinationData =
+                  destinationSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+
+              if (destinationData != null) {
+                destinationData.forEach((key, value) {
+                  final destinationMap = {
+                    'id': key,
+                    'name': value['destination_name'],
+                    'description': value['destination_description'],
+                  };
+                  tempList.add(destinationMap);
+                });
+
+                setState(() {
+                  _destinationIds = tempList;
+                });
+              }
             });
           }
-        });
-        setState(() {
-          _destinationList = tempList;
         });
       }
     } else {
@@ -63,44 +100,79 @@ class _RideShareBusPageState extends State<RideShareBusPage> {
     }
   }
 
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      // initialDate: DateTime.parse(_selectedDate),
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2022),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
+      final newSelectedDate = DateFormat('dd-MM-yyyy').format(picked);
+      if (newSelectedDate != _selectedDate) {
+        setState(() {
+          _selectedDate = newSelectedDate;
+          _destinationIds = [];
+        });
+        _fetchData();
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Ride Share Bus'),
       ),
-      body: _destinationList.isEmpty
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: _destinationList.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    final documentId = _destinationList[index]['documentId'];
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              RideShareBusDetailPage(destinationId: documentId),
-                        ));
+      body: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  _selectedDate,
+                  style: const TextStyle(fontSize: 18),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    _selectDate(context);
                   },
-                  child: Card(
-                    elevation: 4,
-                    margin: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 16,
-                    ),
-                    child: ListTile(
-                      title: Text(_destinationList[index]['destination_name']),
-                      subtitle: Text(
-                        _destinationList[index]['destination_description'],
-                      ),
-                      trailing: const Icon(Icons.arrow_forward),
-                    ),
-                  ),
-                );
-              },
+                  child: const Text("Select Date"),
+                ),
+              ],
             ),
+          ),
+          Expanded(
+            child: _destinationIds.isEmpty
+                ? const Center(
+                    child: Text("Data Kosong"),
+                  )
+                : ListView.builder(
+                    itemCount: _destinationIds.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(_destinationIds[index]['name']),
+                        subtitle: Text(_destinationIds[index]['description']),
+                        onTap: () {
+                          //Navigate to detail page
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => RideShareBusDetailPage(
+                                        destinationId: _destinationIds[index]
+                                            ['id'],
+                                      )));
+                        },
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }
