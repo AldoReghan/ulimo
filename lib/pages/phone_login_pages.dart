@@ -130,12 +130,12 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
               const SizedBox(height: 32.0),
               ElevatedButton(
                 onPressed: () => {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const HomePage()),
-                  )
-                  // _handleSignIn(context)
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //       builder: (context) => const HomePage()),
+                  // )
+                  _handleSignIn(context)
                   // Navigator.push(
                   //   context,
                   //   MaterialPageRoute(
