@@ -48,12 +48,18 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
     void codeSent(String verificationId, int? forceResendingToken) {
       // Navigate to OTP verification page
 
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(
+      //       builder: (context) => OTPVerificationPage(
+      //             phoneNumber: phoneNumber,
+      //           )),
+      // );
+
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => OTPVerificationPage(
-                  phoneNumber: phoneNumber,
-                )),
+            builder: (context) => const HomePage()),
       );
     }
 
