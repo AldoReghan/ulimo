@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
@@ -14,6 +16,9 @@ class _CartPageState extends State<CartPage> {
   List<String> _items = [];
   List<double> _prices = [];
   List<bool> _checkedItems = [];
+  List<String> _discount = [];
+  List<int> _discountRate = [];
+  int _selectedDiscountRate = 0;
 
   @override
   void initState() {
@@ -49,34 +54,73 @@ class _CartPageState extends State<CartPage> {
 
   double _totalPrice() {
     double totalPrice = 0;
+    double totalDiscount = 0;
     for (int i = 0; i < _checkedItems.length; i++) {
       if (_checkedItems[i]) {
         totalPrice += _prices[i];
+
       }
     }
+
+    totalDiscount = totalPrice * (_selectedDiscountRate/100);
+    totalPrice -= totalDiscount;
+
     return totalPrice;
   }
 
   void _showDiscountCodeDialog() async {
-    final discountCodeRef = FirebaseDatabase.instance.ref("discountCode");
-    final snapshot = await discountCodeRef.once();
-    final value = snapshot.snapshot.value as Map<dynamic, dynamic>;
+    final _databaseRef = FirebaseDatabase.instance.ref();
+    List<String> discount = [];
+    List<int> discountRate = [];
+    final discountCodeSnapshot =
+        await _databaseRef.child('discountCode').once();
+    final discountData =
+        discountCodeSnapshot.snapshot.value as Map<dynamic, dynamic>;
 
-    if (value != null) {
-      final code = value['code'];
-      final description = value['discount_description'];
-      final name = value['discount_name'];
-      final rate = value['discount_rate'];
+    if (discountData != null) {
+      discountData.forEach((key, value) {
+        discount.add(value['code'] +
+            "\n" +
+            value['discount_name'] +
+            "\n" +
+            value['discount_rate'] +
+            "%");
+        discountRate.add(int.parse(value['discount_rate']));
+      });
 
-      final discountText = '$code\n$description\nDiscount rate: $rate%';
+      setState(() {
+        _discount = discount;
+        _discountRate = discountRate;
+      });
+
+      // final code = discountData['code'];
+      // final description = discountData['discount_description'];
+      // final name = discountData['discount_name'];
+      // final rate = discountData['discount_rate'];
+      //
+      // final discountText = '$code\n$description\nDiscount rate: $rate%';
 
       // ignore: use_build_context_synchronously
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('Discount Code'),
-          content:
-              Text('Use this code to get a discount:\n$code\n\n$discountText'),
+          content: ListView.builder(
+            itemCount: _discount.length,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap:() {
+
+                  setState(() {
+                    _selectedDiscountRate = _discountRate[index];
+                  });
+
+                  Navigator.of(context).pop();
+                },
+                child: Text(_discount[index]),
+              );
+            },
+          ),
           actions: [
             TextButton(
               onPressed: () {
