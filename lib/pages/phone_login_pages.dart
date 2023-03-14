@@ -15,6 +15,7 @@ class PhoneLoginPage extends StatefulWidget {
 class _PhoneLoginPageState extends State<PhoneLoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _phoneNumberController = TextEditingController();
+  final _otpController = TextEditingController();
   final _phoneAuthService = PhoneAuthService();
 
   Future<void> _handleSignIn(BuildContext context) async {
@@ -35,8 +36,7 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
           MaterialPageRoute(builder: (context) => const HomePage()),
         );
       } else {
-        Fluttertoast.showToast(
-            msg: 'Failed to sign in with phone number');
+        Fluttertoast.showToast(msg: 'Failed to sign in with phone number');
       }
     }
 
@@ -47,10 +47,14 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
 
     void codeSent(String verificationId, int? forceResendingToken) {
       // Navigate to OTP verification page
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => OTPVerificationPage()),
-      );
+
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(
+      //       builder: (context) => OTPVerificationPage(
+      //             phoneNumber: phoneNumber,
+      //           )),
+      // );
     }
 
     void codeAutoRetrievalTimeout(String verificationId) {}
@@ -65,6 +69,29 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
       );
     } catch (e) {
       Fluttertoast.showToast(msg: 'Failed to verify phone number');
+    }
+  }
+
+  Future<void> _handleOTPVerification(
+      BuildContext context, String verificationId) async {
+    final otpCode = _otpController.text.trim();
+    final isValid = _formKey.currentState?.validate() ?? false;
+    if (!isValid) return;
+
+    final credential = PhoneAuthProvider.credential(
+        verificationId: verificationId, smsCode: otpCode);
+    final userCredential =
+        await _phoneAuthService.signInWithCredential(credential);
+
+    if (userCredential != null) {
+      // Sign in successful
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    } else {
+      Fluttertoast.showToast(msg: 'Invalid OTP code');
     }
   }
 
@@ -102,7 +129,16 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
               ),
               const SizedBox(height: 32.0),
               ElevatedButton(
-                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: ((context) => HomePage()))),
+                onPressed: () => {
+                  _handleSignIn(context)
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //       builder: (context) => OTPVerificationPage(
+                  //         phoneNumber: _phoneNumberController.text.trim(),
+                  //       )),
+                  // )
+                },
                 child: const Text('Sign In'),
               ),
             ],
