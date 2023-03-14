@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class CartPage extends StatefulWidget {
   final String user_id;
@@ -58,11 +59,10 @@ class _CartPageState extends State<CartPage> {
     for (int i = 0; i < _checkedItems.length; i++) {
       if (_checkedItems[i]) {
         totalPrice += _prices[i];
-
       }
     }
 
-    totalDiscount = totalPrice * (_selectedDiscountRate/100);
+    totalDiscount = totalPrice * (_selectedDiscountRate / 100);
     totalPrice -= totalDiscount;
 
     return totalPrice;
@@ -72,8 +72,14 @@ class _CartPageState extends State<CartPage> {
     final _databaseRef = FirebaseDatabase.instance.ref();
     List<String> discount = [];
     List<int> discountRate = [];
-    final discountCodeSnapshot =
-        await _databaseRef.child('discountCode').once();
+
+    final DateFormat dateFormat = DateFormat('dd-MM-yyyy');
+    String todayDate = dateFormat.format(DateTime.now());
+
+    final discountCodeSnapshot = await _databaseRef
+        .child('discountCode')
+        .orderByChild('discount_date_expired').endAt(todayDate)
+        .once();
     final discountData =
         discountCodeSnapshot.snapshot.value as Map<dynamic, dynamic>;
 
@@ -109,8 +115,7 @@ class _CartPageState extends State<CartPage> {
             itemCount: _discount.length,
             itemBuilder: (context, index) {
               return GestureDetector(
-                onTap:() {
-
+                onTap: () {
                   setState(() {
                     _selectedDiscountRate = _discountRate[index];
                   });
