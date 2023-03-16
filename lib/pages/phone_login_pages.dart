@@ -1,6 +1,9 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:ulimo/base/base_background_scaffold.dart';
+import 'package:ulimo/base/base_color.dart';
 import 'package:ulimo/services/phone_auth_service.dart';
 import 'otp_verification_page.dart';
 import 'home_page.dart';
@@ -58,8 +61,7 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
 
       Navigator.push(
         context,
-        MaterialPageRoute(
-            builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (context) => const HomePage()),
       );
     }
 
@@ -103,55 +105,158 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Phone Login'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
+    return defaultBackgroundScaffold(
+      scaffold: Scaffold(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: Colors.transparent,
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
-                'Please enter your phone number to sign in',
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 32.0),
-              TextFormField(
-                controller: _phoneNumberController,
-                keyboardType: TextInputType.phone,
-                decoration: const InputDecoration(
-                  hintText: 'Enter phone number',
-                  border: OutlineInputBorder(),
+              Expanded(
+                flex: 9,
+                child: Form(
+                  key: _formKey,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.only(top: 64),
+                          child: const FractionallySizedBox(
+                            widthFactor: 0.5,
+                            child:
+                                Image(image: AssetImage("assets/app_logo.png")),
+                          ),
+                        ),
+                        const SizedBox(height: 93),
+                        const Text(
+                          'Phone Number',
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                          textAlign: TextAlign.start,
+                        ),
+                        const SizedBox(height: 6.0),
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 15,
+                              child: Container(
+                                height: 48,
+                                decoration: BoxDecoration(
+                                    color: const Color(0xFF201F1F),
+                                    borderRadius: BorderRadius.circular(6)),
+                                child: Row(
+                                  children: [
+                                    const SizedBox(width: 4),
+                                    Expanded(
+                                        child:
+                                            Image.asset("assets/us_flag.png")),
+                                    const SizedBox(width: 4),
+                                    const Expanded(
+                                        child: Text(
+                                      "US",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 12),
+                                    ))
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 2),
+                            Expanded(
+                              flex: 85,
+                              child: SizedBox(
+                                height: 50,
+                                child: TextFormField(
+                                  controller: _phoneNumberController,
+                                  keyboardType: TextInputType.phone,
+                                  decoration: InputDecoration(
+                                      hintText: '+1 (045) 0000 0025',
+                                      hintStyle: TextStyle(
+                                          color:
+                                              Colors.white.withOpacity(0.75)),
+                                      filled: true,
+                                      fillColor: const Color(0xFF201F1F),
+                                      border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(6))),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter phone number';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 32.0),
+                        ElevatedButton(
+                          onPressed: () => {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const HomePage()),
+                            )
+                            // _handleSignIn(context)
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //       builder: (context) => OTPVerificationPage(
+                            //         phoneNumber: _phoneNumberController.text.trim(),
+                            //       )),
+                            // )
+                          },
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: yellowPrimary,
+                              padding: const EdgeInsets.all(11.0)),
+                          child: const Text(
+                            'Sign In',
+                            style: TextStyle(color: Colors.black, fontSize: 18),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 16,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter phone number';
-                  }
-                  return null;
-                },
               ),
-              const SizedBox(height: 32.0),
-              ElevatedButton(
-                onPressed: () => {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //       builder: (context) => const HomePage()),
-                  // )
-                  _handleSignIn(context)
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //       builder: (context) => OTPVerificationPage(
-                  //         phoneNumber: _phoneNumberController.text.trim(),
-                  //       )),
-                  // )
-                },
-                child: const Text('Sign In'),
-              ),
+              Flexible(
+                  flex: 1,
+                  child: Align(
+                    alignment: FractionalOffset.bottomCenter,
+                    child: RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                            style: const TextStyle(
+                                fontSize: 16, color: Color(0xFFAAAAAA)),
+                            children: [
+                              const TextSpan(
+                                  text:
+                                      "By clicking ‘Get Started’ you adhere to our "),
+                              TextSpan(
+                                text: "Terms of Service",
+                                style: TextStyle(color: yellowPrimary),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () => print('Open web view'),
+                              ),
+                              const TextSpan(text: " & "),
+                              TextSpan(
+                                text: "Privacy Policy.",
+                                style: TextStyle(color: yellowPrimary),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () => print('Open web view'),
+                              ),
+                            ])),
+                  ))
             ],
           ),
         ),

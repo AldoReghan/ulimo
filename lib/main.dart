@@ -19,6 +19,7 @@ class MyApp extends StatelessWidget {
       title: 'Phone Login Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        fontFamily: 'Saira',
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       // home: StripePay(documentId: "123213", name: "aldo", email: "aldo@gmail.com", amount: "150000", currency: "USD", description: "payment for car"),
