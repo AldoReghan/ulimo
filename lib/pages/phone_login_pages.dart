@@ -116,7 +116,7 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
-                flex: 9,
+                flex: 8,
                 child: Form(
                   key: _formKey,
                   child: SingleChildScrollView(
@@ -175,8 +175,14 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
                                 child: TextFormField(
                                   controller: _phoneNumberController,
                                   keyboardType: TextInputType.phone,
+                                  style: const TextStyle(color: Colors.white),
+                                  cursorColor: yellowPrimary,
                                   decoration: InputDecoration(
                                       hintText: '+1 (045) 0000 0025',
+                                      focusColor: yellowPrimary,
+                                      focusedBorder: const OutlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: yellowPrimary)),
                                       hintStyle: TextStyle(
                                           color:
                                               Colors.white.withOpacity(0.75)),
@@ -196,38 +202,39 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 32.0),
-                        ElevatedButton(
-                          onPressed: () => {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const HomePage()),
-                            )
-                            // _handleSignIn(context)
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //       builder: (context) => OTPVerificationPage(
-                            //         phoneNumber: _phoneNumberController.text.trim(),
-                            //       )),
-                            // )
-                          },
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: yellowPrimary,
-                              padding: const EdgeInsets.all(11.0)),
-                          child: const Text(
-                            'Sign In',
-                            style: TextStyle(color: Colors.black, fontSize: 18),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 16,
-                        ),
                       ],
                     ),
                   ),
                 ),
+              ),
+              Flexible(
+                flex: 1,
+                child: ElevatedButton(
+                  onPressed: () => {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HomePage()),
+                    )
+                    // _handleSignIn(context)
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //       builder: (context) => OTPVerificationPage(
+                    //         phoneNumber: _phoneNumberController.text.trim(),
+                    //       )),
+                    // )
+                  },
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: yellowPrimary,
+                      padding: const EdgeInsets.all(11.0)),
+                  child: const Text(
+                    'Get Started',
+                    style: TextStyle(color: Colors.black, fontSize: 18),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 36,
               ),
               Flexible(
                   flex: 1,
@@ -244,14 +251,14 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
                                       "By clicking ‘Get Started’ you adhere to our "),
                               TextSpan(
                                 text: "Terms of Service",
-                                style: TextStyle(color: yellowPrimary),
+                                style: const TextStyle(color: yellowPrimary),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () => print('Open web view'),
                               ),
                               const TextSpan(text: " & "),
                               TextSpan(
                                 text: "Privacy Policy.",
-                                style: TextStyle(color: yellowPrimary),
+                                style: const TextStyle(color: yellowPrimary),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () => print('Open web view'),
                               ),
