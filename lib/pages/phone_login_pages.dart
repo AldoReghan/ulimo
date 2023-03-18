@@ -211,18 +211,18 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
                 flex: 1,
                 child: ElevatedButton(
                   onPressed: () => {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const HomePage()),
-                    )
-                    // _handleSignIn(context)
                     // Navigator.push(
                     //   context,
-                    //   MaterialPageRoute(
-                    //       builder: (context) => OTPVerificationPage(
-                    //         phoneNumber: _phoneNumberController.text.trim(),
-                    //       )),
+                    //   MaterialPageRoute(builder: (context) => const HomePage()),
                     // )
+                    // _handleSignIn(context)
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => OTPVerificationPage(
+                            phoneNumber: _phoneNumberController.text.trim(),
+                          )),
+                    )
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: yellowPrimary,

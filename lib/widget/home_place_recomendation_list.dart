@@ -59,6 +59,7 @@ Widget recomendationListLayout(BuildContext context) {
                   ),
                   const Flexible(
                     child: Text(
+                      maxLines: 3,
                       "Address is hereAddress is hereAddress is hereAddress is hereAddress is here",
                       style: TextStyle(color: Color(0xFF3586FF), fontSize: 10),
                     ),

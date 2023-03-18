@@ -1,11 +1,18 @@
+import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/scheduler.dart';
+
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
+import 'package:ulimo/base/base_background_scaffold.dart';
+import 'package:ulimo/base/base_color.dart';
 import 'package:ulimo/pages/thank_you_page.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:ulimo/services/stripe_services.dart';
+
+import '../base/utils.dart';
 
 class PrivateRidePage extends StatefulWidget {
   const PrivateRidePage({super.key});
@@ -25,10 +32,13 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
   final _emailController = TextEditingController();
   final _passengersController = TextEditingController();
   final _referralCodeController = TextEditingController();
+  bool _isRoundTrip = false;
   DateTime _date = DateTime.now();
   TimeOfDay _pickupTime = TimeOfDay.now();
   TimeOfDay _returnTime = TimeOfDay.now();
   bool _isLoading = false;
+
+  bool _isChecked = false;
 
   Map<String, dynamic>? paymentIntent;
 
@@ -75,7 +85,7 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
     };
 
     try {
-      await makePayment();
+      // await makePayment();
 
       final databaseRef = FirebaseDatabase.instance.ref('privateRide');
       await databaseRef.push().set(rideDetails);
@@ -111,6 +121,23 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
       initialDate: _date,
       firstDate: DateTime.now(),
       lastDate: DateTime(2100),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData(
+            primaryColor: darkPrimary, // change the selected date color
+            colorScheme: const ColorScheme.light(
+              primary: darkPrimary,
+              // change the text color of the header
+              onPrimary: Colors.white,
+              // change the color of the icons in the header
+              surface: darkPrimary,
+              // change the background color of the calendar
+              onSurface: Colors.black, // change the text color of the calendar
+            ),
+          ),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
     if (picked != null && picked != _date) {
       setState(() {
@@ -120,10 +147,8 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
   }
 
   Future<void> _selectPickupTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: _pickupTime,
-    );
+    final TimeOfDay? picked =
+        await showTimePicker(context: context, initialTime: _pickupTime);
     if (picked != null && picked != _pickupTime) {
       setState(() {
         _pickupTime = picked;
@@ -166,165 +191,569 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Private Ride'),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+    double baseWidth = 375;
+    double fem = MediaQuery.of(context).size.width / baseWidth;
+    double ffem = fem * 0.97;
+
+    return defaultBackgroundScaffold(
+        scaffold: Scaffold(
+      backgroundColor: Colors.transparent,
+
+      body: Container(
+        // requestridepage6oz (0:1133)
+        padding: EdgeInsets.fromLTRB(19.78 * fem, 60 * fem, 20 * fem, 0 * fem),
+        width: double.infinity,
+        child: SingleChildScrollView(
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'First Name'),
-                  controller: _firstNameController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your first name';
-                    }
-                    return null;
-                  },
+                Container(
+                  // group7560J9N (0:1194)
+                  margin: EdgeInsets.fromLTRB(
+                      0.12 * fem, 0 * fem, 32.1 * fem, 10 * fem),
+                  width: double.infinity,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                          // arrowRUt (0:1195)
+                          margin: EdgeInsets.fromLTRB(
+                              0 * fem, 0 * fem, 27 * fem, 0 * fem),
+                          width: 24 * fem,
+                          height: 24 * fem,
+                          child: Icon(
+                            Icons.arrow_back_ios,
+                            color: Colors.white,
+                            size: 24 * fem,
+                          )),
+                      RichText(
+                        // requestaprivaterideVje (0:1199)
+                        text: TextSpan(
+                          style: SafeGoogleFont(
+                            'Saira',
+                            fontSize: 24 * ffem,
+                            fontWeight: FontWeight.w500,
+                            height: 1.575 * ffem / fem,
+                            color: const Color(0xffffffff),
+                          ),
+                          children: [
+                            const TextSpan(
+                              text: 'Request a ',
+                            ),
+                            TextSpan(
+                              text: 'Private Ride',
+                              style: SafeGoogleFont(
+                                'Saira',
+                                fontSize: 24 * ffem,
+                                fontWeight: FontWeight.w500,
+                                height: 1.575 * ffem / fem,
+                                color: const Color(0xfffdcb5b),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 16.0),
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'Last Name'),
-                  controller: _lastNameController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your last name';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16.0),
-                GestureDetector(
-                  onTap: () => _selectDate(context),
-                  child: AbsorbPointer(
-                    child: TextFormField(
-                      decoration: const InputDecoration(labelText: 'Date'),
-                      keyboardType: TextInputType.datetime,
-                      controller: TextEditingController(
-                          text: DateFormat('dd-MM-yyyy').format(_date)),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter the date';
-                        }
-                        return null;
-                      },
+                Container(
+                  // getacustomtripforjustyouandyou (0:1193)
+                  margin: EdgeInsets.fromLTRB(
+                      0 * fem, 0 * fem, 9.78 * fem, 19.52 * fem),
+                  constraints: BoxConstraints(
+                    maxWidth: 325 * fem,
+                  ),
+                  child: Text(
+                    'Get a custom trip for just you and your group. You will receive a quote from us within 24 hours !',
+                    style: SafeGoogleFont(
+                      'Saira',
+                      fontSize: 14 * ffem,
+                      fontWeight: FontWeight.w500,
+                      height: 1.575 * ffem / fem,
+                      color: const Color(0xbfaaaaaa),
                     ),
                   ),
                 ),
-                const SizedBox(height: 16.0),
-                GestureDetector(
-                  onTap: () => _selectPickupTime(context),
-                  child: AbsorbPointer(
-                    child: TextFormField(
-                      decoration:
-                          const InputDecoration(labelText: 'Pickup Time'),
-                      keyboardType: TextInputType.datetime,
-                      controller: TextEditingController(
-                          text: _pickupTime.format(context)),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter the pickup time';
-                        }
-                        return null;
-                      },
+                Container(
+                  // info1pYx (0:1186)
+                  margin: EdgeInsets.fromLTRB(
+                      0.11 * fem, 0 * fem, 0.11 * fem, 30 * fem),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8 * fem),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        // whereshouldwepickyoufrom9r8 (0:1187)
+                        margin: EdgeInsets.fromLTRB(
+                            0 * fem, 0 * fem, 0 * fem, 5 * fem),
+                        child: Text(
+                          'Where should we pick you from?',
+                          style: SafeGoogleFont(
+                            'Saira',
+                            fontSize: 16 * ffem,
+                            fontWeight: FontWeight.w500,
+                            height: 1.575 * ffem / fem,
+                            color: const Color(0xffffffff),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        // group6GA4 (0:1188)
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8 * fem),
+                          border: Border.all(color: const Color(0x0caaaaaa)),
+                          color: const Color(0xff2c2b2b),
+                        ),
+                        child: TextFormField(
+                          cursorColor: yellowPrimary,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            errorBorder: InputBorder.none,
+                            disabledBorder: InputBorder.none,
+                            contentPadding: EdgeInsets.fromLTRB(
+                                12.5 * fem, 15 * fem, 12.5 * fem, 15 * fem),
+                            hintText: 'E.g 14, Oliver street, Quake Rd, Tampa',
+                            hintStyle:
+                                const TextStyle(color: Color(0x59ffffff)),
+                          ),
+                          controller: _pickupAddressController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter the pickup address';
+                            }
+                            return null;
+                          },
+                          style: SafeGoogleFont(
+                            'Saira',
+                            fontSize: 14 * ffem,
+                            fontWeight: FontWeight.w400,
+                            height: 1.1428571429 * ffem / fem,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  // info2JcY (0:1180)
+                  margin: EdgeInsets.fromLTRB(
+                      0.11 * fem, 0 * fem, 0.11 * fem, 30 * fem),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8 * fem),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        // wherewillyouliketogooJQ (0:1181)
+                        margin: EdgeInsets.fromLTRB(
+                            0 * fem, 0 * fem, 0 * fem, 5 * fem),
+                        child: Text(
+                          'Where will you like to go?',
+                          style: SafeGoogleFont(
+                            'Saira',
+                            fontSize: 16 * ffem,
+                            fontWeight: FontWeight.w500,
+                            height: 1.575 * ffem / fem,
+                            color: const Color(0xffffffff),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        // group67pt (0:1182)
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8 * fem),
+                          border: Border.all(color: const Color(0x0caaaaaa)),
+                          color: const Color(0xff2c2b2b),
+                        ),
+                        child: TextFormField(
+                          controller: _destinationController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter the destination';
+                            }
+                            return null;
+                          },
+                          cursorColor: yellowPrimary,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            errorBorder: InputBorder.none,
+                            disabledBorder: InputBorder.none,
+                            contentPadding: EdgeInsets.fromLTRB(
+                                12.5 * fem, 15 * fem, 12.5 * fem, 15 * fem),
+                            hintText: 'E.g 14, Oliver street, Quake Rd, Tampa',
+                            hintStyle:
+                                const TextStyle(color: Color(0x59ffffff)),
+                          ),
+                          style: SafeGoogleFont(
+                            'Saira',
+                            fontSize: 14 * ffem,
+                            fontWeight: FontWeight.w400,
+                            height: 1.1428571429 * ffem / fem,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  // info3HeQ (0:1161)
+                  margin: EdgeInsets.fromLTRB(
+                      0.11 * fem, 0 * fem, 0.11 * fem, 30 * fem),
+                  width: double.infinity,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        // wherewillyouliketogop8Y (0:1162)
+                        margin: EdgeInsets.fromLTRB(
+                            0 * fem, 0 * fem, 0 * fem, 9 * fem),
+                        child: Text(
+                          'Where will you like to go?',
+                          style: SafeGoogleFont(
+                            'Saira',
+                            fontSize: 16 * ffem,
+                            fontWeight: FontWeight.w500,
+                            height: 1.575 * ffem / fem,
+                            color: const Color(0xffffffff),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        // group7540L6t (0:1163)
+                        width: double.infinity,
+                        height: 46 * fem,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Flexible(
+                              child: DottedBorder(
+                                borderType: BorderType.RRect,
+                                radius: const Radius.circular(6),
+                                color: const Color(0xFFFDCB5B),
+                                strokeWidth: 1,
+                                child: SizedBox(
+                                  height: double.infinity,
+                                  child: SizedBox(
+                                    // group7535hLk (0:1167)
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () => _selectDate(context),
+                                            child: Text(
+                                              DateFormat('dd MMM yyyy')
+                                                  .format(_date),
+                                              style: SafeGoogleFont(
+                                                'Saira',
+                                                fontSize: 14 * ffem,
+                                                fontWeight: FontWeight.w500,
+                                                height:
+                                                    1.4285714286 * ffem / fem,
+                                                color: const Color(0xfffdcb5b),
+                                              ),
+                                            ),
+                                          ),
+                                          Icon(
+                                            Icons.keyboard_arrow_down,
+                                            size: 20 * fem,
+                                            color: Colors.white,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 15,
+                            ),
+                            Flexible(
+                              child: DottedBorder(
+                                borderType: BorderType.RRect,
+                                radius: const Radius.circular(6),
+                                color: const Color(0xFFFDCB5B),
+                                strokeWidth: 1,
+                                child: SizedBox(
+                                  height: double.infinity,
+                                  child: SizedBox(
+                                    // group7537o2Q (0:1175)
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () =>
+                                                _selectPickupTime(context),
+                                            child: Text(
+                                              _pickupTime.format(context),
+                                              style: SafeGoogleFont(
+                                                'Saira',
+                                                fontSize: 14 * ffem,
+                                                fontWeight: FontWeight.w500,
+                                                height:
+                                                    1.4285714286 * ffem / fem,
+                                                color: const Color(0xfffdcb5b),
+                                              ),
+                                            ),
+                                          ),
+                                          Icon(
+                                            Icons.keyboard_arrow_down,
+                                            size: 20 * fem,
+                                            color: Colors.white,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  // info1pYx (0:1186)
+                  margin: EdgeInsets.fromLTRB(
+                      0.11 * fem, 0 * fem, 0.11 * fem, 30 * fem),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8 * fem),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        // whereshouldwepickyoufrom9r8 (0:1187)
+                        margin: EdgeInsets.fromLTRB(
+                            0 * fem, 0 * fem, 0 * fem, 5 * fem),
+                        child: Text(
+                          'Passengers',
+                          style: SafeGoogleFont(
+                            'Saira',
+                            fontSize: 16 * ffem,
+                            fontWeight: FontWeight.w500,
+                            height: 1.575 * ffem / fem,
+                            color: const Color(0xffffffff),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        // group6GA4 (0:1188)
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8 * fem),
+                          border: Border.all(color: const Color(0x0caaaaaa)),
+                          color: const Color(0xff2c2b2b),
+                        ),
+                        child: TextFormField(
+                          cursorColor: yellowPrimary,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            errorBorder: InputBorder.none,
+                            disabledBorder: InputBorder.none,
+                            contentPadding: EdgeInsets.fromLTRB(
+                                12.5 * fem, 15 * fem, 12.5 * fem, 15 * fem),
+                            hintText: 'How many people will be going?',
+                            hintStyle:
+                            const TextStyle(color: Color(0x59ffffff)),
+                          ),
+                          controller: _passengersController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter passenger';
+                            }
+                            return null;
+                          },
+                          style: SafeGoogleFont(
+                            'Saira',
+                            fontSize: 14 * ffem,
+                            fontWeight: FontWeight.w400,
+                            height: 1.1428571429 * ffem / fem,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IntrinsicHeight(
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: const Color(0xff2c2b2b),
+                      borderRadius: BorderRadius.circular(6 * fem),
+                    ),
+                    child: SizedBox(
+                      height: double.infinity,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CheckboxListTile(
+                              contentPadding: const EdgeInsets.all(4),
+                              value: _isRoundTrip,
+                              onChanged: (value) {
+                                setState(() {
+                                  _isRoundTrip = value ?? false;
+                                });
+                              },
+                              subtitle: Text(
+                                'Tick this if you’d like us to bring you back',
+                                style: SafeGoogleFont(
+                                  'Saira',
+                                  fontSize: 12 * ffem,
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.6666666667 * ffem / fem,
+                                  color: const Color(0xffaaaaaa),
+                                ),
+                              ),
+                              title: Text(
+                                // takeroundtripr7i (0:1156)
+                                'Take Round-trip',
+                                style: SafeGoogleFont(
+                                  'Saira',
+                                  fontSize: 16 * ffem,
+                                  fontWeight: FontWeight.w500,
+                                  height: 1.25 * ffem / fem,
+                                  color: const Color(0xffffffff),
+                                ),
+                              ),
+                              side: const BorderSide(
+                                  color: Colors.white, width: 2),
+                              controlAffinity: ListTileControlAffinity.leading,
+                              activeColor: Colors.white,
+                              checkColor: Colors.black),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 16.0),
-                GestureDetector(
-                  onTap: () => _selectReturnTime(context),
-                  child: AbsorbPointer(
-                    child: TextFormField(
-                      decoration:
-                          const InputDecoration(labelText: 'Return Time'),
-                      keyboardType: TextInputType.datetime,
-                      controller: TextEditingController(
-                          text: _returnTime.format(context)),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter the return time';
-                        }
-                        return null;
-                      },
-                    ),
+                const SizedBox(height: 24),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8 * fem),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        // emailQYQ (0:1140)
+                        margin: EdgeInsets.fromLTRB(
+                            0 * fem, 0 * fem, 0 * fem, 5 * fem),
+                        child: Text(
+                          'Email',
+                          style: SafeGoogleFont(
+                            'Saira',
+                            fontSize: 16 * ffem,
+                            fontWeight: FontWeight.w500,
+                            height: 1.575 * ffem / fem,
+                            color: const Color(0xffffffff),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        // group68jJ (0:1141)
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8 * fem),
+                          border: Border.all(color: const Color(0x0caaaaaa)),
+                          color: const Color(0xff2c2b2b),
+                        ),
+                        child: TextFormField(
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          cursorColor: yellowPrimary,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            errorBorder: InputBorder.none,
+                            disabledBorder: InputBorder.none,
+                            contentPadding: EdgeInsets.fromLTRB(
+                                12.5 * fem, 15 * fem, 12.5 * fem, 15 * fem),
+                            hintText: 'xyz.edu@hotmail.com',
+                            hintStyle:
+                                const TextStyle(color: Color(0x59ffffff)),
+                          ),
+                          style: SafeGoogleFont(
+                            'Saira',
+                            fontSize: 14 * ffem,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 16.0),
-                TextFormField(
-                  decoration:
-                      const InputDecoration(labelText: 'Pickup Address'),
-                  controller: _pickupAddressController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter the pickup address';
-                    }
-                    return null;
-                  },
+                const SizedBox(
+                  height: 24,
                 ),
-                const SizedBox(height: 16.0),
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'Destination'),
-                  controller: _destinationController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter the destination';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16.0),
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'Phone Number'),
-                  keyboardType: TextInputType.phone,
-                  controller: _phoneNumberController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your phone number';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16.0),
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'Email'),
-                  keyboardType: TextInputType.emailAddress,
-                  controller: _emailController,
-                ),
-                const SizedBox(height: 16.0),
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'Passengers'),
-                  keyboardType: TextInputType.number,
-                  controller: _passengersController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter the number of passengers';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16.0),
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'Referral Code'),
-                  controller: _referralCodeController,
-                ),
-                const SizedBox(height: 16.0),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: yellowPrimary,
+                      maximumSize: const Size(double.infinity, 50),
+                      padding: const EdgeInsets.all(12)),
                   onPressed: _isLoading ? null : _submitForm,
                   child: _isLoading
-                      ? const CircularProgressIndicator()
-                      : const Text('Submit'),
+                      ? const AspectRatio(aspectRatio: 1,
+                      child: CircularProgressIndicator())
+                      : Text(
+                          'Place Order',
+                          style: SafeGoogleFont(
+                            'Saira',
+                            fontSize: 20 * ffem,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xff000000),
+                          ),
+                        ),
                 ),
+                const SizedBox(
+                  height: 24,
+                )
               ],
             ),
           ),
         ),
       ),
-    );
+    ));
   }
 }
