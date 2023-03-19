@@ -11,10 +11,10 @@ void main() async {
   await Firebase.initializeApp();
   Stripe.publishableKey = 'pk_test_51GztTrAJNtmvbtbwMEUYu6YgxipbdFvBNqqO1hEVj6vWAyUFq84DeAM8pGBvGSz5SGZNt3HIGavTnonZyRqUolib00X1dGOYUv';
   await Stripe.instance.applySettings();
-  SystemUiOverlayStyle systemUiOverlayStyle = const SystemUiOverlayStyle(
-    systemNavigationBarColor: darkPrimary, // Change navigation bar color here
-  );
-  SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
+  // SystemUiOverlayStyle systemUiOverlayStyle = const SystemUiOverlayStyle(
+  //   systemNavigationBarColor: darkPrimary, // Change navigation bar color here
+  // );
+  // SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
 
   runApp(MyApp());
 }

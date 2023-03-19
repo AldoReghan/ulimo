@@ -23,6 +23,8 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
   int _selectedIndex = 0;
 
 
+
+
   Widget changeIconSelected(int index, String icons, String selectedIcon) {
     if (_selectedIndex == index) {
       return SvgPicture.asset(
@@ -48,7 +50,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                 setState(() {
                   _selectedIndex = index;
                 });
-                widget.onTap(index);
+                widget.onTap.call(index);
               },
               child: Stack(
                 children: [

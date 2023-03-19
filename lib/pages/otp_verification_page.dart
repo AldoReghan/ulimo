@@ -6,7 +6,7 @@ import 'package:ulimo/base/base_color.dart';
 import 'package:ulimo/services/phone_auth_service.dart';
 import 'package:ulimo/widget/otp_number_field.dart';
 import '../base/utils.dart';
-import 'home_page.dart';
+import 'main_page.dart';
 
 class OTPVerificationPage extends StatefulWidget {
   const OTPVerificationPage({super.key, required this.phoneNumber});
@@ -90,7 +90,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
         // ignore: use_build_context_synchronously
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
+          MaterialPageRoute(builder: (context) => const MainPage()),
         );
       } else {
         Fluttertoast.showToast(msg: 'Failed to sign in with phone number');
@@ -166,7 +166,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
       // ignore: use_build_context_synchronously
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (context) => const MainPage()),
       );
     } else {
       Fluttertoast.showToast(msg: 'Invalid OTP code');
@@ -283,7 +283,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 55 * fem),
               Container(
                 // didyougetanycodeifnotclickrese (0:142)
                 margin:
@@ -361,7 +361,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const HomePage()),
+                    MaterialPageRoute(builder: (context) => const MainPage()),
                   );
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: yellowPrimary),

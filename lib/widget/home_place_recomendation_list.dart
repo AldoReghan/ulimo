@@ -36,9 +36,9 @@ Widget recomendationListLayout(BuildContext context) {
               ),
             ),
             const SizedBox(height: 9),
-            const Padding(
-              padding: EdgeInsets.only(left: 8.0, right: 8.0),
-              child: Flexible(
+            const Flexible(
+              child: Padding(
+                padding: EdgeInsets.only(left: 8.0, right: 8.0),
                 child: Text(
                   "HYDE PARK CAFE",
                   style: TextStyle(color: Colors.white, fontSize: 16),

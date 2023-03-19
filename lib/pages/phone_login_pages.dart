@@ -6,7 +6,7 @@ import 'package:ulimo/base/base_background_scaffold.dart';
 import 'package:ulimo/base/base_color.dart';
 import 'package:ulimo/services/phone_auth_service.dart';
 import 'otp_verification_page.dart';
-import 'home_page.dart';
+import 'main_page.dart';
 
 class PhoneLoginPage extends StatefulWidget {
   const PhoneLoginPage({Key? key}) : super(key: key);
@@ -36,7 +36,7 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
         // ignore: use_build_context_synchronously
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
+          MaterialPageRoute(builder: (context) => const MainPage()),
         );
       } else {
         Fluttertoast.showToast(msg: 'Failed to sign in with phone number');
@@ -61,7 +61,7 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
 
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (context) => const MainPage()),
       );
     }
 
@@ -96,7 +96,7 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
       // ignore: use_build_context_synchronously
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (context) => const MainPage()),
       );
     } else {
       Fluttertoast.showToast(msg: 'Invalid OTP code');
