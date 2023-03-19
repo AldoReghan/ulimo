@@ -6,7 +6,7 @@ import 'package:ulimo/base/base_background_scaffold.dart';
 import 'package:ulimo/base/base_color.dart';
 import 'package:ulimo/services/phone_auth_service.dart';
 import 'otp_verification_page.dart';
-import 'main_page.dart';
+import 'main/main_page.dart';
 
 class PhoneLoginPage extends StatefulWidget {
   const PhoneLoginPage({Key? key}) : super(key: key);

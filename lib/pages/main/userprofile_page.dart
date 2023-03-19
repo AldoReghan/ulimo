@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
 import 'package:ulimo/base/base_color.dart';
+import 'package:ulimo/pages/profile/edit_profile_page.dart';
+import 'package:ulimo/pages/profile/notification_page.dart';
 
-import '../base/utils.dart';
-import '../widget/profile_menu.dart';
+import '../../base/utils.dart';
+import '../../widget/profile_menu.dart';
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({Key? key}) : super(key: key);
@@ -258,6 +260,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                   GestureDetector(
                                                     onTap: () {
                                                       //do something when edit profile clicked
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  const EditProfilePage()));
                                                     },
                                                     child: Container(
                                                       width: 68.46 * fem,
@@ -411,95 +418,104 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             ),
                           ),
                         ),
-                        Container(
-                          // info179i (0:516)
-                          margin: EdgeInsets.fromLTRB(
-                              0.4 * fem, 0 * fem, 0 * fem, 20 * fem),
-                          padding: EdgeInsets.fromLTRB(
-                              11.4 * fem, 12.08 * fem, 10.6 * fem, 12.08 * fem),
-                          width: double.infinity,
-                          height: 50 * fem,
-                          decoration: BoxDecoration(
-                            color: const Color(0xff2b2b2b),
-                            borderRadius: BorderRadius.circular(6 * fem),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0x14000000),
-                                offset: Offset(0 * fem, 4 * fem),
-                                blurRadius: 24 * fem,
-                              ),
-                            ],
-                          ),
-                          child: SizedBox(
-                            // group7596yBv (0:518)
+                        GestureDetector(
+                          onTap: (){
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                    const NotificationPage()));
+                          },
+                          child: Container(
+                            // info179i (0:516)
+                            margin: EdgeInsets.fromLTRB(
+                                0.4 * fem, 0 * fem, 0 * fem, 20 * fem),
+                            padding: EdgeInsets.fromLTRB(
+                                11.4 * fem, 12.08 * fem, 10.6 * fem, 12.08 * fem),
                             width: double.infinity,
-                            height: double.infinity,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Container(
-                                  // autogroupm88bKma (B1LGnSC4aek8Cv8GaVM88b)
-                                  padding: EdgeInsets.fromLTRB(0 * fem,
-                                      0.92 * fem, 134.45 * fem, 0.92 * fem),
-                                  height: double.infinity,
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                          // frameEde (0:526)
-                                          margin: EdgeInsets.fromLTRB(0 * fem,
-                                              0 * fem, 8 * fem, 0 * fem),
-                                          width: 24 * fem,
-                                          height: 24 * fem,
-                                          child: SvgPicture.asset(
-                                              "assets/icon/profile_notification.svg")),
-                                      Text(
-                                        // notifications9kc (0:519)
-                                        'Notifications',
+                            height: 50 * fem,
+                            decoration: BoxDecoration(
+                              color: const Color(0xff2b2b2b),
+                              borderRadius: BorderRadius.circular(6 * fem),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0x14000000),
+                                  offset: Offset(0 * fem, 4 * fem),
+                                  blurRadius: 24 * fem,
+                                ),
+                              ],
+                            ),
+                            child: SizedBox(
+                              // group7596yBv (0:518)
+                              width: double.infinity,
+                              height: double.infinity,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    // autogroupm88bKma (B1LGnSC4aek8Cv8GaVM88b)
+                                    padding: EdgeInsets.fromLTRB(0 * fem,
+                                        0.92 * fem, 134.45 * fem, 0.92 * fem),
+                                    height: double.infinity,
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                            // frameEde (0:526)
+                                            margin: EdgeInsets.fromLTRB(0 * fem,
+                                                0 * fem, 8 * fem, 0 * fem),
+                                            width: 24 * fem,
+                                            height: 24 * fem,
+                                            child: SvgPicture.asset(
+                                                "assets/icon/profile_notification.svg")),
+                                        Text(
+                                          // notifications9kc (0:519)
+                                          'Notifications',
+                                          style: SafeGoogleFont(
+                                            'Saira',
+                                            fontSize: 14 * ffem,
+                                            fontWeight: FontWeight.w500,
+                                            height: 1.4285714286 * ffem / fem,
+                                            color: const Color(0xffaaaaaa),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    // group7588UXz (0:520)
+                                    margin: EdgeInsets.fromLTRB(
+                                        0 * fem, 0 * fem, 10 * fem, 0 * fem),
+                                    width: 29.55 * fem,
+                                    height: double.infinity,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                          color: const Color(0xa5aaaaaa)),
+                                      color: const Color(0x0cd4af34),
+                                      borderRadius:
+                                          BorderRadius.circular(7 * fem),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        '0',
                                         style: SafeGoogleFont(
                                           'Saira',
                                           fontSize: 14 * ffem,
-                                          fontWeight: FontWeight.w500,
+                                          fontWeight: FontWeight.w600,
                                           height: 1.4285714286 * ffem / fem,
-                                          color: const Color(0xffaaaaaa),
+                                          color: const Color(0xa5aaaaaa),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  // group7588UXz (0:520)
-                                  margin: EdgeInsets.fromLTRB(
-                                      0 * fem, 0 * fem, 10 * fem, 0 * fem),
-                                  width: 29.55 * fem,
-                                  height: double.infinity,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: const Color(0xa5aaaaaa)),
-                                    color: const Color(0x0cd4af34),
-                                    borderRadius:
-                                        BorderRadius.circular(7 * fem),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      '0',
-                                      style: SafeGoogleFont(
-                                        'Saira',
-                                        fontSize: 14 * ffem,
-                                        fontWeight: FontWeight.w600,
-                                        height: 1.4285714286 * ffem / fem,
-                                        color: const Color(0xa5aaaaaa),
                                       ),
                                     ),
                                   ),
-                                ),
-                                const Icon(
-                                  Icons.keyboard_arrow_right,
-                                  size: 24,
-                                  color: Colors.white,
-                                )
-                              ],
+                                  const Icon(
+                                    Icons.keyboard_arrow_right,
+                                    size: 24,
+                                    color: Colors.white,
+                                  )
+                                ],
+                              ),
                             ),
                           ),
                         ),

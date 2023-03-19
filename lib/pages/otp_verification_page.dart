@@ -6,7 +6,7 @@ import 'package:ulimo/base/base_color.dart';
 import 'package:ulimo/services/phone_auth_service.dart';
 import 'package:ulimo/widget/otp_number_field.dart';
 import '../base/utils.dart';
-import 'main_page.dart';
+import 'main/main_page.dart';
 
 class OTPVerificationPage extends StatefulWidget {
   const OTPVerificationPage({super.key, required this.phoneNumber});

@@ -5,13 +5,13 @@ import 'package:ulimo/pages/cart_page.dart';
 import 'package:ulimo/pages/nightlife_page.dart';
 import 'package:ulimo/pages/private_ride.dart';
 import 'package:ulimo/pages/ridesharebus_page.dart';
-import 'package:ulimo/pages/userprofile_page.dart';
+import 'package:ulimo/pages/main/userprofile_page.dart';
 import 'package:ulimo/widget/custom_bottom_navigation_bar.dart';
 import 'package:ulimo/widget/home_card.dart';
 import 'package:ulimo/widget/home_place_recomendation_list.dart';
 
-import '../base/base_color.dart';
-import 'home/home_page.dart';
+import '../../base/base_color.dart';
+import 'home_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
