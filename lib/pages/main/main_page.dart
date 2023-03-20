@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
 import 'package:ulimo/pages/cart_page.dart';
+import 'package:ulimo/pages/main/my_ticket_page.dart';
 import 'package:ulimo/pages/nightlife_page.dart';
 import 'package:ulimo/pages/private_ride.dart';
 import 'package:ulimo/pages/ridesharebus_page.dart';
@@ -31,7 +32,7 @@ class _MainPageState extends State<MainPage> {
 
     final List<Widget> mainScreens = [
       const HomePage(),
-      CartPage(user_id: "user_id"),
+      const MyTicketPage(),
       const UserProfilePage(),
     ];
 

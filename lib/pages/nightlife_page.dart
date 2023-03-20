@@ -128,6 +128,9 @@ class _NightLifePageState extends State<NightLifePage> {
                             "4806-8575-6f6278ecd71b?q=90&w=480&h=270",
                             onTap: () {
                               //do something
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => const NightLifePageDetailPage(
+                                      destinationId: "destinationId")));
                             });
                       })),
             ),

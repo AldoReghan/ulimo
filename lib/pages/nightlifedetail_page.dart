@@ -10,6 +10,7 @@ import 'package:ulimo/pages/thank_you_page.dart';
 import 'package:ulimo/widget/date_available_item.dart';
 
 import '../base/utils.dart';
+import 'check_out_page.dart';
 
 class NightLifePageDetailPage extends StatefulWidget {
   final String destinationId;
@@ -26,7 +27,7 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
   late List<Map<dynamic, dynamic>> _destinationList;
   final _databaseRef = FirebaseDatabase.instance.ref('rideShareBusTicket');
   int _passengerSeat = 1;
-  int _availabelSeat = 15;
+  int _availableSeat = 15;
   String? _selectedTime;
   bool _isRideTicket = false;
   bool _isEntryTicket = false;
@@ -500,7 +501,7 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                   child: Slider(
                                     value: _passengerSeat.toDouble(),
                                     min: 1,
-                                    max: _availabelSeat.toDouble(),
+                                    max: _availableSeat.toDouble(),
                                     onChanged: (newValue) {
                                       setState(() {
                                         _passengerSeat = newValue.round();
@@ -661,7 +662,8 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                       onPressed: () {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) =>
-                                CartPage(user_id: "user_id")));
+                                // CartPage(user_id: "user_id")));
+                                const CheckOutPage()));
                       },
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.zero,
