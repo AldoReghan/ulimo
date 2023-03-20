@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:ulimo/pages/ridesharebusdetail_page.dart';
 
+import '../base/base_background_scaffold.dart';
+import '../base/utils.dart';
+import '../widget/ride_item.dart';
+
 class RideShareBusPage extends StatefulWidget {
   const RideShareBusPage({Key? key}) : super(key: key);
 
@@ -122,57 +126,155 @@ class _RideShareBusPageState extends State<RideShareBusPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Ride Share Bus'),
-      ),
-      body: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    double baseWidth = 375;
+    double fem = MediaQuery.of(context).size.width / baseWidth;
+    double ffem = fem * 0.97;
+    return defaultBackgroundScaffold(
+        scaffold: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  _selectedDate,
-                  style: const TextStyle(fontSize: 18),
+                const SizedBox(
+                  height: 55,
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    _selectDate(context);
-                  },
-                  child: const Text("Select Date"),
+                Container(
+                  // group7560fov (0:367)
+                  margin:
+                  EdgeInsets.fromLTRB(20 * fem, 0 * fem, 20 * fem, 5.92 * fem),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        // arrowQFi (0:368)
+                          margin: EdgeInsets.fromLTRB(
+                              0 * fem, 0 * fem, 27 * fem, 0 * fem),
+                          width: 24 * fem,
+                          height: 24 * fem,
+                          child: GestureDetector(
+                            onTap: (){
+                              Navigator.of(context).pop();
+                            },
+                            child: Icon(
+                              Icons.arrow_back_ios,
+                              size: 24 * fem,
+                              color: Colors.white,
+                            ),
+                          )),
+                      RichText(
+                        // nightlifedealsK7n (0:372)
+                        text: TextSpan(
+                          style: SafeGoogleFont(
+                            'Saira',
+                            fontSize: 24 * ffem,
+                            fontWeight: FontWeight.w500,
+                            height: 1.575 * ffem / fem,
+                            color: const Color(0xffffffff),
+                          ),
+                          children: [
+                            const TextSpan(
+                              text: 'Ride ',
+                            ),
+                            TextSpan(
+                              text: 'Tickets',
+                              style: SafeGoogleFont(
+                                'Saira',
+                                fontSize: 24 * ffem,
+                                fontWeight: FontWeight.w500,
+                                height: 1.575 * ffem / fem,
+                                color: const Color(0xfffdcb5b),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    // autogrouplczqZkt (B1LAVsAXW7wCDsdiquLCZq)
+                      padding: EdgeInsets.fromLTRB(
+                          20 * fem, 25.21 * fem, 20 * fem, 3 * fem),
+                      child: ListView.builder(
+                          physics: const BouncingScrollPhysics(),
+                          itemCount: 10,
+                          itemBuilder: (context, index) {
+                            return rideItem(
+                                fem: fem,
+                                ffem: ffem,
+                                title: "The Tampa Club",
+                                ticketType: "Ride ticket",
+                                ticketType2: "Entry ticket",
+                                imageUrl: "https://store-images.s-microsoft.com/image/"
+                                    "apps.47288.14188059920471079.8845931d-"
+                                    "936f-4c5b-848c-e9700ef87a6b.92da2b6e-01a3-"
+                                    "4806-8575-6f6278ecd71b?q=90&w=480&h=270",
+                                onTap: () {
+                                  //do something
+                                });
+                          })),
                 ),
               ],
             ),
           ),
-          Expanded(
-            child: _destinationIds.isEmpty
-                ? const Center(
-                    child: Text("Data Kosong"),
-                  )
-                : ListView.builder(
-                    itemCount: _destinationIds.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(_destinationIds[index]['name']),
-                        subtitle: Text(_destinationIds[index]['description']),
-                        onTap: () {
-                          //Navigate to detail page
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => RideShareBusDetailPage(
-                                        destinationId: _destinationIds[index]
-                                            ['id'],
-                                      )));
-                        },
-                      );
-                    },
-                  ),
-          ),
-        ],
-      ),
-    );
+        ));
   }
+
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     appBar: AppBar(
+  //       title: const Text('Ride Share Bus'),
+  //     ),
+  //     body: Column(
+  //       children: [
+  //         Container(
+  //           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+  //           child: Row(
+  //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //             children: [
+  //               Text(
+  //                 _selectedDate,
+  //                 style: const TextStyle(fontSize: 18),
+  //               ),
+  //               ElevatedButton(
+  //                 onPressed: () {
+  //                   _selectDate(context);
+  //                 },
+  //                 child: const Text("Select Date"),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //         Expanded(
+  //           child: _destinationIds.isEmpty
+  //               ? const Center(
+  //                   child: Text("Data Kosong"),
+  //                 )
+  //               : ListView.builder(
+  //                   itemCount: _destinationIds.length,
+  //                   itemBuilder: (context, index) {
+  //                     return ListTile(
+  //                       title: Text(_destinationIds[index]['name']),
+  //                       subtitle: Text(_destinationIds[index]['description']),
+  //                       onTap: () {
+  //                         //Navigate to detail page
+  //                         Navigator.push(
+  //                             context,
+  //                             MaterialPageRoute(
+  //                                 builder: (context) => RideShareBusDetailPage(
+  //                                       destinationId: _destinationIds[index]
+  //                                           ['id'],
+  //                                     )));
+  //                       },
+  //                     );
+  //                   },
+  //                 ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }

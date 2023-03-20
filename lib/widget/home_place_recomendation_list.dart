@@ -4,13 +4,14 @@ import 'package:flutter_svg/svg.dart';
 
 import '../base/base_color.dart';
 
-Widget recomendationListLayout(BuildContext context) {
+Widget recomendationListLayout(BuildContext context, {required Function() onTap}) {
   return Material(
     borderRadius: BorderRadius.circular(10),
     color: darkPrimary,
     child: InkWell(
       onTap: () {
         //do something
+        onTap.call();
       },
       borderRadius: BorderRadius.circular(10),
       child: Container(

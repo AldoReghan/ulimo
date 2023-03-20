@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:ulimo/pages/nightlifedetail_page.dart';
 
 import '../../base/base_color.dart';
 import '../../widget/home_card.dart';
@@ -63,8 +64,7 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: ((context) =>
-                            const RideShareBusPage())));
+                            builder: ((context) => const RideShareBusPage())));
                   }),
               const SizedBox(
                 height: 10,
@@ -78,8 +78,7 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: ((context) =>
-                            const PrivateRidePage())));
+                            builder: ((context) => const PrivateRidePage())));
                   }),
               const SizedBox(
                 height: 10,
@@ -107,8 +106,7 @@ class _HomePageState extends State<HomePage> {
               ),
               Align(
                   alignment: Alignment.centerLeft,
-                  child:
-                  SvgPicture.asset("assets/icon/home_underline.svg")),
+                  child: SvgPicture.asset("assets/icon/home_underline.svg")),
               const SizedBox(
                 height: 15,
               ),
@@ -121,7 +119,15 @@ class _HomePageState extends State<HomePage> {
                     itemBuilder: (context, index) {
                       return Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: recomendationListLayout(context));
+                          child: recomendationListLayout(context, onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const NightLifePageDetailPage(
+                                          destinationId: "destinationId")),
+                            );
+                          }));
                     }),
               )
             ],
