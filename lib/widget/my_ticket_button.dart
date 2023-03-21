@@ -32,7 +32,8 @@ class _MyTicketButtonState extends State<MyTicketButton> {
   Widget build(BuildContext context) {
     return Container(
       // categoriesCF2 (0:710)
-      margin: EdgeInsets.fromLTRB(0 * widget.fem, 0 * widget.fem, 0 * widget.fem, 24 * widget.fem),
+      margin: EdgeInsets.fromLTRB(
+          0 * widget.fem, 0 * widget.fem, 0 * widget.fem, 24 * widget.fem),
       width: double.infinity,
       height: 40 * widget.fem,
       child: Row(
@@ -58,7 +59,6 @@ class _MyTicketButtonState extends State<MyTicketButton> {
                   borderRadius: BorderRadius.circular(6 * widget.fem),
                 ),
                 child: SizedBox(
-                  // group7570Tkc (0:727)
                   width: 84 * widget.fem,
                   height: double.infinity,
                   child: Row(
@@ -94,8 +94,8 @@ class _MyTicketButtonState extends State<MyTicketButton> {
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.fromLTRB(
-                            0 * widget.fem, 1 * widget.fem, 0 * widget.fem, 0 * widget.fem),
+                        margin: EdgeInsets.fromLTRB(0 * widget.fem,
+                            1 * widget.fem, 0 * widget.fem, 0 * widget.fem),
                         child: Text(
                           widget.labels[index],
                           style: SafeGoogleFont(
@@ -114,77 +114,7 @@ class _MyTicketButtonState extends State<MyTicketButton> {
                 ),
               ),
             );
-          })
-          // [
-          //
-          //   TextButton(
-          //     // button39zp (0:725)
-          //     onPressed: () {},
-          //     style: TextButton.styleFrom(
-          //       padding: EdgeInsets.zero,
-          //     ),
-          //     child: Container(
-          //       padding: EdgeInsets.fromLTRB(
-          //           6.13 * widget.fem, 6 * widget.fem, 6.13 * widget.fem, 6 * widget.fem),
-          //       width: 105.27 * widget.fem,
-          //       height: double.infinity,
-          //       decoration: BoxDecoration(
-          //         color: const Color(0xff2c2b2b),
-          //         borderRadius: BorderRadius.circular(6 * widget.fem),
-          //       ),
-          //       child: SizedBox(
-          //         // group7570Tkc (0:727)
-          //         width: 84 * widget.fem,
-          //         height: double.infinity,
-          //         child: Row(
-          //           crossAxisAlignment: CrossAxisAlignment.center,
-          //           children: [
-          //             Container(
-          //               // group7563Qfr (0:728)
-          //               margin: EdgeInsets.fromLTRB(
-          //                   0 * widget.fem, 0 * widget.fem, 6 * widget.fem, 0 * widget.fem),
-          //               width: 28 * widget.fem,
-          //               height: double.infinity,
-          //               decoration: BoxDecoration(
-          //                 border:
-          //                 Border.all(color: const Color(0xa5aaaaaa)),
-          //                 borderRadius: BorderRadius.circular(14 * widget.fem),
-          //               ),
-          //               child: Center(
-          //                 child: Text(
-          //                   '0',
-          //                   style: SafeGoogleFont(
-          //                     'Saira',
-          //                     fontSize: 14 * widget.ffem,
-          //                     fontWeight: FontWeight.w600,
-          //                     height: 1.575 * widget.ffem / widget.fem,
-          //                     color: const Color(0xa5aaaaaa),
-          //                   ),
-          //                 ),
-          //               ),
-          //             ),
-          //             Container(
-          //               // expiredVhJ (0:731)
-          //               margin: EdgeInsets.fromLTRB(
-          //                   0 * widget.fem, 1 * widget.fem, 0 * widget.fem, 0 * widget.fem),
-          //               child: Text(
-          //                 'Expired',
-          //                 style: SafeGoogleFont(
-          //                   'Saira',
-          //                   fontSize: 14 * widget.ffem,
-          //                   fontWeight: FontWeight.w500,
-          //                   height: 1.575 * widget.ffem / widget.fem,
-          //                   color: const Color(0xa5aaaaaa),
-          //                 ),
-          //               ),
-          //             ),
-          //           ],
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          // ],
-          ),
+          })),
     );
   }
 }

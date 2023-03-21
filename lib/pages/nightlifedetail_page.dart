@@ -10,6 +10,7 @@ import 'package:ulimo/pages/thank_you_page.dart';
 import 'package:ulimo/widget/date_available_item.dart';
 
 import '../base/utils.dart';
+import '../widget/date_available_list.dart';
 import 'check_out_page.dart';
 
 class NightLifePageDetailPage extends StatefulWidget {
@@ -571,7 +572,6 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                 child: SvgPicture.asset(
                                     "assets/icon/checkbox.svg")),
                             Text(
-                              // rideticketR84 (0:1258)
                               'Ride ticket',
                               style: SafeGoogleFont(
                                 'Saira',
@@ -595,15 +595,9 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                             color: const Color(0xff2c2b2b),
                             borderRadius: BorderRadius.circular(8 * fem),
                           ),
-                          child: ListView.builder(
-                              physics: const BouncingScrollPhysics(),
-                              scrollDirection: Axis.horizontal,
-                              itemCount: 10,
-                              itemBuilder: (context, index) {
-                                //do
-                                return dateAvailableItem(
-                                    fem: fem, ffem: ffem, onTap: () {});
-                              })),
+                          child: DateAvailableList(fem: fem, ffem: ffem, onTap: (index){
+                            //do something when clicked
+                          })),
                     ],
                   ),
                 ),

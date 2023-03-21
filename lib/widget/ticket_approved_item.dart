@@ -5,18 +5,19 @@ import 'package:flutter_svg/svg.dart';
 import '../base/base_color.dart';
 import '../base/utils.dart';
 
-Widget ticketItem({required double fem, required double ffem}){
+Widget ticketApprovedItem({required double fem, required double ffem}){
 
   return Container(
     // autogroup8kvhNC8 (B1LcCTg9vHsnNENVyN8kVh)
     padding: EdgeInsets.fromLTRB(22.43 * fem,
         16.83 * fem, 21.52 * fem, 18.26 * fem),
+    margin: const EdgeInsets.only(bottom: 24),
     width: double.infinity,
     decoration: const BoxDecoration(
       image: DecorationImage(
         fit: BoxFit.cover,
         image:
-        AssetImage("assets/ticket_background.png"),
+        AssetImage("assets/ticket_approved_background.png"),
       ),
     ),
     child: Column(
@@ -139,7 +140,7 @@ Widget ticketItem({required double fem, required double ffem}){
         Padding(
           padding: EdgeInsets.only(bottom: 24.6 * fem),
           child: const DottedLine(
-            dashColor: yellowPrimary,
+            dashColor: Color(0xff3586FF),
           ),
         ),
         Container(
@@ -168,7 +169,7 @@ Widget ticketItem({required double fem, required double ffem}){
               fontSize: 12 * ffem,
               fontWeight: FontWeight.w500,
               height: 1.1666666667 * ffem / fem,
-              color: const Color(0xfffdaf00),
+              color: const Color(0xff3586FF),
             ),
           ),
         ),

@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:ulimo/pages/check_out_page.dart';
 import 'package:ulimo/pages/thank_you_page.dart';
+import 'package:ulimo/widget/date_available_list.dart';
 
 import '../base/base_background_scaffold.dart';
 import '../base/base_color.dart';
@@ -597,15 +598,10 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                 color: const Color(0xff2c2b2b),
                                 borderRadius: BorderRadius.circular(8 * fem),
                               ),
-                              child: ListView.builder(
-                                  physics: const BouncingScrollPhysics(),
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: 10,
-                                  itemBuilder: (context, index) {
-                                    //do
-                                    return dateAvailableItem(
-                                        fem: fem, ffem: ffem, onTap: () {});
-                                  })),
+                              child: DateAvailableList(fem: fem, ffem: ffem, onTap: (index){
+                                //do something when clicked
+                              })
+                          ),
                         ],
                       ),
                     ),

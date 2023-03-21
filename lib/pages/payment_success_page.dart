@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
 import 'package:ulimo/base/base_color.dart';
-import 'package:ulimo/widget/ticket_item.dart';
+import 'package:ulimo/widget/ticket_pending_item.dart';
 
 import '../base/utils.dart';
 
@@ -142,7 +142,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
                                     ),
                                   ),
                                 ),
-                                ticketItem(fem: fem, ffem: ffem)
+                                ticketPendingItem(fem: fem, ffem: ffem)
                               ],
                             ),
                           ),
