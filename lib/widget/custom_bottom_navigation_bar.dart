@@ -9,7 +9,7 @@ class CustomBottomNavigationBar extends StatefulWidget {
   final List<String> selectedIcons;
   final Function(int) onTap;
 
-  CustomBottomNavigationBar({required this.icons,
+  const CustomBottomNavigationBar({super.key, required this.icons,
     required this.onTap,
     required this.labels,
     required this.selectedIcons});
