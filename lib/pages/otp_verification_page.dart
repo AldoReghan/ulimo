@@ -9,9 +9,11 @@ import '../base/utils.dart';
 import 'main/main_page.dart';
 
 class OTPVerificationPage extends StatefulWidget {
-  const OTPVerificationPage({super.key, required this.phoneNumber});
+  const OTPVerificationPage(
+      {super.key, required this.phoneNumber, required this.verificationId});
 
   final String phoneNumber;
+  final String verificationId;
 
   @override
   _OTPVerificationPageState createState() => _OTPVerificationPageState();
@@ -62,8 +64,11 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
     final String digitFive = _digitFiveController.text;
     final String digitSix = _digitSixController.text;
 
-    final String otpCode = '$digitOne$digitTwo$digitThree$digitFour';
+    final String otpCode =
+        '$digitOne$digitTwo$digitThree$digitFour$digitFive$digitSix';
     // Use the OTP code as needed (e.g. for authentication)
+
+    _handleOTPVerification(context, widget.verificationId, otpCode);
 
     // Clear the text fields
     _digitOneController.clear();
@@ -72,64 +77,6 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
     _digitFourController.clear();
     _digitFiveController.clear();
     _digitSixController.clear();
-  }
-
-  Future<void> _handleSignIn(BuildContext context) async {
-    final isValid = _formKey.currentState?.validate() ?? false;
-    if (!isValid) return;
-
-    print("aaaaaaaaaaaaaaaaaaaa");
-
-    bool isSignInSuccessful = false;
-
-    void verificationCompleted(PhoneAuthCredential credential) async {
-      final userCredential =
-          await _phoneAuthService.signInWithCredential(credential);
-      if (userCredential != null) {
-        // Sign in successful
-        // ignore: use_build_context_synchronously
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MainPage()),
-        );
-      } else {
-        Fluttertoast.showToast(msg: 'Failed to sign in with phone number');
-      }
-    }
-
-    void verificationFailed(FirebaseAuthException exception) {
-      Fluttertoast.showToast(
-          msg: 'Failed to verify phone number: ${exception.message}');
-    }
-
-    Future<void> codeSent(
-        String verificationId, int? forceResendingToken) async {
-      // Navigate to OTP verification page
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(builder: (context) => OTPVerificationPage()),
-      // );
-
-      _handleOTPVerification(context, verificationId);
-    }
-
-    void codeAutoRetrievalTimeout(String verificationId) {}
-
-    try {
-      await _phoneAuthService.verifyPhoneNumber(
-        widget.phoneNumber,
-        verificationCompleted,
-        verificationFailed,
-        codeSent,
-        codeAutoRetrievalTimeout,
-      );
-    } catch (e) {
-      Fluttertoast.showToast(msg: 'Failed to verify phone number');
-    }
-  }
-
-  void awaitSignIn() async {
-    await _handleSignIn(context);
   }
 
   @override
@@ -151,8 +98,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
   }
 
   Future<void> _handleOTPVerification(
-      BuildContext context, String verificationId) async {
-    final otpCode = _otpController.text.trim();
+      BuildContext context, String verificationId, String otpCode) async {
     final isValid = _formKey.currentState?.validate() ?? false;
     if (!isValid) return;
 
@@ -359,10 +305,11 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const MainPage()),
-                  );
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(builder: (context) => const MainPage()),
+                  // );
+                  _submitOtp();
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: yellowPrimary),
                 child: Container(

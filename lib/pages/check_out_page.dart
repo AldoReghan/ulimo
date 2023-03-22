@@ -1,3 +1,5 @@
+import 'package:connectivity/connectivity.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -9,13 +11,67 @@ import '../base/utils.dart';
 import 'cart_page.dart';
 
 class CheckOutPage extends StatefulWidget {
-  const CheckOutPage({Key? key}) : super(key: key);
+  final String privateRideId;
+
+  const CheckOutPage({Key? key, required this.privateRideId}) : super(key: key);
 
   @override
   State<CheckOutPage> createState() => _CheckOutPageState();
 }
 
 class _CheckOutPageState extends State<CheckOutPage> {
+  late final _privateRideData;
+  final _databaseRef = FirebaseDatabase.instance
+      .ref();
+
+  // Future<void> _getPrivateData() async {
+  //   var connectivityResult = await (Connectivity().checkConnectivity());
+  //   if (connectivityResult != ConnectivityResult.none) {
+  //     final privateRideSnapshot = await _databaseRef.child("privateRide")
+  //         .orderByKey()
+  //         .equalTo(widget.privateRideId).once();
+  //
+  //     final Map<dynamic, dynamic>? privateRideData =
+  //     privateRideSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+  //     final tempData ;
+  //
+  //     if (privateRideData != null) {
+  //       privateRideData.forEach((key, value) async {
+  //         final destinationMap = {
+  //           'id': key,
+  //           'destination': value['destination'],
+  //           'destination': value['pickup_address'],
+  //           'destination': value['pickup_address'],
+  //         };
+  //         tempList.add(destinationMap);
+  //       });
+  //     }
+  //
+  //     setState(() {
+  //       _destinationList = tempList;
+  //     });
+  //   } else {
+  //     // ignore: use_build_context_synchronously
+  //     showDialog(
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return AlertDialog(
+  //           title: const Text("No Internet Connection"),
+  //           content: const Text("Please check your internet connection."),
+  //           actions: [
+  //             TextButton(
+  //               onPressed: () {
+  //                 Navigator.of(context).pop();
+  //               },
+  //               child: const Text("OK"),
+  //             ),
+  //           ],
+  //         );
+  //       },
+  //     );
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
     double baseWidth = 375;

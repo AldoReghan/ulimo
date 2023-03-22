@@ -16,72 +16,46 @@ class RideShareBusPage extends StatefulWidget {
 }
 
 class _RideShareBusPageState extends State<RideShareBusPage> {
-  late List _destinationIds;
+  late List _destinationList;
   final _databaseRef = FirebaseDatabase.instance.ref();
-  late String _selectedDate;
-  final DateFormat _dateFormat = DateFormat('dd-MM-yyyy');
 
   @override
   void initState() {
     super.initState();
-    _destinationIds = [];
-    _selectedDate = _dateFormat.format(DateTime.now());
+    _destinationList = [];
     _fetchData();
   }
 
   Future<void> _fetchData() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult != ConnectivityResult.none) {
-      final ticketSnapshot = await _databaseRef
-          .child('rideShareBusTicketOrder')
-          .orderByChild('date')
-          .equalTo(_selectedDate)
+      final destinationSnapshot = await _databaseRef
+          .child('destination')
+          .orderByChild('destination_type')
+          .equalTo('share')
           .once();
 
-      final Map<dynamic, dynamic>? ticketData =
-          ticketSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+      final Map<dynamic, dynamic>? destinationData =
+      destinationSnapshot.snapshot.value as Map<dynamic, dynamic>?;
       final List tempList = [];
 
-      if (ticketData != null) {
-        ticketData.forEach((key, value) async {
-          final ridesharebusticket = await _databaseRef
-              .child('rideShareBusTicket')
-              .orderByKey()
-              .equalTo(value['rideShareBusTicket_id'])
-              .once();
-
-          final Map<dynamic, dynamic>? ridesharebusticketData =
-              ridesharebusticket.snapshot.value as Map<dynamic, dynamic>?;
-
-          if (ridesharebusticketData != null) {
-            ridesharebusticketData.forEach((key, value) async {
-              final destinationSnapshot = await _databaseRef
-                  .child('rideShareBusDestination')
-                  .orderByKey()
-                  .equalTo(value['destination_id'])
-                  .once();
-
-              final Map<dynamic, dynamic>? destinationData =
-                  destinationSnapshot.snapshot.value as Map<dynamic, dynamic>?;
-
-              if (destinationData != null) {
-                destinationData.forEach((key, value) {
-                  final destinationMap = {
-                    'id': key,
-                    'name': value['destination_name'],
-                    'description': value['destination_description'],
-                  };
-                  tempList.add(destinationMap);
-                });
-
-                setState(() {
-                  _destinationIds = tempList;
-                });
-              }
-            });
-          }
+      if (destinationData != null) {
+        destinationData.forEach((key, value) async {
+          final destinationMap = {
+            'id': key,
+            'name': value['destination_name'],
+            // 'description': value['destination_description'],
+            'image_url': value['destination_image_url'],
+            // 'address': value['destination_address'],
+            // 'type': value['destination_type'],
+          };
+          tempList.add(destinationMap);
         });
       }
+
+      setState(() {
+        _destinationList = tempList;
+      });
     } else {
       // ignore: use_build_context_synchronously
       showDialog(
@@ -101,26 +75,6 @@ class _RideShareBusPageState extends State<RideShareBusPage> {
           );
         },
       );
-    }
-  }
-
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      // initialDate: DateTime.parse(_selectedDate),
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2022),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null) {
-      final newSelectedDate = DateFormat('dd-MM-yyyy').format(picked);
-      if (newSelectedDate != _selectedDate) {
-        setState(() {
-          _selectedDate = newSelectedDate;
-          _destinationIds = [];
-        });
-        _fetchData();
-      }
     }
   }
 
@@ -199,24 +153,22 @@ class _RideShareBusPageState extends State<RideShareBusPage> {
                       20 * fem, 25.21 * fem, 20 * fem, 3 * fem),
                   child: ListView.builder(
                       physics: const BouncingScrollPhysics(),
-                      itemCount: 10,
+                      itemCount: _destinationList.length,
                       itemBuilder: (context, index) {
                         return rideItem(
                             fem: fem,
                             ffem: ffem,
-                            title: "The Tampa Club",
+                            title: _destinationList[index]['name'],
                             ticketType: "Ride ticket",
                             ticketType2: "Entry ticket",
                             imageUrl:
-                                "https://store-images.s-microsoft.com/image/"
-                                "apps.47288.14188059920471079.8845931d-"
-                                "936f-4c5b-848c-e9700ef87a6b.92da2b6e-01a3-"
-                                "4806-8575-6f6278ecd71b?q=90&w=480&h=270",
+                            _destinationList[index]['image_url'],
                             onTap: () {
                               //do something
                               Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => const RideShareBusDetailPage(
-                                      destinationId: "destinationId")));
+                                  builder: (context) =>
+                                      RideShareBusDetailPage(
+                                          destinationId: _destinationList[index]['id'])));
                             });
                       })),
             ),

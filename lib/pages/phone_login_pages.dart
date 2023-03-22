@@ -20,11 +20,16 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
   final _phoneNumberController = TextEditingController();
   final _otpController = TextEditingController();
   final _phoneAuthService = PhoneAuthService();
+  bool _isLoading = false;
 
   Future<void> _handleSignIn(BuildContext context) async {
     final phoneNumber = _phoneNumberController.text.trim();
     final isValid = _formKey.currentState?.validate() ?? false;
     if (!isValid) return;
+
+    setState(() {
+      _isLoading = true;
+    });
 
     bool isSignInSuccessful = false;
 
@@ -50,24 +55,20 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
 
     void codeSent(String verificationId, int? forceResendingToken) {
       // Navigate to OTP verification page
-
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(
-      //       builder: (context) => OTPVerificationPage(
-      //             phoneNumber: phoneNumber,
-      //           )),
-      // );
-
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const MainPage()),
+        MaterialPageRoute(
+            builder: (context) => OTPVerificationPage(
+                  verificationId: verificationId,
+                  phoneNumber: phoneNumber,
+                )),
       );
     }
 
     void codeAutoRetrievalTimeout(String verificationId) {}
 
     try {
+
       await _phoneAuthService.verifyPhoneNumber(
         phoneNumber,
         verificationCompleted,
@@ -75,9 +76,13 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
         codeSent,
         codeAutoRetrievalTimeout,
       );
+
     } catch (e) {
       Fluttertoast.showToast(msg: 'Failed to verify phone number');
     }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> _handleOTPVerification(
@@ -215,22 +220,25 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
                     //   context,
                     //   MaterialPageRoute(builder: (context) => const HomePage()),
                     // )
-                    // _handleSignIn(context)
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => OTPVerificationPage(
-                            phoneNumber: _phoneNumberController.text.trim(),
-                          )),
-                    )
+                    _isLoading ? null : _handleSignIn(context)
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //       builder: (context) => OTPVerificationPage(
+                    //         phoneNumber: _phoneNumberController.text.trim(),
+                    //       )),
+                    // )
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: yellowPrimary,
                       padding: const EdgeInsets.all(11.0)),
-                  child: const Text(
-                    'Get Started',
-                    style: TextStyle(color: Colors.black, fontSize: 18),
-                  ),
+                  child: _isLoading
+                        ? const AspectRatio(
+                          aspectRatio: 1, child: CircularProgressIndicator())
+                      : const Text(
+                          'Get Started',
+                          style: TextStyle(color: Colors.black, fontSize: 18),
+                        ),
                 ),
               ),
               const SizedBox(

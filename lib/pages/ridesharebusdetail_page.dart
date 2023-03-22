@@ -661,7 +661,7 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                             Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) =>
                                     // CartPage(user_id: "user_id")));
-                                    const CheckOutPage()));
+                                    const CheckOutPage(privateRideId: '',)));
                           },
                           style: TextButton.styleFrom(
                             padding: EdgeInsets.zero,

@@ -1,13 +1,16 @@
 import 'package:dotted_border/dotted_border.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
 import 'package:ulimo/base/base_color.dart';
+import 'package:ulimo/pages/check_out_page.dart';
 import 'package:ulimo/pages/thank_you_page.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:ulimo/services/stripe_services.dart';
@@ -24,21 +27,18 @@ class PrivateRidePage extends StatefulWidget {
 
 class _PrivateRidePageState extends State<PrivateRidePage> {
   final _formKey = GlobalKey<FormState>();
-  final _firstNameController = TextEditingController();
-  final _lastNameController = TextEditingController();
+  final _nameController = TextEditingController();
   final _pickupAddressController = TextEditingController();
   final _destinationController = TextEditingController();
   final _phoneNumberController = TextEditingController();
   final _emailController = TextEditingController();
   final _passengersController = TextEditingController();
-  final _referralCodeController = TextEditingController();
   bool _isRoundTrip = false;
   DateTime _date = DateTime.now();
   TimeOfDay _pickupTime = TimeOfDay.now();
-  TimeOfDay _returnTime = TimeOfDay.now();
   bool _isLoading = false;
 
-  bool _isChecked = false;
+  FirebaseAuth authData = FirebaseAuth.instance;
 
   Map<String, dynamic>? paymentIntent;
 
@@ -71,24 +71,23 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
 
     // Send data to Firebase
     final rideDetails = {
-      'first_name': _firstNameController.text.trim(),
-      'last_name': _lastNameController.text.trim(),
+      'name': authData.currentUser?.displayName,
       'date': DateFormat('yyyy-MM-dd').format(_date),
       'pickup_time': _pickupTime.format(context),
-      'return_time': _returnTime.format(context),
       'pickup_address': _pickupAddressController.text.trim(),
       'destination': _destinationController.text.trim(),
       'phone_number': _phoneNumberController.text.trim(),
       'email': _emailController.text.trim(),
       'passenger': _passengersController.text.trim(),
-      'referral_code': _referralCodeController.text.trim(),
+      'is_round_trip': _isRoundTrip,
+      'status': 'pending'
     };
 
     try {
       // await makePayment();
 
-      final databaseRef = FirebaseDatabase.instance.ref('privateRide');
-      await databaseRef.push().set(rideDetails);
+      final databaseRef = FirebaseDatabase.instance.ref('privateRide').push();
+      await databaseRef.set(rideDetails);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -99,12 +98,15 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
 
       SchedulerBinding.instance.addPostFrameCallback((_) {
         _formKey.currentState!.reset();
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const ThankYouPage(),
-          ),
-        );
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) =>
+        //         CheckOutPage(privateRideId: databaseRef.key ?? ""),
+        //   ),
+        // );
+        Fluttertoast.showToast(msg: 'Invalid OTP code');
+        Navigator.of(context).pop();
       });
     } catch (e) {
       print('makePayment() was canceled');
@@ -156,20 +158,6 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
     }
   }
 
-  Future<void> _selectReturnTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      useRootNavigator: false, // set useRootNavigator to false
-      initialTime: _returnTime,
-    );
-
-    if (picked != null && picked != _returnTime) {
-      setState(() {
-        _returnTime = picked;
-      });
-    }
-  }
-
   Future<void> makePayment() async {
     paymentIntent = await StripeServices.createPaymentIntent(
       '120000',
@@ -177,13 +165,13 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
     );
     await StripeServices.displayPaymentSheet(
       paymentIntent!['client_secret'],
-      _firstNameController.text.trim(),
+      _nameController.text.trim(),
       _emailController.text.trim(),
       '12000',
     );
     await StripeServices.savePaymentToFirebase(
       '9876678',
-      _firstNameController.text.trim(),
+      _nameController.text.trim(),
       _emailController.text.trim(),
       '12000',
     );
@@ -198,12 +186,12 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
     return defaultBackgroundScaffold(
         scaffold: Scaffold(
       backgroundColor: Colors.transparent,
-
       body: Container(
         // requestridepage6oz (0:1133)
         padding: EdgeInsets.fromLTRB(19.78 * fem, 60 * fem, 20 * fem, 0 * fem),
         width: double.infinity,
         child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           child: Form(
             key: _formKey,
             child: Column(
@@ -223,10 +211,15 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                               0 * fem, 0 * fem, 27 * fem, 0 * fem),
                           width: 24 * fem,
                           height: 24 * fem,
-                          child: Icon(
-                            Icons.arrow_back_ios,
-                            color: Colors.white,
-                            size: 24 * fem,
+                          child: GestureDetector(
+                            onTap: (){
+                              Navigator.pop(context);
+                            },
+                            child: Icon(
+                              Icons.arrow_back_ios,
+                              color: Colors.white,
+                              size: 24 * fem,
+                            ),
                           )),
                       RichText(
                         // requestaprivaterideVje (0:1199)
@@ -593,7 +586,7 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                                 12.5 * fem, 15 * fem, 12.5 * fem, 15 * fem),
                             hintText: 'How many people will be going?',
                             hintStyle:
-                            const TextStyle(color: Color(0x59ffffff)),
+                                const TextStyle(color: Color(0x59ffffff)),
                           ),
                           controller: _passengersController,
                           validator: (value) {
@@ -734,8 +727,8 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                       padding: const EdgeInsets.all(12)),
                   onPressed: _isLoading ? null : _submitForm,
                   child: _isLoading
-                      ? const AspectRatio(aspectRatio: 1,
-                      child: CircularProgressIndicator())
+                      ? const AspectRatio(
+                          aspectRatio: 1, child: CircularProgressIndicator())
                       : Text(
                           'Place Order',
                           style: SafeGoogleFont(

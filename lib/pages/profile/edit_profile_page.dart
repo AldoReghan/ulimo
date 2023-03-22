@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
@@ -17,6 +18,14 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
+
+  FirebaseAuth authData = FirebaseAuth.instance;
+  final _nameController = TextEditingController();
+
+  Future<void> updateDisplayName() async{
+    await authData.currentUser?.updateDisplayName(_nameController.text);
+  }
+
   @override
   Widget build(BuildContext context) {
     double baseWidth = 375;
@@ -134,6 +143,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               ),
                               child: TextField(
                                 cursorColor: yellowPrimary,
+                                controller: _nameController,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
                                   focusedBorder: InputBorder.none,
@@ -446,7 +456,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       ),
                       TextButton(
                         // buttonHct (0:1059)
-                        onPressed: () {},
+                        onPressed: () {
+                          updateDisplayName();
+                        },
                         style: TextButton.styleFrom(
                           padding: EdgeInsets.zero,
                         ),

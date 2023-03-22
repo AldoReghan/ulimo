@@ -1,6 +1,10 @@
+import 'package:connectivity/connectivity.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:ulimo/pages/nightlifedetail_page.dart';
 
 import '../../base/base_color.dart';
@@ -18,6 +22,71 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  FirebaseAuth authData = FirebaseAuth.instance;
+
+  late List _destinationList;
+  final _databaseRef = FirebaseDatabase.instance.ref();
+
+  @override
+  void initState() {
+    super.initState();
+    _destinationList = [];
+    _fetchData();
+  }
+
+  User? getCurrentUser() {
+    return authData.currentUser;
+  }
+
+  Future<void> _fetchData() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult != ConnectivityResult.none) {
+      final destinationSnapshot =
+          await _databaseRef.child('destination').limitToFirst(15).once();
+
+      final Map<dynamic, dynamic>? destinationData =
+          destinationSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+      final List tempList = [];
+
+      if (destinationData != null) {
+        destinationData.forEach((key, value) async {
+          final destinationMap = {
+            'id': key,
+            'name': value['destination_name'],
+            // 'description': value['destination_description'],
+            'image_url': value['destination_image_url'],
+            'address': value['destination_address'],
+            // 'type': value['destination_type'],
+          };
+          tempList.add(destinationMap);
+        });
+      }
+
+      setState(() {
+        _destinationList = tempList;
+      });
+    } else {
+      // ignore: use_build_context_synchronously
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("No Internet Connection"),
+            content: const Text("Please check your internet connection."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -33,9 +102,9 @@ class _HomePageState extends State<HomePage> {
             mainAxisSize: MainAxisSize.max,
             children: [
               const SizedBox(height: 24),
-              const Text(
-                "Hello, Daniel",
-                style: TextStyle(color: Colors.white, fontSize: 18),
+              Text(
+                "Hello, ${getCurrentUser()?.displayName != "" ? getCurrentUser()?.displayName : "Set Your Name"}.",
+                style: const TextStyle(color: Colors.white, fontSize: 18),
                 textAlign: TextAlign.start,
               ),
               const SizedBox(
@@ -75,10 +144,16 @@ class _HomePageState extends State<HomePage> {
                   imageAsset: "assets/icon/home_bus.png",
                   onTap: () {
                     //go to private ride page
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: ((context) => const PrivateRidePage())));
+                    if (getCurrentUser()?.displayName == "") {
+                      Fluttertoast.showToast(
+                          msg: "Please add your name first in profile menu",
+                          backgroundColor: Colors.red);
+                    } else {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: ((context) => const PrivateRidePage())));
+                    }
                   }),
               const SizedBox(
                 height: 10,
@@ -115,7 +190,7 @@ class _HomePageState extends State<HomePage> {
                 child: ListView.builder(
                     physics: const BouncingScrollPhysics(),
                     scrollDirection: Axis.horizontal,
-                    itemCount: 10,
+                    itemCount: _destinationList.length,
                     itemBuilder: (context, index) {
                       return Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -123,11 +198,14 @@ class _HomePageState extends State<HomePage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      const NightLifePageDetailPage(
-                                          destinationId: "destinationId")),
+                                  builder: (context) => NightLifePageDetailPage(
+                                      destinationId: _destinationList[index]
+                                          ['id'])),
                             );
-                          }));
+                          },
+                              name: _destinationList[index]['name'],
+                              address: _destinationList[index]['address'],
+                              imageUrl: _destinationList[index]['image_url']));
                     }),
               )
             ],

@@ -1,3 +1,4 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:ulimo/pages/nightlifedetail_page.dart';
@@ -15,8 +16,8 @@ class NightLifePage extends StatefulWidget {
 }
 
 class _NightLifePageState extends State<NightLifePage> {
-  late List<Map<dynamic, dynamic>> _destinationList;
-  final _databaseRef = FirebaseDatabase.instance.ref('nightlife');
+  late List _destinationList;
+  final _databaseRef = FirebaseDatabase.instance.ref();
 
   @override
   void initState() {
@@ -26,21 +27,54 @@ class _NightLifePageState extends State<NightLifePage> {
   }
 
   Future<void> _fetchData() async {
-    final snapshot = await _databaseRef.once();
-    final Map<dynamic, dynamic>? data = snapshot.snapshot.value as Map?;
-    if (data != null) {
-      final List<Map<String, dynamic>> tempList = [];
-      data.forEach((key, value) {
-        if (value['description'] != null && value['name'] != null) {
-          tempList.add({
-            'documentId': key, // add documentId to the map
-            ...value, // add all other fields from the value map
-          });
-        }
-      });
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult != ConnectivityResult.none) {
+      final destinationSnapshot = await _databaseRef
+          .child('destination')
+          .orderByChild('destination_type')
+          .equalTo('night')
+          .once();
+
+      final Map<dynamic, dynamic>? destinationData =
+          destinationSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+      final List tempList = [];
+
+      if (destinationData != null) {
+        destinationData.forEach((key, value) async {
+          final destinationMap = {
+            'id': key,
+            'name': value['destination_name'],
+            // 'description': value['destination_description'],
+            'image_url': value['destination_image_url'],
+            // 'address': value['destination_address'],
+            // 'type': value['destination_type'],
+          };
+          tempList.add(destinationMap);
+        });
+      }
+
       setState(() {
         _destinationList = tempList;
       });
+    } else {
+      // ignore: use_build_context_synchronously
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("No Internet Connection"),
+            content: const Text("Please check your internet connection."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -113,24 +147,23 @@ class _NightLifePageState extends State<NightLifePage> {
                   padding: EdgeInsets.fromLTRB(
                       20 * fem, 25.21 * fem, 20 * fem, 3 * fem),
                   child: ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                      itemCount: 10,
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: _destinationList.length,
                       itemBuilder: (context, index) {
                         return rideItem(
                             fem: fem,
                             ffem: ffem,
-                            title: "The Tampa Club",
+                            title: _destinationList[index]['name'],
                             ticketType: "Ride ticket",
                             ticketType2: "Entry ticket",
-                            imageUrl: "https://store-images.s-microsoft.com/image/"
-                            "apps.47288.14188059920471079.8845931d-"
-                            "936f-4c5b-848c-e9700ef87a6b.92da2b6e-01a3-"
-                            "4806-8575-6f6278ecd71b?q=90&w=480&h=270",
+                            imageUrl:
+                            _destinationList[index]['image_url'],
                             onTap: () {
                               //do something
                               Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => const NightLifePageDetailPage(
-                                      destinationId: "destinationId")));
+                                  builder: (context) =>
+                                      NightLifePageDetailPage(
+                                          destinationId: _destinationList[index]['id'])));
                             });
                       })),
             ),
