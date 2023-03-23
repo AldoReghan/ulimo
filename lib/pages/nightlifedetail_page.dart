@@ -32,6 +32,8 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
   String? _selectedTime;
   bool _isRideTicket = false;
   bool _isEntryTicket = false;
+  DateTime _date = DateTime.now();
+  TimeOfDay _pickupTime = TimeOfDay.now();
 
   final _formKey = GlobalKey<FormState>();
   final _quantityController = TextEditingController(text: '0');
@@ -63,6 +65,47 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
       });
       setState(() {
         _destinationList = tempList;
+      });
+    }
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _date,
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData(
+            primaryColor: darkPrimary, // change the selected date color
+            colorScheme: const ColorScheme.light(
+              primary: darkPrimary,
+              // change the text color of the header
+              onPrimary: Colors.white,
+              // change the color of the icons in the header
+              surface: darkPrimary,
+              // change the background color of the calendar
+              onSurface: Colors.black, // change the text color of the calendar
+            ),
+          ),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
+    );
+    if (picked != null && picked != _date) {
+      setState(() {
+        _date = picked;
+      });
+    }
+  }
+
+  Future<void> _selectPickupTime(BuildContext context) async {
+    final TimeOfDay? picked =
+    await showTimePicker(context: context, initialTime: _pickupTime);
+    if (picked != null && picked != _pickupTime) {
+      setState(() {
+        _pickupTime = picked;
       });
     }
   }
@@ -402,9 +445,89 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                   ],
                 ),
               ),
+              Container(
+                // info3HeQ (0:1161)
+                margin: EdgeInsets.fromLTRB(
+                    19.94 * fem, 0 * fem, 20.17 * fem, 42.82 * fem),
+                width: double.infinity,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      // wherewillyouliketogop8Y (0:1162)
+                      margin: EdgeInsets.fromLTRB(
+                          0 * fem, 0 * fem, 0 * fem, 9 * fem),
+                      child: Text(
+                        'When will you go?',
+                        style: SafeGoogleFont(
+                          'Saira',
+                          fontSize: 16 * ffem,
+                          fontWeight: FontWeight.w500,
+                          height: 1.575 * ffem / fem,
+                          color: const Color(0xffffffff),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      // group7540L6t (0:1163)
+                      width: double.infinity,
+                      height: 46 * fem,
+                      child: Flexible(
+                        child: DottedBorder(
+                          borderType: BorderType.RRect,
+                          radius: const Radius.circular(6),
+                          color: const Color(0xFFFDCB5B),
+                          strokeWidth: 1,
+                          child: SizedBox(
+                            height: double.infinity,
+                            child: SizedBox(
+                              // group7535hLk (0:1167)
+                              width: double.infinity,
+                              height: double.infinity,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 15),
+                                child: Row(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.center,
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () => _selectDate(context),
+                                      child: Text(
+                                        DateFormat('dd MMM yyyy')
+                                            .format(_date),
+                                        style: SafeGoogleFont(
+                                          'Saira',
+                                          fontSize: 14 * ffem,
+                                          fontWeight: FontWeight.w500,
+                                          height:
+                                          1.4285714286 * ffem / fem,
+                                          color: const Color(0xfffdcb5b),
+                                        ),
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.keyboard_arrow_down,
+                                      size: 20 * fem,
+                                      color: Colors.white,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
               Visibility(
                 maintainSize: false,
-                visible: _isRideTicket,
+                visible: _isEntryTicket,
                 child: Column(
                   children: [
                     Container(
@@ -443,7 +566,7 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                               "assets/icon/checkbox.svg")),
                                       Text(
                                         // entryticket9Vz (0:1243)
-                                        'Entry ticket',
+                                        'Ride ticket',
                                         style: SafeGoogleFont(
                                           'Saira',
                                           fontSize: 14 * ffem,
@@ -546,61 +669,199 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
               ),
               Visibility(
                 maintainSize: false,
-                visible: _isEntryTicket,
-                child: Container(
-                  // group7533cRW (0:1255)
-                  margin: EdgeInsets.fromLTRB(
-                      19.94 * fem, 0 * fem, 20.06 * fem, 46 * fem),
-                  width: double.infinity,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        // group7532Mdz (0:1256)
-                        margin: EdgeInsets.fromLTRB(
-                            0.11 * fem, 0 * fem, 241.89 * fem, 10 * fem),
-                        width: double.infinity,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                                // framet88 (0:1259)
-                                margin: EdgeInsets.fromLTRB(
-                                    0 * fem, 0 * fem, 4 * fem, 0 * fem),
-                                width: 20 * fem,
-                                height: 20 * fem,
-                                child: SvgPicture.asset(
-                                    "assets/icon/checkbox.svg")),
-                            Text(
-                              'Ride ticket',
-                              style: SafeGoogleFont(
-                                'Saira',
-                                fontSize: 14 * ffem,
-                                fontWeight: FontWeight.w500,
-                                height: 1.4285714286 * ffem / fem,
-                                color: const Color(0xfffdcb5b),
-                              ),
+                visible: _isRideTicket,
+                child: Column(
+                  children: [
+                    Container(
+                      // group7520ZPN (0:1239)
+                      margin: EdgeInsets.fromLTRB(
+                          20 * fem, 0 * fem, 20 * fem, 24 * fem),
+                      width: double.infinity,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            // group75125Mi (0:1240)
+                            margin: EdgeInsets.fromLTRB(
+                                0 * fem, 0 * fem, 0 * fem, 10 * fem),
+                            width: double.infinity,
+                            height: 20 * fem,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  // group7511jx4 (0:1242)
+                                  margin: EdgeInsets.fromLTRB(
+                                      0 * fem, 0 * fem, 188 * fem, 0 * fem),
+                                  height: double.infinity,
+                                  child: Row(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        // frameGwz (0:1244)
+                                          margin: EdgeInsets.fromLTRB(0 * fem,
+                                              0 * fem, 4 * fem, 0 * fem),
+                                          width: 20 * fem,
+                                          height: 20 * fem,
+                                          child: SvgPicture.asset(
+                                              "assets/icon/checkbox.svg")),
+                                      Text(
+                                        // entryticket9Vz (0:1243)
+                                        'Ride ticket',
+                                        style: SafeGoogleFont(
+                                          'Saira',
+                                          fontSize: 14 * ffem,
+                                          fontWeight: FontWeight.w500,
+                                          height: 1.4285714286 * ffem / fem,
+                                          color: const Color(0xfffdcb5b),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Text(
+                                  // Vpk (0:1241)
+                                  '\$20.00',
+                                  style: SafeGoogleFont(
+                                    'Saira',
+                                    fontSize: 14 * ffem,
+                                    fontWeight: FontWeight.w500,
+                                    height: 1.4285714286 * ffem / fem,
+                                    color: const Color(0xfffdcb5b),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                          // group7528ArL (0:1262)
-                          padding: EdgeInsets.fromLTRB(
-                              6.53 * fem, 6.35 * fem, 6.53 * fem, 6.35 * fem),
-                          width: double.infinity,
-                          height: 100 * fem,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: const Color(0x0caaaaaa)),
-                            color: const Color(0xff2c2b2b),
-                            borderRadius: BorderRadius.circular(8 * fem),
                           ),
-                          child: DateAvailableList(fem: fem, ffem: ffem, onTap: (index){
-                            //do something when clicked
-                          })),
-                    ],
-                  ),
+                          Container(
+                            // group7519ehe (0:1247)
+                            padding: EdgeInsets.fromLTRB(
+                                10.53 * fem, 10 * fem, 10.53 * fem, 10 * fem),
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              border:
+                              Border.all(color: const Color(0x0caaaaaa)),
+                              color: const Color(0xff2c2b2b),
+                              borderRadius: BorderRadius.circular(8 * fem),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  // of15ticketsavailableWE4 (0:1250)
+                                  '15 of 15 tickets available ',
+                                  style: SafeGoogleFont(
+                                    'Saira',
+                                    fontSize: 12 * ffem,
+                                    fontWeight: FontWeight.w500,
+                                    height: 1.6666666667 * ffem / fem,
+                                    color: const Color(0xffffffff),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 6 * fem,
+                                ),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: Slider(
+                                    value: _passengerSeat.toDouble(),
+                                    min: 1,
+                                    max: _availableSeat.toDouble(),
+                                    onChanged: (newValue) {
+                                      setState(() {
+                                        _passengerSeat = newValue.round();
+                                      });
+                                    },
+                                    activeColor: yellowPrimary,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 6 * fem,
+                                ),
+                                Text(
+                                  // seatxrk (0:1251)
+                                  '$_passengerSeat Seat',
+                                  style: SafeGoogleFont(
+                                    'Saira',
+                                    fontSize: 12 * ffem,
+                                    fontWeight: FontWeight.w500,
+                                    height: 1.6666666667 * ffem / fem,
+                                    color: const Color(0xffffffff),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      // line46CG (0:1298)
+                      margin: EdgeInsets.fromLTRB(
+                          21.49 * fem, 0 * fem, 21.49 * fem, 23 * fem),
+                      width: double.infinity,
+                      height: 1 * fem,
+                      decoration: const BoxDecoration(
+                        color: Color(0x3faaaaaa),
+                      ),
+                    ),
+                  ],
                 ),
+                // child: Container(
+                //   // group7533cRW (0:1255)
+                //   margin: EdgeInsets.fromLTRB(
+                //       19.94 * fem, 0 * fem, 20.06 * fem, 46 * fem),
+                //   width: double.infinity,
+                //   child: Column(
+                //     crossAxisAlignment: CrossAxisAlignment.start,
+                //     children: [
+                //       Container(
+                //         // group7532Mdz (0:1256)
+                //         margin: EdgeInsets.fromLTRB(
+                //             0.11 * fem, 0 * fem, 241.89 * fem, 10 * fem),
+                //         width: double.infinity,
+                //         child: Row(
+                //           crossAxisAlignment: CrossAxisAlignment.center,
+                //           children: [
+                //             Container(
+                //                 // framet88 (0:1259)
+                //                 margin: EdgeInsets.fromLTRB(
+                //                     0 * fem, 0 * fem, 4 * fem, 0 * fem),
+                //                 width: 20 * fem,
+                //                 height: 20 * fem,
+                //                 child: SvgPicture.asset(
+                //                     "assets/icon/checkbox.svg")),
+                //             Text(
+                //               'Ride ticket',
+                //               style: SafeGoogleFont(
+                //                 'Saira',
+                //                 fontSize: 14 * ffem,
+                //                 fontWeight: FontWeight.w500,
+                //                 height: 1.4285714286 * ffem / fem,
+                //                 color: const Color(0xfffdcb5b),
+                //               ),
+                //             ),
+                //           ],
+                //         ),
+                //       ),
+                //       Container(
+                //           // group7528ArL (0:1262)
+                //           padding: EdgeInsets.fromLTRB(
+                //               6.53 * fem, 6.35 * fem, 6.53 * fem, 6.35 * fem),
+                //           width: double.infinity,
+                //           height: 100 * fem,
+                //           decoration: BoxDecoration(
+                //             border: Border.all(color: const Color(0x0caaaaaa)),
+                //             color: const Color(0xff2c2b2b),
+                //             borderRadius: BorderRadius.circular(8 * fem),
+                //           ),
+                //           child: DateAvailableList(fem: fem, ffem: ffem, onTap: (index){
+                //             //do something when clicked
+                //           })),
+                //     ],
+                //   ),
+                // ),
               ),
               Container(
                 // group7530qqJ (0:1290)

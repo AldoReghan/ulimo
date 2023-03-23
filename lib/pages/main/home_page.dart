@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:ulimo/pages/nightlifedetail_page.dart';
+import 'package:ulimo/pages/ridesharebusdetail_page.dart';
 
 import '../../base/base_color.dart';
 import '../../widget/home_card.dart';
@@ -56,7 +57,7 @@ class _HomePageState extends State<HomePage> {
             // 'description': value['destination_description'],
             'image_url': value['destination_image_url'],
             'address': value['destination_address'],
-            // 'type': value['destination_type'],
+            'type': value['destination_type'],
           };
           tempList.add(destinationMap);
         });
@@ -194,13 +195,20 @@ class _HomePageState extends State<HomePage> {
                     itemBuilder: (context, index) {
                       return Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: recomendationListLayout(context, onTap: () {
+                          child: recommendationListLayout(context, onTap: () {
+                            print(_destinationList[index]['type']);
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => NightLifePageDetailPage(
-                                      destinationId: _destinationList[index]
-                                          ['id'])),
+                                  builder: (context) =>
+                                      _destinationList[index]['type'] == 'night'
+                                          ? NightLifePageDetailPage(
+                                              destinationId:
+                                                  _destinationList[index]['id'])
+                                          : RideShareBusDetailPage(
+                                              destinationId:
+                                                  _destinationList[index]
+                                                      ['id'])),
                             );
                           },
                               name: _destinationList[index]['name'],

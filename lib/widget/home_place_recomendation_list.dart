@@ -4,7 +4,7 @@ import 'package:flutter_svg/svg.dart';
 
 import '../base/base_color.dart';
 
-Widget recomendationListLayout(BuildContext context,
+Widget recommendationListLayout(BuildContext context,
     {required String name,
     required String address,
     required String imageUrl,

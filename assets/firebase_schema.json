@@ -248,54 +248,97 @@
       "phone_number": "085548567055",
       "pickup_address": "sda",
       "pickup_time": "02:30",
-      "is_round_trip": true
-    },
-    "-NfBaUvGilSjFMBF6G9w": {
-      "date": "2023-03-11",
-      "destination": "aby",
-      "email": "yahya@hotmail.com",
-      "name": "yahya",
-      "passenger": "1",
-      "phone_number": "085548567055",
-      "pickup_address": "sda",
-      "pickup_time": "02:30",
-      "is_round_trip": true
+      "is_round_trip": true,
+      "price": "",
+      "status": "Pending",
+      "user_id": "asddhnjna98dfas"
     }
   },
-  "rideShareBusDestination": {
-    "-NPcSgmRLzdAUCBPQz-g": {
-      "destination_description": "just the zoo",
-      "destination_name": "Zoo"
-    },
-    "-NPcUkP6HIjb8nxqcFV9": {
-      "destination_description": "ya sungai kali",
-      "destination_name": "kali"
+  "nightlifeTicket": {
+    "-NPcThfa7CZYIuqtLRttk": {
+      "destination_id": "-NPcUkP6HIjb8nxqcFV9",
+      "ticket_price": {
+        "2023-03-22": {
+          "entry_price": "4.00",
+          "ride_price": "4.00",
+          "entry_quantity": "10",
+          "ride_quantity": "10"
+        },
+        "2023-03-23": {
+          "entry_price": "4.00",
+          "ride_price": "4.00",
+          "entry_quantity": "10",
+          "ride_quantity": "10"
+        },
+        "2023-03-24": {
+          "entry_price": "4.00",
+          "ride_price": "4.00",
+          "entry_quantity": "10",
+          "ride_quantity": "10"
+        }
+      }
     }
   },
   "rideShareBusTicket": {
-    "-NPcThfa7CZYIuqtLRPk": {
-      "destination_id": "-NPcUkP6HIjb8nxqcFV9",
-      "price": 4,
-      "quantity": "10",
-      "time": "18:30"
-    },
-    "-NPfi6K3512H2AASPTgP": {
-      "destination_id": "-NPcUkP6HIjb8nxqcFV9",
-      "price": 7,
-      "quantity": "50",
+    "-NPcThfa7CZYIuqtLRP": {
+      "destination_id": "-as7dadjkkldsa",
+      "ride_price": "4.21",
+      "entry_price": "5.00",
+      "ride_quantity": "10",
+      "entry_quantity": "10",
+      "entry_quantity_left": "5",
+      "ride_quantity_left": "5",
       "time": "19:30"
     },
-    "-NPfi7sgvSm9dfc1Ru8_": {
-      "destination_id": "-NPcUkP6HIjb8nxqcFV9",
-      "price": 9,
-      "quantity": "1",
-      "time": "20:30"
+    "-NPcThfa7CZYIuqtRPk": {
+      "destination_id": "-as7dadjkkldsa",
+      "ride_price": "9.29",
+      "entry_price": "95.11",
+      "ride_quantity": "10",
+      "entry_quantity": "10",
+      "entry_quantity_left": "5",
+      "ride_quantity_left": "5",
+      "time": "18:30"
     },
-    "-NQBUae3OaUWE-c80WT7": {
-      "destination_id": "-NPcUkP6HIjb8nxqcFV9",
-      "price": 350,
-      "quantity": "10",
-      "time": "21:30"
+    "-NPcThfa7CZYIuqtsLRPk": {
+      "destination_id": "-as7dadjkkldsa",
+      "ride_price": "91.01",
+      "entry_price": "10.21",
+      "ride_quantity": "10",
+      "entry_quantity": "10",
+      "entry_quantity_left": "5",
+      "ride_quantity_left": "5",
+      "time": "17:30"
+    }
+  },
+  "rideShareBusTicketOld": {
+    "-as7dadjkkldsa": {
+      "ticket_price": {
+        "2023-03-22T14:30:00Z": {
+          "entry_price": "4.00",
+          "ride_price": "4.00",
+          "entry_quantity": "10",
+          "ride_quantity": "10"
+        },
+        "2023-03-22T15:30:00Z": {
+          "entry_price": "4.00",
+          "ride_price": "4.00",
+          "entry_quantity": "10",
+          "ride_quantity": "10"
+        },
+        "2023-03-23T14:30:00Z": {
+          "entry_price": "4.00",
+          "ride_price": "4.00",
+          "entry_quantity": "10",
+          "ride_quantity": "10"
+        },
+        "2023-03-23T15:30:00Z": {
+          "entry_price": "4.00",
+          "ride_price": "4.00",
+          "entry_quantity": "10",
+          "ride_quantity": "10"
+        }
+      }
     }
   },
   "rideShareBusTicketOrder": {

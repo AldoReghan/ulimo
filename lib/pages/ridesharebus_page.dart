@@ -19,6 +19,8 @@ class _RideShareBusPageState extends State<RideShareBusPage> {
   late List _destinationList;
   final _databaseRef = FirebaseDatabase.instance.ref();
 
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -27,6 +29,9 @@ class _RideShareBusPageState extends State<RideShareBusPage> {
   }
 
   Future<void> _fetchData() async {
+    setState(() {
+      _isLoading = true;
+    });
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult != ConnectivityResult.none) {
       final destinationSnapshot = await _databaseRef
@@ -36,7 +41,7 @@ class _RideShareBusPageState extends State<RideShareBusPage> {
           .once();
 
       final Map<dynamic, dynamic>? destinationData =
-      destinationSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+          destinationSnapshot.snapshot.value as Map<dynamic, dynamic>?;
       final List tempList = [];
 
       if (destinationData != null) {
@@ -76,6 +81,9 @@ class _RideShareBusPageState extends State<RideShareBusPage> {
         },
       );
     }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -87,93 +95,100 @@ class _RideShareBusPageState extends State<RideShareBusPage> {
         scaffold: Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(
-              height: 55,
-            ),
-            Container(
-              // group7560fov (0:367)
-              margin:
-                  EdgeInsets.fromLTRB(20 * fem, 0 * fem, 20 * fem, 5.92 * fem),
-              child: Row(
+        child: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  const SizedBox(
+                    height: 55,
+                  ),
                   Container(
-                      // arrowQFi (0:368)
-                      margin: EdgeInsets.fromLTRB(
-                          0 * fem, 0 * fem, 27 * fem, 0 * fem),
-                      width: 24 * fem,
-                      height: 24 * fem,
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Icon(
-                          Icons.arrow_back_ios,
-                          size: 24 * fem,
-                          color: Colors.white,
-                        ),
-                      )),
-                  RichText(
-                    // nightlifedealsK7n (0:372)
-                    text: TextSpan(
-                      style: SafeGoogleFont(
-                        'Saira',
-                        fontSize: 24 * ffem,
-                        fontWeight: FontWeight.w500,
-                        height: 1.575 * ffem / fem,
-                        color: const Color(0xffffffff),
-                      ),
+                    // group7560fov (0:367)
+                    margin: EdgeInsets.fromLTRB(
+                        20 * fem, 0 * fem, 20 * fem, 5.92 * fem),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const TextSpan(
-                          text: 'Ride ',
-                        ),
-                        TextSpan(
-                          text: 'Tickets',
-                          style: SafeGoogleFont(
-                            'Saira',
-                            fontSize: 24 * ffem,
-                            fontWeight: FontWeight.w500,
-                            height: 1.575 * ffem / fem,
-                            color: const Color(0xfffdcb5b),
+                        Container(
+                            // arrowQFi (0:368)
+                            margin: EdgeInsets.fromLTRB(
+                                0 * fem, 0 * fem, 27 * fem, 0 * fem),
+                            width: 24 * fem,
+                            height: 24 * fem,
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Icon(
+                                Icons.arrow_back_ios,
+                                size: 24 * fem,
+                                color: Colors.white,
+                              ),
+                            )),
+                        RichText(
+                          // nightlifedealsK7n (0:372)
+                          text: TextSpan(
+                            style: SafeGoogleFont(
+                              'Saira',
+                              fontSize: 24 * ffem,
+                              fontWeight: FontWeight.w500,
+                              height: 1.575 * ffem / fem,
+                              color: const Color(0xffffffff),
+                            ),
+                            children: [
+                              const TextSpan(
+                                text: 'Ride ',
+                              ),
+                              TextSpan(
+                                text: 'Tickets',
+                                style: SafeGoogleFont(
+                                  'Saira',
+                                  fontSize: 24 * ffem,
+                                  fontWeight: FontWeight.w500,
+                                  height: 1.575 * ffem / fem,
+                                  color: const Color(0xfffdcb5b),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
                   ),
+                  Expanded(
+                    child: Container(
+                        // autogrouplczqZkt (B1LAVsAXW7wCDsdiquLCZq)
+                        padding: EdgeInsets.fromLTRB(
+                            20 * fem, 25.21 * fem, 20 * fem, 3 * fem),
+                        child: ListView.builder(
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: _destinationList.length,
+                            itemBuilder: (context, index) {
+                              return rideItem(
+                                  fem: fem,
+                                  ffem: ffem,
+                                  title: _destinationList[index]['name'],
+                                  ticketType: "Ride ticket",
+                                  ticketType2: "Entry ticket",
+                                  imageUrl: _destinationList[index]
+                                      ['image_url'],
+                                  onTap: () {
+                                    //do something
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                RideShareBusDetailPage(
+                                                    destinationId:
+                                                        _destinationList[index]
+                                                            ['id'])));
+                                  });
+                            })),
+                  ),
                 ],
               ),
-            ),
-            Expanded(
-              child: Container(
-                  // autogrouplczqZkt (B1LAVsAXW7wCDsdiquLCZq)
-                  padding: EdgeInsets.fromLTRB(
-                      20 * fem, 25.21 * fem, 20 * fem, 3 * fem),
-                  child: ListView.builder(
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: _destinationList.length,
-                      itemBuilder: (context, index) {
-                        return rideItem(
-                            fem: fem,
-                            ffem: ffem,
-                            title: _destinationList[index]['name'],
-                            ticketType: "Ride ticket",
-                            ticketType2: "Entry ticket",
-                            imageUrl:
-                            _destinationList[index]['image_url'],
-                            onTap: () {
-                              //do something
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) =>
-                                      RideShareBusDetailPage(
-                                          destinationId: _destinationList[index]['id'])));
-                            });
-                      })),
-            ),
-          ],
-        ),
       ),
     ));
   }

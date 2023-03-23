@@ -72,6 +72,7 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
     // Send data to Firebase
     final rideDetails = {
       'name': authData.currentUser?.displayName,
+      'user_id': authData.currentUser?.uid,
       'date': DateFormat('yyyy-MM-dd').format(_date),
       'pickup_time': _pickupTime.format(context),
       'pickup_address': _pickupAddressController.text.trim(),

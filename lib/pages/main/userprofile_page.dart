@@ -1,4 +1,5 @@
 import 'package:dotted_border/dotted_border.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
@@ -19,6 +20,12 @@ class UserProfilePage extends StatefulWidget {
 class _UserProfilePageState extends State<UserProfilePage> {
   TextEditingController _nameController = TextEditingController();
   TextEditingController _phoneNumberController = TextEditingController();
+
+  FirebaseAuth authData = FirebaseAuth.instance;
+
+  User? getCurrentUser() {
+    return authData.currentUser;
+  }
 
   @override
   void initState() {
@@ -205,7 +212,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                               width: 134 * fem,
                                                               height: 29 * fem,
                                                               child: Text(
-                                                                'Daniel B. Dalton',
+                                                                getCurrentUser()
+                                                                            ?.displayName ==
+                                                                        ""
+                                                                    ? "Set Your Name"
+                                                                    : getCurrentUser()
+                                                                            ?.displayName ??
+                                                                        "",
                                                                 style:
                                                                     SafeGoogleFont(
                                                                   'Saira',
@@ -419,19 +432,19 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           ),
                         ),
                         GestureDetector(
-                          onTap: (){
+                          onTap: () {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) =>
-                                    const NotificationPage()));
+                                        const NotificationPage()));
                           },
                           child: Container(
                             // info179i (0:516)
                             margin: EdgeInsets.fromLTRB(
                                 0.4 * fem, 0 * fem, 0 * fem, 20 * fem),
-                            padding: EdgeInsets.fromLTRB(
-                                11.4 * fem, 12.08 * fem, 10.6 * fem, 12.08 * fem),
+                            padding: EdgeInsets.fromLTRB(11.4 * fem,
+                                12.08 * fem, 10.6 * fem, 12.08 * fem),
                             width: double.infinity,
                             height: 50 * fem,
                             decoration: BoxDecoration(
