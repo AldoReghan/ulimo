@@ -25,6 +25,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   FirebaseAuth authData = FirebaseAuth.instance;
 
+  bool _isLoading = true;
+
   late List _destinationList;
   final _databaseRef = FirebaseDatabase.instance.ref();
 
@@ -40,6 +42,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _fetchData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult != ConnectivityResult.none) {
       final destinationSnapshot =
@@ -86,6 +92,9 @@ class _HomePageState extends State<HomePage> {
         },
       );
     }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -188,33 +197,41 @@ class _HomePageState extends State<HomePage> {
               ),
               SizedBox(
                 height: 260,
-                child: ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _destinationList.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: recommendationListLayout(context, onTap: () {
-                            print(_destinationList[index]['type']);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      _destinationList[index]['type'] == 'night'
-                                          ? NightLifePageDetailPage(
-                                              destinationId:
-                                                  _destinationList[index]['id'])
-                                          : RideShareBusDetailPage(
-                                              destinationId:
-                                                  _destinationList[index]
-                                                      ['id'])),
-                            );
-                          },
-                              name: _destinationList[index]['name'],
-                              address: _destinationList[index]['address'],
-                              imageUrl: _destinationList[index]['image_url']));
-                    }),
+                child: _isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _destinationList.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: recommendationListLayout(context,
+                                  onTap: () {
+                                print(_destinationList[index]['type']);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          _destinationList[index]['type'] ==
+                                                  'night'
+                                              ? NightLifePageDetailPage(
+                                                  destinationId:
+                                                      _destinationList[index]
+                                                          ['id'])
+                                              : RideShareBusDetailPage(
+                                                  destinationId:
+                                                      _destinationList[index]
+                                                          ['id'])),
+                                );
+                              },
+                                  name: _destinationList[index]['name'],
+                                  address: _destinationList[index]['address'],
+                                  imageUrl: _destinationList[index]
+                                      ['image_url']));
+                        }),
               )
             ],
           ),

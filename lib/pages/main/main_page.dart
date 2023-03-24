@@ -33,7 +33,7 @@ class _MainPageState extends State<MainPage> {
     final List<Widget> mainScreens = [
       const HomePage(),
       const MyTicketPage(),
-      const UserProfilePage(),
+      UserProfilePage(parentContext: context,),
     ];
 
     return defaultBackgroundScaffold(

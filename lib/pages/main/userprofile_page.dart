@@ -1,5 +1,7 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
@@ -11,7 +13,8 @@ import '../../base/utils.dart';
 import '../../widget/profile_menu.dart';
 
 class UserProfilePage extends StatefulWidget {
-  const UserProfilePage({Key? key}) : super(key: key);
+  final BuildContext parentContext;
+  const UserProfilePage({Key? key, required this.parentContext}) : super(key: key);
 
   @override
   _UserProfilePageState createState() => _UserProfilePageState();
@@ -23,14 +26,142 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   FirebaseAuth authData = FirebaseAuth.instance;
 
-  User? getCurrentUser() {
-    return authData.currentUser;
+  final _databaseRef = FirebaseDatabase.instance.ref();
+  late List _ticketListData;
+  bool _isLoading = true;
+
+
+  Future<void> _fetchData() async {
+    setState(() {
+      _isLoading = true;
+      _ticketListData.clear();
+    });
+
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult != ConnectivityResult.none) {
+      final privateRideSnapshot = await _databaseRef
+          .child('privateRide')
+          .orderByChild('user_id')
+          .equalTo(authData.currentUser?.uid)
+          .once();
+
+      final rideShareBusOrderSnapshot = await _databaseRef
+          .child('rideShareBusTicketOrder')
+          .orderByChild('users_id')
+      // .equalTo(authData.currentUser?.uid)
+          .once();
+
+      final Map<dynamic, dynamic>? privateRideData =
+      privateRideSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+      final List tempPrivateRideList = [];
+      List filteredListPrivateRide = [];
+      final List tempActiveData = [];
+
+      final Map<dynamic, dynamic>? rideShareBusOrderData =
+      rideShareBusOrderSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+      final List tempRideShareBusOrderList = [];
+      List filteredListShareBusOrder = [];
+
+      print("data orderr $rideShareBusOrderData");
+
+      if (privateRideData != null || rideShareBusOrderData != null) {
+        privateRideData?.forEach((key, value) async {
+          final privateRideMap = {
+            'id': key,
+            'address': value['pickup_address'],
+            'date': value['date'],
+            'time': value['pickup_time'],
+            'name': 'PRIVATE RIDE',
+            'price': value['price'],
+            'status': value['status']
+          };
+          // tempPrivateRideList.add(privateRideMap);
+          setState(() {
+            _ticketListData.add(privateRideMap);
+          });
+        });
+
+        rideShareBusOrderData?.forEach((orderKey, orderValue) async {
+          final mapValue = orderValue as Map<dynamic, dynamic>?;
+
+          mapValue?.forEach((key, value) async {
+            final destinationTicketSnapshot = await FirebaseDatabase.instance
+                .ref('rideShareBusTicket')
+                .orderByKey()
+                .equalTo(value['rideShareBusTicket_id'])
+                .once();
+
+            final Map<dynamic, dynamic>? ticketData = destinationTicketSnapshot
+                .snapshot.value as Map<dynamic, dynamic>?;
+
+            if (ticketData != null) {
+              // final availableDate = <String>{};
+              ticketData.forEach((ticketKey, ticketValue) async {
+                final destinationSnapshot = await FirebaseDatabase.instance
+                    .ref('destination')
+                    .orderByKey()
+                    .equalTo(ticketValue['destination_id'])
+                    .once();
+
+                final Map<dynamic, dynamic>? destinationData =
+                destinationSnapshot.snapshot.value
+                as Map<dynamic, dynamic>?;
+
+                destinationData?.forEach((destinationKey, destinationValue) {
+                  final rideShareBusOrderMap = {
+                    'id': key,
+                    'address': destinationValue['destination_address'],
+                    'date': value['date'],
+                    'time': ticketValue['time'],
+                    'name': destinationValue['destination_name'],
+                    'status': value['status']
+                  };
+                  tempRideShareBusOrderList.add(rideShareBusOrderMap);
+                  setState(() {
+                    _ticketListData.add(rideShareBusOrderMap);
+                  });
+                });
+              });
+            }
+          });
+        });
+      }
+    } else {
+      // ignore: use_build_context_synchronously
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("No Internet Connection"),
+            content: const Text("Please check your internet connection."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
-    // Initialize text controllers with default values here, if needed.
+    _ticketListData = [];
+    _fetchData();
+  }
+
+  User? getCurrentUser() {
+    return authData.currentUser;
   }
 
   @override
@@ -367,7 +498,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                   width: 11 * fem,
                                                   height: 26 * fem,
                                                   child: Text(
-                                                    '0',
+                                                    "${_ticketListData.length}",
                                                     style: SafeGoogleFont(
                                                       'Saira',
                                                       fontSize: 16 * ffem,
@@ -560,25 +691,31 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             onTap: () {
                               // do something
                             }),
-                        Container(
-                          // logoutbutton8tg (0:559)
-                          margin: EdgeInsets.fromLTRB(
-                              0.4 * fem, 0 * fem, 0 * fem, 0 * fem),
-                          width: double.infinity,
-                          height: 50 * fem,
-                          decoration: BoxDecoration(
-                            color: const Color(0xff3586ff),
-                            borderRadius: BorderRadius.circular(5 * fem),
-                          ),
-                          child: Center(
-                            child: Text(
-                              'Log Out',
-                              style: SafeGoogleFont(
-                                'Saira',
-                                fontSize: 20 * ffem,
-                                fontWeight: FontWeight.w500,
-                                height: 1.575 * ffem / fem,
-                                color: const Color(0xffffffff),
+                        GestureDetector(
+                          onTap: () {
+                            authData.signOut();
+                            Navigator.pop(widget.parentContext);
+                          },
+                          child: Container(
+                            // logoutbutton8tg (0:559)
+                            margin: EdgeInsets.fromLTRB(
+                                0.4 * fem, 0 * fem, 0 * fem, 0 * fem),
+                            width: double.infinity,
+                            height: 50 * fem,
+                            decoration: BoxDecoration(
+                              color: const Color(0xff3586ff),
+                              borderRadius: BorderRadius.circular(5 * fem),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Log Out',
+                                style: SafeGoogleFont(
+                                  'Saira',
+                                  fontSize: 20 * ffem,
+                                  fontWeight: FontWeight.w500,
+                                  height: 1.575 * ffem / fem,
+                                  color: const Color(0xffffffff),
+                                ),
                               ),
                             ),
                           ),
