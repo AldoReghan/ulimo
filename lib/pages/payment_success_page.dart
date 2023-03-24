@@ -142,7 +142,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
                                     ),
                                   ),
                                 ),
-                                ticketPendingItem(fem: fem, ffem: ffem)
+                                ticketPendingItem(fem: fem, ffem: ffem, address: '', date: '', time: '', status: '', price: '', onTap: () {  })
                               ],
                             ),
                           ),

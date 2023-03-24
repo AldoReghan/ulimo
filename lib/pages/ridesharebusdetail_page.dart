@@ -28,8 +28,8 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
   final _databaseRef = FirebaseDatabase.instance.ref('rideShareBusTicket');
   late int _passengerSeat = 1;
   late int _availableSeat = 1;
-  late String _availableRide;
-  late String _availableEntry;
+  late int _availableRide = 1;
+  late int _availableEntry = 1;
   int _selectedEntry = 1;
   int _selectedRide = 1;
   String _entryPrice = "0.00";
@@ -40,9 +40,10 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
   String? _selectedTime;
   String? _selectedDate;
   int _selectedTimeIndex = 0;
+  late List<String> _rideShareBusTicketOrderId;
   int _selectedDateIndex = 0;
-  late String _totalRideQuantity;
-  late String _totalEntryQuantity;
+  late String _totalRideQuantity = "";
+  late String _totalEntryQuantity = "";
   DateTime? _selectedDateTime;
   String? _selectedDateISO;
   bool _isRideTicket = false;
@@ -58,6 +59,7 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
   void initState() {
     super.initState();
     _destinationData = {};
+    _rideShareBusTicketOrderId = [];
     _fetchData(widget.destinationId);
   }
 
@@ -72,6 +74,15 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
         .equalTo('-as7dadjkkldsa')
         .once();
 
+    final destinationTicketSnapshot = await FirebaseDatabase.instance
+        .ref('rideShareBusTicket')
+        .orderByChild('destination_id')
+        .equalTo('-as7dadjkkldsa')
+        .once();
+
+    final Map<dynamic, dynamic>? ticketData =
+    destinationTicketSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+
     //old data
     // final destinationTicketSnapshot = await FirebaseDatabase.instance
     //     .ref('rideShareBusTicket')
@@ -83,39 +94,24 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
     //     // .equalTo("-as7dadjkkldsa")
     //     .once();
 
-    final destinationTicketSnapshot = await FirebaseDatabase.instance
-        .ref('rideShareBusTicket')
-        .orderByChild('destination_id')
-        .equalTo('-as7dadjkkldsa')
-        // .orderByKey()
-        // .orderByChild('destination_id')
-        // .equalTo(destinationId)
-        // .equalTo("-as7dadjkkldsa")
-        .once();
-
-    final Map<dynamic, dynamic>? ticketData =
-        destinationTicketSnapshot.snapshot.value as Map<dynamic, dynamic>?;
-
     final Map<dynamic, dynamic>? destinationData =
         destinationDataSnapshot.snapshot.value as Map<dynamic, dynamic>?;
 
     if (destinationData != null) {
       Map<String, dynamic> tempDestinationData;
       destinationData.forEach((dataKey, dataValue) async {
+
+
         if (ticketData != null) {
-          // final availableDate = <String>{};
           final availableTime = [];
           final ticketPriceList = [];
+          final List<String> tempRideShareBusOrderIds = [];
           ticketData.forEach((ticketKey, ticketValue) {
-            // DateTime ticketSchedule = DateTime.parse(ticketKey);
 
-            // String timeFormat = DateFormat('HH:mm').format(ticketSchedule);
-            // String formatDate = DateFormat('yyyy-MM-dd').format(ticketSchedule);
-
-            // availableDate.add(formatDate);
-            // availableTime.add(timeFormat);
             availableTime.add(ticketValue['time']);
             ticketPriceList.add(ticketValue);
+
+            tempRideShareBusOrderIds.add(ticketKey);
           });
 
           tempDestinationData = {
@@ -123,14 +119,16 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
             'address': dataValue['destination_address'],
             'image_url': dataValue['destination_image_url'],
             'description': dataValue['destination_description'],
-            // 'available_date': availableDate,
             'available_time': availableTime,
             'ticket_price': ticketPriceList
           };
 
           setState(() {
             _destinationData = tempDestinationData;
+            _rideShareBusTicketOrderId = (tempRideShareBusOrderIds);
           });
+
+          updateAvailableSeat();
         }
       });
     }
@@ -142,11 +140,6 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
       _entryPrice =
           _destinationData['ticket_price'][_selectedTimeIndex]['entry_price'];
 
-      _availableRide = _destinationData['ticket_price'][_selectedTimeIndex]
-          ['ride_quantity_left'];
-      _availableEntry = _destinationData['ticket_price'][_selectedTimeIndex]
-          ['entry_quantity_left'];
-
       _totalEntryQuantity = _destinationData['ticket_price'][_selectedTimeIndex]
           ['entry_quantity'];
 
@@ -155,41 +148,36 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
     });
   }
 
-  void _showQuantityForm(BuildContext context) {
-    final TextEditingController _quantityController = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Enter Quantity'),
-          content: TextField(
-            controller: _quantityController,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              hintText: 'Enter Quantity',
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                final String quantity = _quantityController.text.trim();
-                if (quantity.isNotEmpty) {
-                  _saveData(quantity);
-                  Navigator.of(context).pop();
-                }
-              },
-              child: const Text('Save'),
-            ),
-          ],
-        );
-      },
-    );
+  Future<void> updateAvailableSeat() async {
+    final destinationTicketSnapshot = await FirebaseDatabase.instance
+        .ref('rideShareBusTicketOrder')
+        .child(_rideShareBusTicketOrderId[_selectedTimeIndex])
+        .orderByChild('date')
+        .equalTo(DateFormat('dd-MM-yyyy').format(_date))
+        .once();
+
+    final Map<dynamic, dynamic>? ticketOrderData =
+        destinationTicketSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+
+    if (ticketOrderData != null) {
+      int tempQuantityRide = 0;
+      int tempQuantityEntry = 0;
+
+      ticketOrderData.forEach((key, value) {
+        tempQuantityRide += value['ride_quantity'] as int;
+        tempQuantityEntry += value['entry_quantity'] as int;
+      });
+
+      setState(() {
+        _availableEntry = int.parse(_totalEntryQuantity) - tempQuantityEntry;
+        _availableRide = int.parse(_totalRideQuantity) - tempQuantityRide;
+      });
+    } else {
+      setState(() {
+        _availableEntry = int.parse(_totalEntryQuantity);
+        _availableRide = int.parse(_totalRideQuantity);
+      });
+    }
   }
 
   void _saveData(String quantity) async {
@@ -604,15 +592,11 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               GestureDetector(
-                                                onTap: () => _selectDate(
-                                                    context,
-                                                    fem,
-                                                    ffem,
-                                                    _destinationData[
-                                                            'available_date']
-                                                        .length),
+                                                onTap: () =>
+                                                    _selectDate(context),
                                                 child: Text(
-                                                  "",
+                                                  DateFormat('dd MMM yyyy')
+                                                      .format(_date),
                                                   // _destinationData[
                                                   //         'available_date']
                                                   //     .elementAt(
@@ -750,11 +734,13 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                   child: Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Container(
                                         // group7511jx4 (0:1242)
-                                        margin: EdgeInsets.fromLTRB(0 * fem,
-                                            0 * fem, 188 * fem, 0 * fem),
+                                        margin: EdgeInsets.fromLTRB(
+                                            0 * fem, 0 * fem, 5 * fem, 0 * fem),
                                         height: double.infinity,
                                         child: Row(
                                           crossAxisAlignment:
@@ -788,7 +774,7 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                       ),
                                       Text(
                                         // Vpk (0:1241)
-                                        '\$$_rideSubTotalPrice',
+                                        '\$${_rideSubTotalPrice.toStringAsFixed(2)}',
                                         style: SafeGoogleFont(
                                           'Saira',
                                           fontSize: 14 * ffem,
@@ -818,7 +804,7 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                     children: [
                                       Text(
                                         // of15ticketsavailableWE4 (0:1250)
-                                        '$_availableRide of $_totalRideQuantity} tickets available ',
+                                        '$_availableRide of $_totalRideQuantity tickets available ',
                                         style: SafeGoogleFont(
                                           'Saira',
                                           fontSize: 12 * ffem,
@@ -835,7 +821,7 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                         child: Slider(
                                           value: _selectedRide.toDouble(),
                                           min: 1,
-                                          max: double.parse(_availableRide),
+                                          max: _availableRide.toDouble(),
                                           onChanged: (newValue) {
                                             setState(() {
                                               _selectedRide = newValue.round();
@@ -906,11 +892,13 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                   child: Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Container(
                                         // group7511jx4 (0:1242)
-                                        margin: EdgeInsets.fromLTRB(0 * fem,
-                                            0 * fem, 188 * fem, 0 * fem),
+                                        margin: EdgeInsets.fromLTRB(
+                                            0 * fem, 0 * fem, 6 * fem, 0 * fem),
                                         height: double.infinity,
                                         child: Row(
                                           crossAxisAlignment:
@@ -944,7 +932,7 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                       ),
                                       Text(
                                         // Vpk (0:1241)
-                                        '\$$_entrySubTotalPrice',
+                                        '\$${_entrySubTotalPrice.toStringAsFixed(2)}',
                                         style: SafeGoogleFont(
                                           'Saira',
                                           fontSize: 14 * ffem,
@@ -991,7 +979,7 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                         child: Slider(
                                           value: _selectedEntry.toDouble(),
                                           min: 1,
-                                          max: double.parse(_availableEntry),
+                                          max: _availableEntry.toDouble(),
                                           onChanged: (newValue) {
                                             setState(() {
                                               _selectedEntry = newValue.round();
@@ -1380,266 +1368,36 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
     // );
   }
 
-  bool _isSelectedTime(String time) {
-    return _selectedTime != null && _selectedTime == time;
-  }
-
-  Future<void> _selectDate(
-      BuildContext context, double fem, double ffem, int dateCount) async {
-    // showDialog(
-    //     context: context,
-    //     barrierDismissible: false,
-    //     builder: (context) {
-    //       return AlertDialog(
-    //         title: Text(
-    //           "Available Date",
-    //           textAlign: TextAlign.center,
-    //           style: SafeGoogleFont(
-    //             'Saira',
-    //             fontSize: 14 * ffem,
-    //             fontWeight: FontWeight.w500,
-    //             height: 1.4285714286 * ffem / fem,
-    //             color: const Color(0xfffdcb5b),
-    //           ),
-    //         ),
-    //         backgroundColor: darkPrimary,
-    //         content: ConstrainedBox(
-    //           constraints: const BoxConstraints(maxHeight: 300),
-    //           child: ListView.builder(
-    //               itemCount: dateCount,
-    //               itemBuilder: (context, index) {
-    //                 return Container(
-    //                   margin: const EdgeInsets.only(bottom: 12),
-    //                   width: MediaQuery.of(context).size.width / 3,
-    //                   height: 46 * fem,
-    //                   child: DottedBorder(
-    //                     borderType: BorderType.RRect,
-    //                     radius: const Radius.circular(6),
-    //                     color: const Color(0xFFFDCB5B),
-    //                     strokeWidth: 1,
-    //                     child: SizedBox(
-    //                       height: double.infinity,
-    //                       child: SizedBox(
-    //                         // group7535hLk (0:1167)
-    //                         width: double.infinity,
-    //                         height: double.infinity,
-    //                         child: Padding(
-    //                           padding:
-    //                               const EdgeInsets.symmetric(horizontal: 15),
-    //                           child: GestureDetector(
-    //                             onTap: () {
-    //                               setState(() {
-    //                                 _selectedDateIndex = index;
-    //                               });
-    //                               //update price for ticket
-    //
-    //                               Map<dynamic, dynamic>? ticketList =
-    //                                   _destinationData['ticket_price'];
-    //
-    //                               print("ticketList $ticketList");
-    //
-    //                               setState(() {
-    //                                 _selectedDateTime = DateTime.parse(
-    //                                     "${_destinationData['available_date'].elementAt(index)}T${_destinationData['available_time'].elementAt(index)}:00Z");
-    //                               });
-    //
-    //                               print(
-    //                                   "selectedDate${_selectedDateTime?.year} ");
-    //
-    //                               setState(() {
-    //                                 // _selectedDateTime?.day = 4;
-    //                                 _selectedDateISO =
-    //                                     "${_destinationData['available_date'].elementAt(index)}T${_destinationData['available_time'].elementAt(index)}:00Z";
-    //                               });
-    //
-    //                               print("selectedDateISOO $_selectedDateISO");
-    //
-    //                               setState(() {
-    //                                 _availableEntry =
-    //                                     ticketList?[_selectedDateISO]
-    //                                             ['entry_quantity'] ??
-    //                                         "";
-    //                                 _availableRide =
-    //                                     ticketList?[_selectedDateISO]
-    //                                             ['ride_quantity'] ??
-    //                                         "";
-    //                                 _entryPrice = ticketList?[_selectedDateISO]
-    //                                         ['entry_price'] ??
-    //                                     "";
-    //                                 _ridePrice = ticketList?[_selectedDateISO]
-    //                                         ['ride_price'] ??
-    //                                     "";
-    //                                 _availableEntry =
-    //                                     ticketList?[_selectedDateISO]
-    //                                             ['entry_quantity'] ??
-    //                                         "";
-    //                                 _totalPrice = double.parse(_entryPrice) +
-    //                                     double.parse(_ridePrice);
-    //                               });
-    //
-    //                               //
-    //                               Navigator.pop(context);
-    //                             },
-    //                             child: Center(
-    //                               child: Text(
-    //                                 _destinationData['available_date']
-    //                                     .elementAt(index),
-    //                                 textAlign: TextAlign.center,
-    //                                 style: SafeGoogleFont(
-    //                                   'Saira',
-    //                                   fontSize: 14 * ffem,
-    //                                   fontWeight: FontWeight.w500,
-    //                                   height: 1.4285714286 * ffem / fem,
-    //                                   color: const Color(0xfffdcb5b),
-    //                                 ),
-    //                               ),
-    //                             ),
-    //                           ),
-    //                         ),
-    //                       ),
-    //                     ),
-    //                   ),
-    //                 );
-    //               }),
-    //         ),
-    //       );
-    //     });
-
-    // final DateTime? picked = await showDatePicker(
-    //   context: context,
-    //   initialDate: _date,
-    //   firstDate: DateTime.now(),
-    //   lastDate: DateTime(2100),
-    //   builder: (BuildContext context, Widget? child) {
-    //     return Theme(
-    //       data: ThemeData(
-    //         primaryColor: darkPrimary, // change the selected date color
-    //         colorScheme: const ColorScheme.light(
-    //           primary: darkPrimary,
-    //           // change the text color of the header
-    //           onPrimary: Colors.white,
-    //           // change the color of the icons in the header
-    //           surface: darkPrimary,
-    //           // change the background color of the calendar
-    //           onSurface: Colors.black, // change the text color of the calendar
-    //         ),
-    //       ),
-    //       child: child ?? const SizedBox.shrink(),
-    //     );
-    //   },
-    // );
-    // if (picked != null && picked != _date) {
-    //   setState(() {
-    //     _date = picked;
-    //   });
-    // }
-  }
-
-  Future<void> _selectPickupTime(
-      BuildContext context, double fem, double ffem, int dateCount) async {
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(
-              "Available Time",
-              textAlign: TextAlign.center,
-              style: SafeGoogleFont(
-                'Saira',
-                fontSize: 14 * ffem,
-                fontWeight: FontWeight.w500,
-                height: 1.4285714286 * ffem / fem,
-                color: const Color(0xfffdcb5b),
-              ),
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _date,
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData(
+            primaryColor: darkPrimary, // change the selected date color
+            colorScheme: const ColorScheme.light(
+              primary: darkPrimary,
+              // change the text color of the header
+              onPrimary: Colors.white,
+              // change the color of the icons in the header
+              surface: darkPrimary,
+              // change the background color of the calendar
+              onSurface: Colors.black, // change the text color of the calendar
             ),
-            backgroundColor: darkPrimary,
-            content: ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 300),
-              child: ListView.builder(
-                  itemCount: dateCount,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      width: MediaQuery.of(context).size.width / 3,
-                      height: 46 * fem,
-                      child: DottedBorder(
-                        borderType: BorderType.RRect,
-                        radius: const Radius.circular(6),
-                        color: const Color(0xFFFDCB5B),
-                        strokeWidth: 1,
-                        child: SizedBox(
-                          height: double.infinity,
-                          child: SizedBox(
-                            // group7535hLk (0:1167)
-                            width: double.infinity,
-                            height: double.infinity,
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 15),
-                              child: GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _selectedTimeIndex = index;
-                                  });
-                                  //update price for ticket
-
-                                  //
-                                  Navigator.pop(context);
-                                },
-                                child: Center(
-                                  child: Text(
-                                    _destinationData['available_time']
-                                        .elementAt(index),
-                                    textAlign: TextAlign.center,
-                                    style: SafeGoogleFont(
-                                      'Saira',
-                                      fontSize: 14 * ffem,
-                                      fontWeight: FontWeight.w500,
-                                      height: 1.4285714286 * ffem / fem,
-                                      color: const Color(0xfffdcb5b),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }),
-            ),
-          );
-        });
-
-    // final DateTime? picked = await showDatePicker(
-    //   context: context,
-    //   initialDate: _date,
-    //   firstDate: DateTime.now(),
-    //   lastDate: DateTime(2100),
-    //   builder: (BuildContext context, Widget? child) {
-    //     return Theme(
-    //       data: ThemeData(
-    //         primaryColor: darkPrimary, // change the selected date color
-    //         colorScheme: const ColorScheme.light(
-    //           primary: darkPrimary,
-    //           // change the text color of the header
-    //           onPrimary: Colors.white,
-    //           // change the color of the icons in the header
-    //           surface: darkPrimary,
-    //           // change the background color of the calendar
-    //           onSurface: Colors.black, // change the text color of the calendar
-    //         ),
-    //       ),
-    //       child: child ?? const SizedBox.shrink(),
-    //     );
-    //   },
-    // );
-    // if (picked != null && picked != _date) {
-    //   setState(() {
-    //     _date = picked;
-    //   });
-    // }
+          ),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
+    );
+    if (picked != null && picked != _date) {
+      setState(() {
+        _date = picked;
+      });
+      updateAvailableSeat();
+    }
   }
 
   String countTotalPrice(double rideSubTotalPrice, double entrySubTotalPrice) {

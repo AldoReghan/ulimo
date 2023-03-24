@@ -1,23 +1,40 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
 
 import '../base/base_color.dart';
 import '../base/utils.dart';
 
-Widget ticketPendingItem({required double fem, required double ffem}){
+Widget ticketPendingItem(
+    {required double fem,
+    required double ffem,
+    required String address,
+    required String date,
+    required String time,
+    required String price,
+    required String status,
+    required Function() onTap}) {
+  final backgroundTicket = status == "pending"
+      ? const AssetImage("assets/ticket_pending_background.png")
+      : const AssetImage("assets/ticket_approved_background.png");
+
+  final baseColor =
+      status == "pending" ? yellowPrimary : const Color(0xFF3586FF);
+
+  final showPayButton = status == "approved" ? true : false;
 
   return Container(
     // autogroup8kvhNC8 (B1LcCTg9vHsnNENVyN8kVh)
-    padding: EdgeInsets.fromLTRB(22.43 * fem,
-        16.83 * fem, 21.52 * fem, 18.26 * fem),
+    padding:
+        EdgeInsets.fromLTRB(22.43 * fem, 16.83 * fem, 21.52 * fem, 8.26 * fem),
     margin: const EdgeInsets.only(bottom: 24),
     width: double.infinity,
-    decoration: const BoxDecoration(
+    decoration: BoxDecoration(
       image: DecorationImage(
         fit: BoxFit.cover,
-        image:
-        AssetImage("assets/ticket_pending_background.png"),
+        image: backgroundTicket,
       ),
     ),
     child: Column(
@@ -25,31 +42,26 @@ Widget ticketPendingItem({required double fem, required double ffem}){
       children: [
         Container(
           // group7607UFA (1:1384)
-          margin: EdgeInsets.fromLTRB(8.04 * fem,
-              0 * fem, 4.41 * fem, 25.6 * fem),
+          margin:
+              EdgeInsets.fromLTRB(8.04 * fem, 0 * fem, 4.41 * fem, 25.6 * fem),
           width: double.infinity,
           height: 41 * fem,
           child: Row(
-            crossAxisAlignment:
-            CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
                 // group15oHS (1:1385)
-                margin: EdgeInsets.fromLTRB(0 * fem,
-                    0 * fem, 27.6 * fem, 0 * fem),
+                margin:
+                    EdgeInsets.fromLTRB(0 * fem, 0 * fem, 27.6 * fem, 0 * fem),
                 width: 177 * fem,
                 height: double.infinity,
                 child: Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
                       // privaterideYF2 (1:1386)
                       margin: EdgeInsets.fromLTRB(
-                          0 * fem,
-                          0 * fem,
-                          0 * fem,
-                          1 * fem),
+                          0 * fem, 0 * fem, 0 * fem, 1 * fem),
                       child: Text(
                         'PRIVATE RIDE',
                         style: SafeGoogleFont(
@@ -57,8 +69,7 @@ Widget ticketPendingItem({required double fem, required double ffem}){
                           fontSize: 16 * ffem,
                           fontWeight: FontWeight.w500,
                           height: 1.575 * ffem / fem,
-                          color:
-                          const Color(0xffffffff),
+                          color: const Color(0xffffffff),
                         ),
                       ),
                     ),
@@ -66,32 +77,25 @@ Widget ticketPendingItem({required double fem, required double ffem}){
                       // group14eor (1:1387)
                       width: double.infinity,
                       child: Row(
-                        crossAxisAlignment:
-                        CrossAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Container(
-                            // frameowe (1:1389)
-                              margin:
-                              EdgeInsets.fromLTRB(
-                                  0 * fem,
-                                  0 * fem,
-                                  5 * fem,
-                                  0 * fem),
+                              // frameowe (1:1389)
+                              margin: EdgeInsets.fromLTRB(
+                                  0 * fem, 0 * fem, 5 * fem, 0 * fem),
                               width: 14 * fem,
                               height: 14 * fem,
-                              child: SvgPicture.asset(
-                                  "assets/icon/location.svg")),
+                              child:
+                                  SvgPicture.asset("assets/icon/location.svg")),
                           Text(
                             // wplattsttampafl33606LRn (1:1388)
-                            '1806 W Platt St Tampa, FL 33606',
+                            address,
                             style: SafeGoogleFont(
                               'Saira',
                               fontSize: 10 * ffem,
-                              fontWeight:
-                              FontWeight.w500,
+                              fontWeight: FontWeight.w500,
                               height: 1.4 * ffem / fem,
-                              color: const Color(
-                                  0xff3586ff),
+                              color: const Color(0xff3586ff),
                             ),
                           ),
                         ],
@@ -102,16 +106,16 @@ Widget ticketPendingItem({required double fem, required double ffem}){
               ),
               Container(
                 // group7606sRi (1:1392)
-                margin: EdgeInsets.fromLTRB(0 * fem,
-                    1.5 * fem, 0 * fem, 1.5 * fem),
+                margin:
+                    EdgeInsets.fromLTRB(0 * fem, 1.5 * fem, 0 * fem, 1.5 * fem),
                 height: double.infinity,
                 child: Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       // pmQwS (1:1394)
-                      '6:20 PM',
+                      DateFormat("h:mm a")
+                          .format(DateFormat("H:mm").parse(time)),
                       style: SafeGoogleFont(
                         'Saira',
                         fontSize: 12 * ffem,
@@ -122,7 +126,8 @@ Widget ticketPendingItem({required double fem, required double ffem}){
                     ),
                     Text(
                       // feb2023kkQ (1:1393)
-                      '03 FEB 2023',
+                      DateFormat("dd MMM yyyy")
+                          .format(DateFormat("yyyy-MM-dd").parse(date)),
                       style: SafeGoogleFont(
                         'Saira',
                         fontSize: 12 * ffem,
@@ -139,42 +144,84 @@ Widget ticketPendingItem({required double fem, required double ffem}){
         ),
         Padding(
           padding: EdgeInsets.only(bottom: 24.6 * fem),
-          child: const DottedLine(
-            dashColor: yellowPrimary,
+          child: DottedLine(
+            dashColor: baseColor,
           ),
         ),
         Container(
-          // ticketstatusEfa (1:1382)
-          margin: EdgeInsets.fromLTRB(
-              6.41 * fem, 0 * fem, 0 * fem, 6 * fem),
-          child: Text(
-            'Ticket Status',
-            style: SafeGoogleFont(
-              'Saira',
-              fontSize: 16 * ffem,
-              fontWeight: FontWeight.w500,
-              height: 0.875 * ffem / fem,
-              color: const Color(0xffffffff),
+          margin: const EdgeInsets.only(left: 6, right: 6, bottom: 10),
+          width: double.infinity,
+          child: IntrinsicHeight(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      // ticketstatusEfa (1:1382)
+                      margin: EdgeInsets.fromLTRB(
+                          6.41 * fem, 0 * fem, 0 * fem, 6 * fem),
+                      child: Text(
+                        'Ticket Status',
+                        style: SafeGoogleFont(
+                          'Saira',
+                          fontSize: 16 * ffem,
+                          fontWeight: FontWeight.w500,
+                          height: 0.875 * ffem / fem,
+                          color: const Color(0xffffffff),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      // confirmedkdv (1:1383)
+                      margin: EdgeInsets.fromLTRB(
+                          8.04 * fem, 0 * fem, 0 * fem, 0 * fem),
+                      child: Text(
+                        toBeginningOfSentenceCase(status) ?? status,
+                        style: SafeGoogleFont(
+                          'Saira',
+                          fontSize: 12 * ffem,
+                          fontWeight: FontWeight.w500,
+                          height: 1.1666666667 * ffem / fem,
+                          color: baseColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                showPayButton
+                    ? SizedBox(
+                        height: 30 * fem,
+                        child: ElevatedButton(
+                          // button8hv (0:1291)
+                          onPressed: () {
+                            onTap.call();
+                          },
+                          style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 4),
+                              backgroundColor: yellowPrimary),
+                          child: Center(
+                            child: Text(
+                              'PAY \$$price',
+                              style: SafeGoogleFont(
+                                'Saira',
+                                fontSize: 16 * ffem,
+                                fontWeight: FontWeight.w500,
+                                height: 1.575 * ffem / fem,
+                                color: const Color(0xff000000),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    : const SizedBox(),
+              ],
             ),
           ),
-        ),
-        Container(
-          // confirmedkdv (1:1383)
-          margin: EdgeInsets.fromLTRB(
-              8.04 * fem, 0 * fem, 0 * fem, 0 * fem),
-          child: Text(
-            'Confirmed',
-            style: SafeGoogleFont(
-              'Saira',
-              fontSize: 12 * ffem,
-              fontWeight: FontWeight.w500,
-              height: 1.1666666667 * ffem / fem,
-              color: const Color(0xfffdaf00),
-            ),
-          ),
-        ),
+        )
       ],
     ),
   );
-
 }
