@@ -22,6 +22,30 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
   final _phoneAuthService = PhoneAuthService();
   bool _isLoading = false;
 
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+
+  void _handleFakeLoginForTest(BuildContext context) async{
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: 'fafirmansyah20@gmail.com',
+        password: 'ulimo123',
+      );
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MainPage()));
+      // User account created successfully
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided for that user.');
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
   Future<void> _handleSignIn(BuildContext context) async {
     final phoneNumber = _phoneNumberController.text.trim();
     final isValid = _formKey.currentState?.validate() ?? false;
@@ -221,7 +245,8 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
     //   context,
     //   MaterialPageRoute(builder: (context) => const HomePage()),
     // )
-    _isLoading ? null : _handleSignIn(context)
+    // _isLoading ? null : _handleSignIn(context)
+    _isLoading ? null : _handleFakeLoginForTest(context)
     // Navigator.push(
     //   context,
     //   MaterialPageRoute(
