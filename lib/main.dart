@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:ulimo/base/base_color.dart';
+import 'package:ulimo/firebase_options.dart';
 import 'package:ulimo/pages/main/home_page.dart';
 import 'package:ulimo/pages/main/main_page.dart';
 import 'package:ulimo/pages/phone_login_pages.dart';
@@ -11,7 +12,9 @@ import 'package:ulimo/pages/phone_login_pages.dart';
 void main() async {
   // Initialize Firebase app
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform
+  );
   Stripe.publishableKey =
       'pk_test_51GztTrAJNtmvbtbwMEUYu6YgxipbdFvBNqqO1hEVj6vWAyUFq84DeAM8pGBvGSz5SGZNt3HIGavTnonZyRqUolib00X1dGOYUv';
   await Stripe.instance.applySettings();
