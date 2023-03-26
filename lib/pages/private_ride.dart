@@ -81,6 +81,7 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
       'email': _emailController.text.trim(),
       'passenger': _passengersController.text.trim(),
       'is_round_trip': _isRoundTrip,
+      'price': '',
       'status': 'pending'
     };
 

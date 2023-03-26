@@ -70,17 +70,17 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
     });
 
     final destinationDataSnapshot = await FirebaseDatabase.instance
-        .ref('destination')
+        .ref('rideShareBusDestination')
         .orderByKey()
-        // .equalTo(destinationId)
-        .equalTo("-as7dadjkkldsa")
+        .equalTo(destinationId)
+        // .equalTo("-as7dadjkkldsa")
         .once();
 
     final destinationTicketSnapshot = await FirebaseDatabase.instance
         .ref('rideShareBusTicket')
         .orderByChild('destination_id')
-        // .equalTo(destinationId)
-        .equalTo("-as7dadjkkldsa")
+        .equalTo(destinationId)
+        // .equalTo("-as7dadjkkldsa")
         .once();
 
     final Map<dynamic, dynamic>? ticketData =
@@ -141,7 +141,7 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
   Future<void> updateAvailableSeat() async {
     final destinationTicketSnapshot = await FirebaseDatabase.instance
         .ref('rideShareBusTicketOrder')
-        .child(_rideShareBusTicketOrderId[_selectedTimeIndex])
+        // .child(_rideShareBusTicketOrderId[_selectedTimeIndex])
         .orderByChild('date')
         .equalTo(DateFormat('dd-MM-yyyy').format(_date))
         .once();
@@ -154,8 +154,10 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
       int tempQuantityEntry = 0;
 
       ticketOrderData.forEach((key, value) {
-        tempQuantityRide += value['ride_quantity'] as int;
-        tempQuantityEntry += value['entry_quantity'] as int;
+        if(value['rideShareBusTicket_id'] == _rideShareBusTicketOrderId[_selectedTimeIndex]){
+          tempQuantityRide += value['ride_quantity'] as int;
+          tempQuantityEntry += value['entry_quantity'] as int;
+        }
       });
 
       setState(() {
@@ -1098,7 +1100,7 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                         date: DateFormat("dd-MM-yyyy")
                                             .format(_date),
                                         time: _selectedTime ?? "00:00",
-                                        rideType: '',
+                                        rideType: 'sharebus',
                                         orderId: '',
                                         destinationName: _destinationData['name'],
                                         destinationAddress: _destinationData['address'],

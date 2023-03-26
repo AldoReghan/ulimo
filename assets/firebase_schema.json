@@ -49,106 +49,8 @@
       "user_id": "-NPcUkP6HIjb8nxqcFV9"
     }
   },
-  "destination": {
+  "rideShareBusDestination": {
     "-as7dadjkkldsa": {
-      "destination_address": "jl tampa",
-      "destination_description": "this is zoo",
-      "destination_image_url": "https://store-images.s-microsoft.com/image/apps.47288.14188059920471079.8845931d-936f-4c5b-848c-e9700ef87a6b.92da2b6e-01a3-4806-8575-6f6278ecd71b?q=90&w=480&h=270",
-      "destination_name": "Zoo",
-      "destination_type": "share"
-    },
-    "-asdasdjkldsa": {
-      "destination_address": "jl tampa",
-      "destination_description": "this is zoo",
-      "destination_image_url": "https://store-images.s-microsoft.com/image/apps.47288.14188059920471079.8845931d-936f-4c5b-848c-e9700ef87a6b.92da2b6e-01a3-4806-8575-6f6278ecd71b?q=90&w=480&h=270",
-      "destination_name": "Zoo",
-      "destination_type": "night"
-    },
-    "-asdasdjkklsa": {
-      "destination_address": "jl tampa",
-      "destination_description": "this is zoo",
-      "destination_image_url": "https://store-images.s-microsoft.com/image/apps.47288.14188059920471079.8845931d-936f-4c5b-848c-e9700ef87a6b.92da2b6e-01a3-4806-8575-6f6278ecd71b?q=90&w=480&h=270",
-      "destination_name": "Zoo",
-      "destination_type": "share"
-    },
-    "-asdadjkkldsa": {
-      "destination_address": "jl tampa",
-      "destination_description": "this is zoo",
-      "destination_image_url": "https://store-images.s-microsoft.com/image/apps.47288.14188059920471079.8845931d-936f-4c5b-848c-e9700ef87a6b.92da2b6e-01a3-4806-8575-6f6278ecd71b?q=90&w=480&h=270",
-      "destination_name": "Zoo",
-      "destination_type": "night"
-    },
-    "-asadjkkldsa": {
-      "destination_address": "jl tampa",
-      "destination_description": "this is zoo",
-      "destination_image_url": "https://store-images.s-microsoft.com/image/apps.47288.14188059920471079.8845931d-936f-4c5b-848c-e9700ef87a6b.92da2b6e-01a3-4806-8575-6f6278ecd71b?q=90&w=480&h=270",
-      "destination_name": "Zoo",
-      "destination_type": "share"
-    },
-    "-asdasdjkkld1sa": {
-      "destination_address": "jl tampa",
-      "destination_description": "this is zoo",
-      "destination_image_url": "https://store-images.s-microsoft.com/image/apps.47288.14188059920471079.8845931d-936f-4c5b-848c-e9700ef87a6b.92da2b6e-01a3-4806-8575-6f6278ecd71b?q=90&w=480&h=270",
-      "destination_name": "Zoo",
-      "destination_type": "share"
-    },
-    "-asdaskldsa": {
-      "destination_address": "jl tampa",
-      "destination_description": "this is zoo",
-      "destination_image_url": "https://store-images.s-microsoft.com/image/apps.47288.14188059920471079.8845931d-936f-4c5b-848c-e9700ef87a6b.92da2b6e-01a3-4806-8575-6f6278ecd71b?q=90&w=480&h=270",
-      "destination_name": "Zoo",
-      "destination_type": "night"
-    },
-    "-asdahhhsdjkklsa": {
-      "destination_address": "jl tampa",
-      "destination_description": "this is zoo",
-      "destination_image_url": "https://store-images.s-microsoft.com/image/apps.47288.14188059920471079.8845931d-936f-4c5b-848c-e9700ef87a6b.92da2b6e-01a3-4806-8575-6f6278ecd71b?q=90&w=480&h=270",
-      "destination_name": "Zoo",
-      "destination_type": "share"
-    },
-    "-asdfadjkkldsa": {
-      "destination_address": "jl tampa",
-      "destination_description": "this is zoo",
-      "destination_image_url": "https://store-images.s-microsoft.com/image/apps.47288.14188059920471079.8845931d-936f-4c5b-848c-e9700ef87a6b.92da2b6e-01a3-4806-8575-6f6278ecd71b?q=90&w=480&h=270",
-      "destination_name": "Zoo",
-      "destination_type": "night"
-    },
-    "-assdjkkldsa": {
-      "destination_address": "jl tampa",
-      "destination_description": "this is zoo",
-      "destination_image_url": "https://store-images.s-microsoft.com/image/apps.47288.14188059920471079.8845931d-936f-4c5b-848c-e9700ef87a6b.92da2b6e-01a3-4806-8575-6f6278ecd71b?q=90&w=480&h=270",
-      "destination_name": "Zoo",
-      "destination_type": "share"
-    },
-    "-asdasjjdjkkldsa": {
-      "destination_address": "jl tampa",
-      "destination_description": "this is zoo",
-      "destination_image_url": "https://store-images.s-microsoft.com/image/apps.47288.14188059920471079.8845931d-936f-4c5b-848c-e9700ef87a6b.92da2b6e-01a3-4806-8575-6f6278ecd71b?q=90&w=480&h=270",
-      "destination_name": "Zoo",
-      "destination_type": "share"
-    },
-    "-asda1sdjkldsa": {
-      "destination_address": "jl tampa",
-      "destination_description": "this is zoo",
-      "destination_image_url": "https://store-images.s-microsoft.com/image/apps.47288.14188059920471079.8845931d-936f-4c5b-848c-e9700ef87a6b.92da2b6e-01a3-4806-8575-6f6278ecd71b?q=90&w=480&h=270",
-      "destination_name": "Zoo",
-      "destination_type": "night"
-    },
-    "-asd9asdjkklsa": {
-      "destination_address": "jl tampa",
-      "destination_description": "this is zoo",
-      "destination_image_url": "https://store-images.s-microsoft.com/image/apps.47288.14188059920471079.8845931d-936f-4c5b-848c-e9700ef87a6b.92da2b6e-01a3-4806-8575-6f6278ecd71b?q=90&w=480&h=270",
-      "destination_name": "Zoo",
-      "destination_type": "share"
-    },
-    "-as7dadjkkaldsa": {
-      "destination_address": "jl tampa",
-      "destination_description": "this is zoo",
-      "destination_image_url": "https://store-images.s-microsoft.com/image/apps.47288.14188059920471079.8845931d-936f-4c5b-848c-e9700ef87a6b.92da2b6e-01a3-4806-8575-6f6278ecd71b?q=90&w=480&h=270",
-      "destination_name": "Zoo",
-      "destination_type": "night"
-    },
-    "-aaadjkkldsa": {
       "destination_address": "jl tampa",
       "destination_description": "this is zoo",
       "destination_image_url": "https://store-images.s-microsoft.com/image/apps.47288.14188059920471079.8845931d-936f-4c5b-848c-e9700ef87a6b.92da2b6e-01a3-4806-8575-6f6278ecd71b?q=90&w=480&h=270",
@@ -185,31 +87,29 @@
     }
   },
   "nightlifeOrder": {
-    "-NPbMvpXQP7Trim8Xxxw" : {
-      "-keyasawas": {
-        "date": "01-04-2023",
-        "ride_quantity": 1,
-        "entry_quantity": 1,
-        "nightlife_id": "-NPbMvpXQP7Trim8Xxxw",
-        "status": "paid",
-        "users_id": "z8bMpdPtCAWITdw3y99H0f4YsQX2"
-      },
-      "-1keyasawas": {
-        "date": "02-04-2023",
-        "ride_quantity": 5,
-        "entry_quantity": 1,
-        "nightlife_id": "-NPbMvpXQP7Trim8Xxxw",
-        "status": "paid",
-        "users_id": "z8bMpdPtCAWITdw3y99H0f4YsQX2"
-      },
-      "-k2eyasawas": {
-        "date": "03-04-2023",
-        "ride_quantity": 5,
-        "entry_quantity": 1,
-        "nightlife_id": "-NPbMvpXQP7Trim8Xxxw",
-        "status": "paid",
-        "users_id": "z8bMpdPtCAWITdw3y99H0f4YsQX2"
-      }
+    "-keyasawas": {
+      "date": "01-04-2023",
+      "ride_quantity": 1,
+      "entry_quantity": 1,
+      "nightlife_id": "-NPbMvpXQP7Trim8Xxxw",
+      "status": "paid",
+      "users_id": "z8bMpdPtCAWITdw3y99H0f4YsQX2"
+    },
+    "-1keyasawas": {
+      "date": "02-04-2023",
+      "ride_quantity": 5,
+      "entry_quantity": 1,
+      "nightlife_id": "-NPbMvpXQP7Trim8Xxxw",
+      "status": "paid",
+      "users_id": "z8bMpdPtCAWITdw3y99H0f4YsQX2"
+    },
+    "-k2eyasawas": {
+      "date": "03-04-2023",
+      "ride_quantity": 5,
+      "entry_quantity": 1,
+      "nightlife_id": "-NPbMvpXQP7Trim8Xxxw",
+      "status": "paid",
+      "users_id": "z8bMpdPtCAWITdw3y99H0f4YsQX2"
     }
   },
   "payments": {
@@ -341,31 +241,29 @@
     }
   },
   "rideShareBusTicketOrder": {
-    "-NPcThfa7CZYIuqtLRP": {
-      "-keyasawas": {
-        "date": "01-04-2023",
-        "ride_quantity": 2,
-        "entry_quantity": 7,
-        "rideShareBusTicket_id": "-NPcThfa7CZYIuqtLRP",
-        "status": "paid",
-        "users_id": "z8bMpdPtCAWITdw3y99H0f4YsQX2"
-      },
-      "-keywsdwas": {
-        "date": "03-04-2023",
-        "ride_quantity": 5,
-        "entry_quantity": 5,
-        "rideShareBusTicket_id": "-NPcThfa7CZYIuqtLRP",
-        "status": "expired",
-        "users_id": "z8bMpdPtCAWITdw3y99H0f4YsQX2"
-      },
-      "-keyasdgwas": {
-        "date": "02-04-2023",
-        "ride_quantity": 1,
-        "entry_quantity": 0,
-        "rideShareBusTicket_id": "-NPcThfa7CZYIuqtLRP",
-        "status": "paid",
-        "users_id": "z8bMpdPtCAWITdw3y99H0f4YsQX2"
-      }
+    "-keyasawas": {
+      "date": "01-04-2023",
+      "ride_quantity": 2,
+      "entry_quantity": 7,
+      "rideShareBusTicket_id": "-NPcThfa7CZYIuqtLRP",
+      "status": "paid",
+      "users_id": "z8bMpdPtCAWITdw3y99H0f4YsQX2"
+    },
+    "-keywsdwas": {
+      "date": "03-04-2023",
+      "ride_quantity": 5,
+      "entry_quantity": 5,
+      "rideShareBusTicket_id": "-NPcThfa7CZYIuqtLRP",
+      "status": "expired",
+      "users_id": "z8bMpdPtCAWITdw3y99H0f4YsQX2"
+    },
+    "-keyasdgwas": {
+      "date": "02-04-2023",
+      "ride_quantity": 1,
+      "entry_quantity": 0,
+      "rideShareBusTicket_id": "-NPcThfa7CZYIuqtLRP",
+      "status": "paid",
+      "users_id": "z8bMpdPtCAWITdw3y99H0f4YsQX2"
     }
   },
   "notifications": {

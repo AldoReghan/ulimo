@@ -48,6 +48,8 @@ class _MyTicketPageState extends State<MyTicketPage> {
           .equalTo(authData.currentUser?.uid)
           .once();
 
+      print("uidddd ${authData.currentUser?.uid}");
+
       final Map<dynamic, dynamic>? privateRideData =
           privateRideSnapshot.snapshot.value as Map<dynamic, dynamic>?;
       final List tempPrivateRideList = [];
@@ -78,10 +80,10 @@ class _MyTicketPageState extends State<MyTicketPage> {
           });
         });
 
-        rideShareBusOrderData?.forEach((orderKey, orderValue) async {
-          final mapValue = orderValue as Map<dynamic, dynamic>?;
-
-          mapValue?.forEach((key, value) async {
+        rideShareBusOrderData?.forEach((key, value) async {
+          // final mapValue = orderValue as Map<dynamic, dynamic>?;
+          //
+          // mapValue?.forEach((key, value) async {
             final destinationTicketSnapshot = await FirebaseDatabase.instance
                 .ref('rideShareBusTicket')
                 .orderByKey()
@@ -95,7 +97,7 @@ class _MyTicketPageState extends State<MyTicketPage> {
               // final availableDate = <String>{};
               ticketData.forEach((ticketKey, ticketValue) async {
                 final destinationSnapshot = await FirebaseDatabase.instance
-                    .ref('destination')
+                    .ref('rideShareBusDestination')
                     .orderByKey()
                     .equalTo(ticketValue['destination_id'])
                     .once();
@@ -120,7 +122,7 @@ class _MyTicketPageState extends State<MyTicketPage> {
                 });
               });
             }
-          });
+          // });
         });
       }
     } else {

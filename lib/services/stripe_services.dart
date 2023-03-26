@@ -6,6 +6,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:http/http.dart' as http;
 
 class StripeServices {
+
   static Future<Map<String, dynamic>> createPaymentIntent(
       String amount, String currency) async {
     try {
@@ -40,6 +41,8 @@ class StripeServices {
       'status': 'Paid',
     });
   }
+
+
 
   static Future<void> displayPaymentSheet(
       String clientSecret, String name, String email, String amount) async {

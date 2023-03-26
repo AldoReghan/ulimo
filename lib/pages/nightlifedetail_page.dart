@@ -116,7 +116,7 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
   Future<void> updateAvailableSeat() async {
     final destinationTicketSnapshot = await FirebaseDatabase.instance
         .ref('nightlifeOrder')
-        .child(widget.nightlifeDestinationId)
+        // .child(widget.nightlifeDestinationId)
         .orderByChild('date')
         .equalTo(DateFormat('dd-MM-yyyy').format(_date))
         .once();
@@ -1064,7 +1064,7 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                     date: DateFormat("dd-MM-yyyy")
                                         .format(_date),
                                     time: '',
-                                    rideType: '',
+                                    rideType: 'nightlife',
                                     orderId: '',
                                     destinationName: _destinationData['destination_name'],
                                     destinationAddress: _destinationData['destination_address'],

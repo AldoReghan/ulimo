@@ -111,7 +111,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               // final availableDate = <String>{};
               ticketData.forEach((ticketKey, ticketValue) async {
                 final destinationSnapshot = await FirebaseDatabase.instance
-                    .ref('destination')
+                    .ref('rideShareBusDestination')
                     .orderByKey()
                     .equalTo(ticketValue['destination_id'])
                     .once();

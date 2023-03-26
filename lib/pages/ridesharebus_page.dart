@@ -35,7 +35,7 @@ class _RideShareBusPageState extends State<RideShareBusPage> {
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult != ConnectivityResult.none) {
       final destinationSnapshot = await _databaseRef
-          .child('destination')
+          .child('rideShareBusDestination')
           .orderByChild('destination_type')
           .equalTo('share')
           .once();

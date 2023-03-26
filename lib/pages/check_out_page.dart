@@ -2,6 +2,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
@@ -47,6 +48,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
   bool isCodeValid = false;
   DateTime _discountExpiredDate = DateTime.now();
   final promoController = TextEditingController();
+  final cardController = CardFormEditController();
 
   final _databaseRef = FirebaseDatabase.instance.ref();
 
@@ -413,229 +415,242 @@ class _CheckOutPageState extends State<CheckOutPage> {
                   ],
                 ),
               ),
-              Container(
-                // info2Pq2 (0:1079)
-                margin: EdgeInsets.fromLTRB(
-                    0.08 * fem, 0 * fem, 0.08 * fem, 36 * fem),
-                width: double.infinity,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      // cardnumberLkG (0:1080)
-                      margin: EdgeInsets.fromLTRB(
-                          0 * fem, 0 * fem, 0 * fem, 10 * fem),
-                      child: Text(
-                        'Card number',
-                        style: SafeGoogleFont(
-                          'Saira',
-                          fontSize: 16 * ffem,
-                          fontWeight: FontWeight.w500,
-                          height: 1.5625 * ffem / fem,
-                          color: const Color(0xffffffff),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      // group19f1r (0:1081)
-                      width: double.infinity,
-                      height: 54 * fem,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: const Color(0x0caaaaaa)),
-                        color: const Color(0xff2c2b2b),
-                        borderRadius: BorderRadius.circular(6 * fem),
-                      ),
-                      child: TextField(
-                        cursorColor: yellowPrimary,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          suffixIcon: Padding(
-                            padding: EdgeInsets.only(right: 10 * fem),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Image.asset(
-                                  'assets/icon/paypal.png',
-                                  height: 25 * fem,
-                                  width: 30 * fem,
-                                ),
-                                const SizedBox(width: 2),
-                                Image.asset(
-                                  'assets/icon/stripe.png',
-                                  height: 25 * fem,
-                                  width: 30 * fem,
-                                ),
-                                const SizedBox(width: 2),
-                                Image.asset(
-                                  'assets/icon/master_card.png',
-                                  height: 25 * fem,
-                                  width: 30 * fem,
-                                ),
-                              ],
-                            ),
-                          ),
-                          border: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          errorBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
-                          contentPadding: EdgeInsets.fromLTRB(
-                              15 * fem, 14 * fem, 15 * fem, 13 * fem),
-                          hintText: '5000 0000 0000 0000',
-                          hintStyle: const TextStyle(color: Color(0xffaaaaaa)),
-                        ),
-                        style: SafeGoogleFont(
-                          'Saira',
-                          fontSize: 14 * ffem,
-                          fontWeight: FontWeight.w500,
-                          height: 1.575 * ffem / fem,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
+              // Container(
+              //   // info2Pq2 (0:1079)
+              //   margin: EdgeInsets.fromLTRB(
+              //       0.08 * fem, 0 * fem, 0.08 * fem, 36 * fem),
+              //   width: double.infinity,
+              //   child: Column(
+              //     crossAxisAlignment: CrossAxisAlignment.start,
+              //     children: [
+              //       Container(
+              //         // cardnumberLkG (0:1080)
+              //         margin: EdgeInsets.fromLTRB(
+              //             0 * fem, 0 * fem, 0 * fem, 10 * fem),
+              //         child: Text(
+              //           'Card number',
+              //           style: SafeGoogleFont(
+              //             'Saira',
+              //             fontSize: 16 * ffem,
+              //             fontWeight: FontWeight.w500,
+              //             height: 1.5625 * ffem / fem,
+              //             color: const Color(0xffffffff),
+              //           ),
+              //         ),
+              //       ),
+              //       Container(
+              //         // group19f1r (0:1081)
+              //         width: double.infinity,
+              //         height: 54 * fem,
+              //         decoration: BoxDecoration(
+              //           border: Border.all(color: const Color(0x0caaaaaa)),
+              //           color: const Color(0xff2c2b2b),
+              //           borderRadius: BorderRadius.circular(6 * fem),
+              //         ),
+              //         child: TextField(
+              //           cursorColor: yellowPrimary,
+              //           keyboardType: TextInputType.number,
+              //           decoration: InputDecoration(
+              //             suffixIcon: Padding(
+              //               padding: EdgeInsets.only(right: 10 * fem),
+              //               child: Row(
+              //                 mainAxisSize: MainAxisSize.min,
+              //                 children: [
+              //                   Image.asset(
+              //                     'assets/icon/paypal.png',
+              //                     height: 25 * fem,
+              //                     width: 30 * fem,
+              //                   ),
+              //                   const SizedBox(width: 2),
+              //                   Image.asset(
+              //                     'assets/icon/stripe.png',
+              //                     height: 25 * fem,
+              //                     width: 30 * fem,
+              //                   ),
+              //                   const SizedBox(width: 2),
+              //                   Image.asset(
+              //                     'assets/icon/master_card.png',
+              //                     height: 25 * fem,
+              //                     width: 30 * fem,
+              //                   ),
+              //                 ],
+              //               ),
+              //             ),
+              //             border: InputBorder.none,
+              //             focusedBorder: InputBorder.none,
+              //             enabledBorder: InputBorder.none,
+              //             errorBorder: InputBorder.none,
+              //             disabledBorder: InputBorder.none,
+              //             contentPadding: EdgeInsets.fromLTRB(
+              //                 15 * fem, 14 * fem, 15 * fem, 13 * fem),
+              //             hintText: '5000 0000 0000 0000',
+              //             hintStyle: const TextStyle(color: Color(0xffaaaaaa)),
+              //           ),
+              //           style: SafeGoogleFont(
+              //             'Saira',
+              //             fontSize: 14 * ffem,
+              //             fontWeight: FontWeight.w500,
+              //             height: 1.575 * ffem / fem,
+              //             color: Colors.white,
+              //           ),
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              // IntrinsicHeight(
+              //   child: Container(
+              //     // info3NS4 (0:1068)
+              //     margin: EdgeInsets.fromLTRB(
+              //         0.08 * fem, 0 * fem, 0.08 * fem, 36 * fem),
+              //     width: double.infinity,
+              //     decoration: BoxDecoration(
+              //       borderRadius: BorderRadius.circular(6 * fem),
+              //     ),
+              //     child: Row(
+              //       crossAxisAlignment: CrossAxisAlignment.center,
+              //       children: [
+              //         Container(
+              //           // group23uRz (0:1069)
+              //           margin: EdgeInsets.fromLTRB(
+              //               0 * fem, 0 * fem, 21.64 * fem, 0 * fem),
+              //           width: 156.6 * fem,
+              //           height: double.infinity,
+              //           decoration: BoxDecoration(
+              //             borderRadius: BorderRadius.circular(6 * fem),
+              //           ),
+              //           child: Column(
+              //             crossAxisAlignment: CrossAxisAlignment.start,
+              //             children: [
+              //               Container(
+              //                 // expirationb3v (0:1070)
+              //                 margin: EdgeInsets.fromLTRB(
+              //                     0 * fem, 0 * fem, 0 * fem, 10 * fem),
+              //                 child: Text(
+              //                   'Expiration',
+              //                   style: SafeGoogleFont(
+              //                     'Saira',
+              //                     fontSize: 16 * ffem,
+              //                     fontWeight: FontWeight.w500,
+              //                     height: 1.5625 * ffem / fem,
+              //                     color: const Color(0xffffffff),
+              //                   ),
+              //                 ),
+              //               ),
+              //               Container(
+              //                 // group22vbz (0:1071)
+              //                 width: double.infinity,
+              //                 decoration: BoxDecoration(
+              //                   borderRadius: BorderRadius.circular(6 * fem),
+              //                   border:
+              //                       Border.all(color: const Color(0x0caaaaaa)),
+              //                   color: const Color(0xff2c2b2b),
+              //                 ),
+              //                 child: TextField(
+              //                   cursorColor: yellowPrimary,
+              //                   decoration: InputDecoration(
+              //                     border: InputBorder.none,
+              //                     focusedBorder: InputBorder.none,
+              //                     enabledBorder: InputBorder.none,
+              //                     errorBorder: InputBorder.none,
+              //                     disabledBorder: InputBorder.none,
+              //                     contentPadding: EdgeInsets.fromLTRB(
+              //                         15 * fem, 14 * fem, 15 * fem, 13 * fem),
+              //                     hintText: '09/10',
+              //                     hintStyle:
+              //                         const TextStyle(color: Color(0xa5aaaaaa)),
+              //                   ),
+              //                   style: SafeGoogleFont(
+              //                     'Saira',
+              //                     fontSize: 14 * ffem,
+              //                     fontWeight: FontWeight.w400,
+              //                     height: 1.575 * ffem / fem,
+              //                     color: Colors.white,
+              //                   ),
+              //                 ),
+              //               ),
+              //             ],
+              //           ),
+              //         ),
+              //         Container(
+              //           // group24bi8 (0:1074)
+              //           width: 156.6 * fem,
+              //           height: double.infinity,
+              //           decoration: BoxDecoration(
+              //             borderRadius: BorderRadius.circular(6 * fem),
+              //           ),
+              //           child: Column(
+              //             crossAxisAlignment: CrossAxisAlignment.start,
+              //             children: [
+              //               Container(
+              //                 // cvvMSQ (0:1075)
+              //                 margin: EdgeInsets.fromLTRB(
+              //                     0 * fem, 0 * fem, 0 * fem, 10 * fem),
+              //                 child: Text(
+              //                   'Cvv',
+              //                   style: SafeGoogleFont(
+              //                     'Saira',
+              //                     fontSize: 16 * ffem,
+              //                     fontWeight: FontWeight.w500,
+              //                     height: 1.5625 * ffem / fem,
+              //                     color: const Color(0xffffffff),
+              //                   ),
+              //                 ),
+              //               ),
+              //               Container(
+              //                 // group175dJ (0:1076)
+              //                 width: double.infinity,
+              //                 decoration: BoxDecoration(
+              //                   borderRadius: BorderRadius.circular(6 * fem),
+              //                   border:
+              //                       Border.all(color: const Color(0x0caaaaaa)),
+              //                   color: const Color(0xff2c2b2b),
+              //                 ),
+              //                 child: TextField(
+              //                   cursorColor: yellowPrimary,
+              //                   decoration: InputDecoration(
+              //                     border: InputBorder.none,
+              //                     focusedBorder: InputBorder.none,
+              //                     enabledBorder: InputBorder.none,
+              //                     errorBorder: InputBorder.none,
+              //                     disabledBorder: InputBorder.none,
+              //                     contentPadding: EdgeInsets.fromLTRB(
+              //                         14.76 * fem,
+              //                         14 * fem,
+              //                         14.76 * fem,
+              //                         13 * fem),
+              //                     hintText: '000',
+              //                     hintStyle:
+              //                         const TextStyle(color: Color(0xa5aaaaaa)),
+              //                   ),
+              //                   style: SafeGoogleFont(
+              //                     'Saira',
+              //                     fontSize: 14 * ffem,
+              //                     fontWeight: FontWeight.w400,
+              //                     height: 1.575 * ffem / fem,
+              //                     color: Colors.white,
+              //                   ),
+              //                 ),
+              //               ),
+              //             ],
+              //           ),
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
+              CardFormField(
+                style: CardFormStyle(
+                  placeholderColor: Colors.grey,
+                  backgroundColor: darkPrimary,
+                  textColor: yellowPrimary,
+                  borderColor: yellowPrimary,
+                  cursorColor: yellowPrimary,
+                  borderRadius: 10
                 ),
-              ),
-              IntrinsicHeight(
-                child: Container(
-                  // info3NS4 (0:1068)
-                  margin: EdgeInsets.fromLTRB(
-                      0.08 * fem, 0 * fem, 0.08 * fem, 36 * fem),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6 * fem),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        // group23uRz (0:1069)
-                        margin: EdgeInsets.fromLTRB(
-                            0 * fem, 0 * fem, 21.64 * fem, 0 * fem),
-                        width: 156.6 * fem,
-                        height: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(6 * fem),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              // expirationb3v (0:1070)
-                              margin: EdgeInsets.fromLTRB(
-                                  0 * fem, 0 * fem, 0 * fem, 10 * fem),
-                              child: Text(
-                                'Expiration',
-                                style: SafeGoogleFont(
-                                  'Saira',
-                                  fontSize: 16 * ffem,
-                                  fontWeight: FontWeight.w500,
-                                  height: 1.5625 * ffem / fem,
-                                  color: const Color(0xffffffff),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              // group22vbz (0:1071)
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(6 * fem),
-                                border:
-                                    Border.all(color: const Color(0x0caaaaaa)),
-                                color: const Color(0xff2c2b2b),
-                              ),
-                              child: TextField(
-                                cursorColor: yellowPrimary,
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  focusedBorder: InputBorder.none,
-                                  enabledBorder: InputBorder.none,
-                                  errorBorder: InputBorder.none,
-                                  disabledBorder: InputBorder.none,
-                                  contentPadding: EdgeInsets.fromLTRB(
-                                      15 * fem, 14 * fem, 15 * fem, 13 * fem),
-                                  hintText: '09/10',
-                                  hintStyle:
-                                      const TextStyle(color: Color(0xa5aaaaaa)),
-                                ),
-                                style: SafeGoogleFont(
-                                  'Saira',
-                                  fontSize: 14 * ffem,
-                                  fontWeight: FontWeight.w400,
-                                  height: 1.575 * ffem / fem,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        // group24bi8 (0:1074)
-                        width: 156.6 * fem,
-                        height: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(6 * fem),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              // cvvMSQ (0:1075)
-                              margin: EdgeInsets.fromLTRB(
-                                  0 * fem, 0 * fem, 0 * fem, 10 * fem),
-                              child: Text(
-                                'Cvv',
-                                style: SafeGoogleFont(
-                                  'Saira',
-                                  fontSize: 16 * ffem,
-                                  fontWeight: FontWeight.w500,
-                                  height: 1.5625 * ffem / fem,
-                                  color: const Color(0xffffffff),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              // group175dJ (0:1076)
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(6 * fem),
-                                border:
-                                    Border.all(color: const Color(0x0caaaaaa)),
-                                color: const Color(0xff2c2b2b),
-                              ),
-                              child: TextField(
-                                cursorColor: yellowPrimary,
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  focusedBorder: InputBorder.none,
-                                  enabledBorder: InputBorder.none,
-                                  errorBorder: InputBorder.none,
-                                  disabledBorder: InputBorder.none,
-                                  contentPadding: EdgeInsets.fromLTRB(
-                                      14.76 * fem,
-                                      14 * fem,
-                                      14.76 * fem,
-                                      13 * fem),
-                                  hintText: '000',
-                                  hintStyle:
-                                      const TextStyle(color: Color(0xa5aaaaaa)),
-                                ),
-                                style: SafeGoogleFont(
-                                  'Saira',
-                                  fontSize: 14 * ffem,
-                                  fontWeight: FontWeight.w400,
-                                  height: 1.575 * ffem / fem,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                controller: cardController,
+                enablePostalCode: false,
+                countryCode: 'USD',
               ),
               Container(
                 // info4ZoN (0:1063)

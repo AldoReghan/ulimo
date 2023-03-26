@@ -48,8 +48,10 @@ class _HomePageState extends State<HomePage> {
 
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult != ConnectivityResult.none) {
-      final destinationSnapshot =
-          await _databaseRef.child('destination').limitToFirst(15).once();
+      final destinationSnapshot = await _databaseRef
+          .child('nightlifeDestination')
+          .limitToFirst(15)
+          .once();
 
       final Map<dynamic, dynamic>? destinationData =
           destinationSnapshot.snapshot.value as Map<dynamic, dynamic>?;
@@ -63,7 +65,6 @@ class _HomePageState extends State<HomePage> {
             // 'description': value['destination_description'],
             'image_url': value['destination_image_url'],
             'address': value['destination_address'],
-            'type': value['destination_type'],
           };
           tempList.add(destinationMap);
         });
@@ -215,16 +216,10 @@ class _HomePageState extends State<HomePage> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                          _destinationList[index]['type'] ==
-                                                  'night'
-                                              ? NightLifePageDetailPage(
-                                                  nightlifeDestinationId:
-                                                      _destinationList[index]
-                                                          ['id'])
-                                              : RideShareBusDetailPage(
-                                                  destinationId:
-                                                      _destinationList[index]
-                                                          ['id'])),
+                                          NightLifePageDetailPage(
+                                              nightlifeDestinationId:
+                                                  _destinationList[index]
+                                                      ['id'])),
                                 );
                               },
                                   name: _destinationList[index]['name'],
