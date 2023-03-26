@@ -396,5 +396,14 @@
         "users_id": "z8bMpdPtCAWITdw3y99H0f4YsQX2"
       }
     }
+  },
+  "notifications": {
+    "-keu123": {
+      "title": "PRIVATE RIDE",
+      "subtitle": "Your request has been accepted, visit the Ticket tab to pay",
+      "user_id": "z8bMpdPtCAWITdw3y99H0f4YsQX2",
+      "date": "25-03-2023",
+      "time": "19:30"
+    }
   }
 }

@@ -11,14 +11,16 @@ class MyTicketButton extends StatefulWidget {
   final Function(int) onTap;
   final double fem;
   final double ffem;
+  final int selectedIndex;
 
-  const MyTicketButton(
-      {Key? key,
-      required this.fem,
-      required this.ffem,
-      required this.labels,
-      required this.count,
-      required this.onTap})
+  const MyTicketButton({Key? key,
+    required this.fem,
+    required this.ffem,
+    required this.labels,
+    required this.count,
+    required this.selectedIndex,
+    required this.onTap,
+  })
       : super(key: key);
 
   @override
@@ -26,7 +28,6 @@ class MyTicketButton extends StatefulWidget {
 }
 
 class _MyTicketButtonState extends State<MyTicketButton> {
-  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -41,9 +42,6 @@ class _MyTicketButtonState extends State<MyTicketButton> {
           children: List.generate(widget.labels.length, (index) {
             return TextButton(
               onPressed: () {
-                setState(() {
-                  _selectedIndex = index;
-                });
                 widget.onTap.call(index);
               },
               style: TextButton.styleFrom(
@@ -53,7 +51,7 @@ class _MyTicketButtonState extends State<MyTicketButton> {
                 width: 105.27 * widget.fem,
                 height: double.infinity,
                 decoration: BoxDecoration(
-                  color: _selectedIndex == index
+                  color: widget.selectedIndex == index
                       ? yellowPrimary
                       : const Color(0xff2c2b2b),
                   borderRadius: BorderRadius.circular(6 * widget.fem),
@@ -68,7 +66,7 @@ class _MyTicketButtonState extends State<MyTicketButton> {
                         padding: const EdgeInsets.all(4),
                         child: DottedBorder(
                           borderType: BorderType.Circle,
-                          color: _selectedIndex == index
+                          color: widget.selectedIndex == index
                               ? Colors.black
                               : const Color(0xa5aaaaaa),
                           child: SizedBox(
@@ -84,7 +82,7 @@ class _MyTicketButtonState extends State<MyTicketButton> {
                                   fontSize: 14 * widget.ffem,
                                   fontWeight: FontWeight.w600,
                                   height: 1.575 * widget.ffem / widget.fem,
-                                  color: _selectedIndex == index
+                                  color: widget.selectedIndex == index
                                       ? Colors.black
                                       : const Color(0xa5aaaaaa),
                                 ),
@@ -103,7 +101,7 @@ class _MyTicketButtonState extends State<MyTicketButton> {
                             fontSize: 14 * widget.ffem,
                             fontWeight: FontWeight.w500,
                             height: 1.575 * widget.ffem / widget.fem,
-                            color: _selectedIndex == index
+                            color: widget.selectedIndex == index
                                 ? Colors.black
                                 : const Color(0xa5aaaaaa),
                           ),
