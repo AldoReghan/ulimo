@@ -172,12 +172,44 @@
       "discount_rate": "20"
     }
   },
-  "nightlife": {
+  "nightlifeDestination": {
     "-NPbMvpXQP7Trim8Xxxw": {
-      "description": "just zoo",
-      "name": "zoossss",
-      "price": "300",
-      "quantity": "1"
+      "destination_address": "jl tampa",
+      "destination_description": "this is zoo",
+      "destination_image_url": "https://store-images.s-microsoft.com/image/apps.47288.14188059920471079.8845931d-936f-4c5b-848c-e9700ef87a6b.92da2b6e-01a3-4806-8575-6f6278ecd71b?q=90&w=480&h=270",
+      "destination_name": "Zoo",
+      "ride_price": "10.00",
+      "entry_price": "30.00",
+      "ride_quantity": "15",
+      "entry_quantity": "15"
+    }
+  },
+  "nightlifeOrder": {
+    "-NPbMvpXQP7Trim8Xxxw" : {
+      "-keyasawas": {
+        "date": "01-04-2023",
+        "ride_quantity": 1,
+        "entry_quantity": 1,
+        "nightlife_id": "-NPbMvpXQP7Trim8Xxxw",
+        "status": "paid",
+        "users_id": "z8bMpdPtCAWITdw3y99H0f4YsQX2"
+      },
+      "-1keyasawas": {
+        "date": "02-04-2023",
+        "ride_quantity": 5,
+        "entry_quantity": 1,
+        "nightlife_id": "-NPbMvpXQP7Trim8Xxxw",
+        "status": "paid",
+        "users_id": "z8bMpdPtCAWITdw3y99H0f4YsQX2"
+      },
+      "-k2eyasawas": {
+        "date": "03-04-2023",
+        "ride_quantity": 5,
+        "entry_quantity": 1,
+        "nightlife_id": "-NPbMvpXQP7Trim8Xxxw",
+        "status": "paid",
+        "users_id": "z8bMpdPtCAWITdw3y99H0f4YsQX2"
+      }
     }
   },
   "payments": {
@@ -282,31 +314,6 @@
       "user_id": "z8bMpdPtCAWITdw3y99H0f4YsQX2"
     }
   },
-  "nightlifeTicket": {
-    "-NPcThfa7CZYIuqtLRttk": {
-      "destination_id": "-NPcUkP6HIjb8nxqcFV9",
-      "ticket_price": {
-        "2023-03-22": {
-          "entry_price": "4.00",
-          "ride_price": "4.00",
-          "entry_quantity": "10",
-          "ride_quantity": "10"
-        },
-        "2023-03-23": {
-          "entry_price": "4.00",
-          "ride_price": "4.00",
-          "entry_quantity": "10",
-          "ride_quantity": "10"
-        },
-        "2023-03-24": {
-          "entry_price": "4.00",
-          "ride_price": "4.00",
-          "entry_quantity": "10",
-          "ride_quantity": "10"
-        }
-      }
-    }
-  },
   "rideShareBusTicket": {
     "-NPcThfa7CZYIuqtLRP": {
       "destination_id": "-as7dadjkkldsa",
@@ -314,8 +321,6 @@
       "entry_price": "5.00",
       "ride_quantity": "10",
       "entry_quantity": "10",
-      "entry_quantity_left": "5",
-      "ride_quantity_left": "5",
       "time": "19:30"
     },
     "-NPcThfa7CZYIuqtRPk": {
@@ -324,8 +329,6 @@
       "entry_price": "95.11",
       "ride_quantity": "10",
       "entry_quantity": "10",
-      "entry_quantity_left": "5",
-      "ride_quantity_left": "5",
       "time": "18:30"
     },
     "-NPcThfa7CZYIuqtsLRPk": {
@@ -334,39 +337,7 @@
       "entry_price": "10.21",
       "ride_quantity": "10",
       "entry_quantity": "10",
-      "entry_quantity_left": "5",
-      "ride_quantity_left": "5",
       "time": "17:30"
-    }
-  },
-  "rideShareBusTicketOld": {
-    "-as7dadjkkldsa": {
-      "ticket_price": {
-        "2023-03-22T14:30:00Z": {
-          "entry_price": "4.00",
-          "ride_price": "4.00",
-          "entry_quantity": "10",
-          "ride_quantity": "10"
-        },
-        "2023-03-22T15:30:00Z": {
-          "entry_price": "4.00",
-          "ride_price": "4.00",
-          "entry_quantity": "10",
-          "ride_quantity": "10"
-        },
-        "2023-03-23T14:30:00Z": {
-          "entry_price": "4.00",
-          "ride_price": "4.00",
-          "entry_quantity": "10",
-          "ride_quantity": "10"
-        },
-        "2023-03-23T15:30:00Z": {
-          "entry_price": "4.00",
-          "ride_price": "4.00",
-          "entry_quantity": "10",
-          "ride_quantity": "10"
-        }
-      }
     }
   },
   "rideShareBusTicketOrder": {

@@ -36,9 +36,9 @@ class _NightLifePageState extends State<NightLifePage> {
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult != ConnectivityResult.none) {
       final destinationSnapshot = await _databaseRef
-          .child('destination')
-          .orderByChild('destination_type')
-          .equalTo('night')
+          .child('nightlifeDestination')
+          // .orderByChild('destination_type')
+          // .equalTo('night')
           .once();
 
       final Map<dynamic, dynamic>? destinationData =
@@ -178,7 +178,7 @@ class _NightLifePageState extends State<NightLifePage> {
                                         MaterialPageRoute(
                                             builder: (context) =>
                                                 NightLifePageDetailPage(
-                                                    destinationId:
+                                                    nightlifeDestinationId:
                                                         _destinationList[index]
                                                             ['id'])));
                                   });

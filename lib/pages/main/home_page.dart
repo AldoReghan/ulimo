@@ -137,7 +137,7 @@ class _HomePageState extends State<HomePage> {
               homeCard(
                   title: "Ride Share Bus",
                   subtitle: "Socialize and make new friends",
-                  imageAsset: "assets/icon/home_car.png",
+                  imageAsset: "assets/icon/home_bus.png",
                   onTap: () {
                     //go to share bus page
                     Navigator.push(
@@ -151,7 +151,7 @@ class _HomePageState extends State<HomePage> {
               homeCard(
                   title: "Private Ride",
                   subtitle: "Custom trips for just you and group",
-                  imageAsset: "assets/icon/home_bus.png",
+                  imageAsset: "assets/icon/home_private_ride.png",
                   onTap: () {
                     //go to private ride page
                     if (getCurrentUser()?.displayName == "") {
@@ -218,7 +218,7 @@ class _HomePageState extends State<HomePage> {
                                           _destinationList[index]['type'] ==
                                                   'night'
                                               ? NightLifePageDetailPage(
-                                                  destinationId:
+                                                  nightlifeDestinationId:
                                                       _destinationList[index]
                                                           ['id'])
                                               : RideShareBusDetailPage(

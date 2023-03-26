@@ -80,3 +80,82 @@ TextStyle SafeGoogleFont(
     );
   }
 }
+
+
+
+// Container(
+// // info3HeQ (0:1161)
+// margin: EdgeInsets.fromLTRB(
+// 19.94 * fem, 0 * fem, 20.17 * fem, 42.82 * fem),
+// width: double.infinity,
+// child: Column(
+// crossAxisAlignment: CrossAxisAlignment.start,
+// children: [
+// Container(
+// // wherewillyouliketogop8Y (0:1162)
+// margin: EdgeInsets.fromLTRB(
+// 0 * fem, 0 * fem, 0 * fem, 9 * fem),
+// child: Text(
+// 'When will you go?',
+// style: SafeGoogleFont(
+// 'Saira',
+// fontSize: 16 * ffem,
+// fontWeight: FontWeight.w500,
+// height: 1.575 * ffem / fem,
+// color: const Color(0xffffffff),
+// ),
+// ),
+// ),
+// SizedBox(
+// // group7540L6t (0:1163)
+// width: double.infinity,
+// height: 46 * fem,
+// child: Flexible(
+// child: DottedBorder(
+// borderType: BorderType.RRect,
+// radius: const Radius.circular(6),
+// color: const Color(0xFFFDCB5B),
+// strokeWidth: 1,
+// child: SizedBox(
+// height: double.infinity,
+// child: SizedBox(
+// // group7535hLk (0:1167)
+// width: double.infinity,
+// height: double.infinity,
+// child: Padding(
+// padding:
+// const EdgeInsets.symmetric(horizontal: 15),
+// child: Row(
+// crossAxisAlignment: CrossAxisAlignment.center,
+// mainAxisAlignment:
+// MainAxisAlignment.spaceBetween,
+// children: [
+// GestureDetector(
+// onTap: () => _selectDate(context),
+// child: Text(
+// DateFormat('dd MMM yyyy').format(_date),
+// style: SafeGoogleFont(
+// 'Saira',
+// fontSize: 14 * ffem,
+// fontWeight: FontWeight.w500,
+// height: 1.4285714286 * ffem / fem,
+// color: const Color(0xfffdcb5b),
+// ),
+// ),
+// ),
+// Icon(
+// Icons.keyboard_arrow_down,
+// size: 20 * fem,
+// color: Colors.white,
+// ),
+// ],
+// ),
+// ),
+// ),
+// ),
+// ),
+// ),
+// ),
+// ],
+// ),
+// ),
