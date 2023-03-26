@@ -1058,10 +1058,17 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                             onPressed: () {
                               Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) =>
-                                      // CartPage(user_id: "user_id")));
-                                      const CheckOutPage(
-                                        privateRideId: '',
-                                      )));
+                                  // CartPage(user_id: "user_id")));
+                                  CheckOutPage(
+                                    price: _totalPrice.toStringAsFixed(2),
+                                    date: DateFormat("dd-MM-yyyy")
+                                        .format(_date),
+                                    time: '',
+                                    rideType: '',
+                                    orderId: '',
+                                    destinationName: _destinationData['destination_name'],
+                                    destinationAddress: _destinationData['destination_address'],
+                                  )));
                             },
                             style: TextButton.styleFrom(
                               padding: EdgeInsets.zero,

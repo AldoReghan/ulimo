@@ -3,74 +3,164 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
 import 'package:ulimo/pages/payment_success_page.dart';
+import 'package:intl/intl.dart';
 
 import '../base/base_color.dart';
 import '../base/utils.dart';
 import 'cart_page.dart';
 
 class CheckOutPage extends StatefulWidget {
-  final String privateRideId;
+  final String orderId;
+  final String rideType;
+  final String destinationName;
+  final String destinationAddress;
+  final String date;
+  final String time;
+  final String price;
 
-  const CheckOutPage({Key? key, required this.privateRideId}) : super(key: key);
+  const CheckOutPage(
+      {Key? key,
+      required this.orderId,
+      required this.rideType,
+      required this.destinationName,
+      required this.destinationAddress,
+      required this.date,
+      required this.time,
+      required this.price})
+      : super(key: key);
 
   @override
   State<CheckOutPage> createState() => _CheckOutPageState();
 }
 
 class _CheckOutPageState extends State<CheckOutPage> {
-  late final _privateRideData;
-  final _databaseRef = FirebaseDatabase.instance
-      .ref();
+  String _subtitle = "";
+  String _title = "";
+  String _date = "";
+  String _time = "";
+  String _price = "0.00";
+  double _discountRate = 0.00;
+  String _discountName = "";
+  bool isCodeValid = false;
+  DateTime _discountExpiredDate = DateTime.now();
+  final promoController = TextEditingController();
 
-  // Future<void> _getPrivateData() async {
-  //   var connectivityResult = await (Connectivity().checkConnectivity());
-  //   if (connectivityResult != ConnectivityResult.none) {
-  //     final privateRideSnapshot = await _databaseRef.child("privateRide")
-  //         .orderByKey()
-  //         .equalTo(widget.privateRideId).once();
-  //
-  //     final Map<dynamic, dynamic>? privateRideData =
-  //     privateRideSnapshot.snapshot.value as Map<dynamic, dynamic>?;
-  //     final tempData ;
-  //
-  //     if (privateRideData != null) {
-  //       privateRideData.forEach((key, value) async {
-  //         final destinationMap = {
-  //           'id': key,
-  //           'destination': value['destination'],
-  //           'destination': value['pickup_address'],
-  //           'destination': value['pickup_address'],
-  //         };
-  //         tempList.add(destinationMap);
-  //       });
-  //     }
-  //
-  //     setState(() {
-  //       _destinationList = tempList;
-  //     });
-  //   } else {
-  //     // ignore: use_build_context_synchronously
-  //     showDialog(
-  //       context: context,
-  //       builder: (BuildContext context) {
-  //         return AlertDialog(
-  //           title: const Text("No Internet Connection"),
-  //           content: const Text("Please check your internet connection."),
-  //           actions: [
-  //             TextButton(
-  //               onPressed: () {
-  //                 Navigator.of(context).pop();
-  //               },
-  //               child: const Text("OK"),
-  //             ),
-  //           ],
-  //         );
-  //       },
-  //     );
-  //   }
-  // }
+  final _databaseRef = FirebaseDatabase.instance.ref();
+
+  Future<void> _getCheckoutData() async {
+    if (widget.rideType == 'private') {
+      var connectivityResult = await (Connectivity().checkConnectivity());
+      if (connectivityResult != ConnectivityResult.none) {
+        final privateRideSnapshot = await _databaseRef
+            .child("privateRide")
+            .orderByKey()
+            .equalTo(widget.orderId)
+            .once();
+
+        final Map<dynamic, dynamic>? privateRideData =
+            privateRideSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+
+        if (privateRideData != null) {
+          privateRideData.forEach((key, value) async {
+            setState(() {
+              _title = "PRIVATE RIDE";
+              _subtitle =
+                  "${value['pickup_address']} to ${value['destination']}";
+              _time = "${value['pickup_time']}";
+              _date = "${value['date']}";
+              _price = value['price'];
+            });
+          });
+        }
+      } else {
+        // ignore: use_build_context_synchronously
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text("No Internet Connection"),
+              content: const Text("Please check your internet connection."),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("OK"),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } else {
+      setState(() {
+        _title = widget.destinationName;
+        _subtitle = widget.destinationAddress;
+        _time = widget.time;
+        _date = widget.date;
+        _price = widget.price;
+      });
+    }
+  }
+
+  Future<void> _getPromoCode() async {
+    final promoCode = promoController.text.trim();
+
+    final promoCodeSnapshot = await _databaseRef
+        .child("discountCode")
+        .orderByChild('code')
+        .equalTo(promoCode)
+        .once();
+
+    final Map<dynamic, dynamic>? promoCodeData =
+        promoCodeSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+
+    if (promoCodeData != null) {
+      promoCodeData.forEach((key, value) async {
+        setState(() {
+          _discountRate =  double.parse(value['discount_rate']);
+          _discountName = value['discount_name'];
+          //format yyyy-MM-dd
+          _discountExpiredDate = DateTime.parse(value['discount_date_expired']);
+        });
+        if (_discountExpiredDate.isBefore(DateTime.now())) {
+          Fluttertoast.showToast(
+              msg: "Promo code is expired",
+              backgroundColor: Colors.red,
+              textColor: Colors.white);
+        } else {
+          setState(() {
+            isCodeValid = true;
+          });
+          Fluttertoast.showToast(
+              msg: _discountName,
+              backgroundColor: CupertinoColors.activeGreen,
+              textColor: Colors.white);
+        }
+      });
+    }else{
+      setState(() {
+        _discountRate = 0;
+        isCodeValid = false;
+      });
+    }
+  }
+
+  String countTotalPrice(){
+    final totalDiscount = double.parse(_price) * (_discountRate / 100);
+    final totalPrice = double.parse(_price) - totalDiscount;
+    return totalPrice.toStringAsFixed(2);
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _getCheckoutData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,10 +194,15 @@ class _CheckOutPageState extends State<CheckOutPage> {
                             0 * fem, 0 * fem, 27 * fem, 0 * fem),
                         width: 24 * fem,
                         height: 24 * fem,
-                        child: const Icon(
-                          Icons.arrow_back_ios,
-                          color: Colors.white,
-                          size: 24,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Icon(
+                            Icons.arrow_back_ios,
+                            color: Colors.white,
+                            size: 24,
+                          ),
                         )),
                     Text(
                       // myprofilecqv (0:608)
@@ -146,7 +241,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
                             width: 24 * fem,
                             height: 24 * fem,
                             child: SvgPicture.asset(
-                                "assets/icon/profile_ticket.svg")),
+                                "assets/icon/bottom_nav_ticket.svg")),
                       ),
                     ),
                     Positioned(
@@ -176,7 +271,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
                                         width: 105 * fem,
                                         height: 26 * fem,
                                         child: Text(
-                                          'PRIVATE RIDE',
+                                          _title,
                                           style: SafeGoogleFont(
                                             'Saira',
                                             fontSize: 16 * ffem,
@@ -197,7 +292,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
                                         width: 242 * fem,
                                         height: 14 * fem,
                                         child: Text(
-                                          '5224 W Neptune Way, Tampa, FL to Hyde Park Cafe',
+                                          _subtitle,
                                           style: SafeGoogleFont(
                                             'Saira',
                                             fontSize: 10 * ffem,
@@ -225,7 +320,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
                                     margin: EdgeInsets.fromLTRB(
                                         0 * fem, 0 * fem, 5 * fem, 0 * fem),
                                     child: Text(
-                                      '03 FEB 2023',
+                                      _date,
                                       style: SafeGoogleFont(
                                         'Saira',
                                         fontSize: 12 * ffem,
@@ -237,7 +332,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
                                   ),
                                   Text(
                                     // pmD5z (1:1141)
-                                    '6:20 PM',
+                                    _time,
                                     style: SafeGoogleFont(
                                       'Saira',
                                       fontSize: 12 * ffem,
@@ -558,7 +653,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
                       margin: EdgeInsets.fromLTRB(
                           0 * fem, 0 * fem, 0 * fem, 10 * fem),
                       child: Text(
-                        'Passcode code',
+                        'Promo code',
                         style: SafeGoogleFont(
                           'Saira',
                           fontSize: 16 * ffem,
@@ -568,42 +663,63 @@ class _CheckOutPageState extends State<CheckOutPage> {
                         ),
                       ),
                     ),
-                    Container(
-                      // group16cWk (0:1065)
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(6 * fem),
-                        border: Border.all(color: const Color(0x0caaaaaa)),
-                        color: const Color(0xff2c2b2b),
-                      ),
-                      child: TextField(
-                        cursorColor: yellowPrimary,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          errorBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
-                          contentPadding: EdgeInsets.fromLTRB(
-                              15 * fem, 14 * fem, 15 * fem, 13 * fem),
-                          hintText: '******',
-                          hintStyle: const TextStyle(color: Color(0xa5aaaaaa)),
-                        ),
-                        style: SafeGoogleFont(
-                          'Saira',
-                          fontSize: 14 * ffem,
-                          fontWeight: FontWeight.w400,
-                          height: 1.575 * ffem / fem,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                            child: Container(
+                          // group16cWk (0:1065)
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(6 * fem),
+                            border: Border.all(color: const Color(0x0caaaaaa)),
+                            color: const Color(0xff2c2b2b),
+                          ),
+                          child: TextField(
+                            cursorColor: yellowPrimary,
+                            controller: promoController,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.fromLTRB(
+                                  15 * fem, 14 * fem, 15 * fem, 13 * fem),
+                              hintText: 'Your Promo Code',
+                              hintStyle:
+                                  const TextStyle(color: Color(0xa5aaaaaa)),
+                            ),
+                            style: SafeGoogleFont(
+                              'Saira',
+                              fontSize: 14 * ffem,
+                              fontWeight: FontWeight.w400,
+                              height: 1.575 * ffem / fem,
+                              color: Colors.white,
+                            ),
+                          ),
+                        )),
+                        Container(
+                          padding: const EdgeInsets.only(left: 10),
+                          height: 50 * fem,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              //check promo code
+                              _getPromoCode();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: isCodeValid ? Colors.green : yellowPrimary,
+                            ),
+                            child: const Icon(Icons.check),
+                          ),
+                        )
+                      ],
+                    )
                   ],
                 ),
               ),
               Container(
                 // group7530qqJ (0:1290)
+                margin:
+                    EdgeInsets.fromLTRB(0 * fem, 0 * fem, 0 * fem, 42.82 * fem),
                 width: double.infinity,
                 height: 50 * fem,
                 decoration: BoxDecoration(
@@ -615,7 +731,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
                     Container(
                       // group7529Asa (0:1295)
                       margin: EdgeInsets.fromLTRB(
-                          0 * fem, 0 * fem, 45.42 * fem, 0 * fem),
+                          0 * fem, 0 * fem, 25.42 * fem, 0 * fem),
                       height: double.infinity,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -635,15 +751,21 @@ class _CheckOutPageState extends State<CheckOutPage> {
                               ),
                             ),
                           ),
-                          Text(
-                            // QX2 (0:1297)
-                            '\$20.00',
-                            style: SafeGoogleFont(
-                              'Barlow',
-                              fontSize: 24 * ffem,
-                              fontWeight: FontWeight.w600,
-                              height: 1.2 * ffem / fem,
-                              color: const Color(0xfffdcb5b),
+                          SizedBox(
+                            width: 80 * fem,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                // QX2 (0:1297)
+                                '\$${countTotalPrice()}',
+                                style: SafeGoogleFont(
+                                  'Barlow',
+                                  fontSize: 24 * ffem,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.2 * ffem / fem,
+                                  color: const Color(0xfffdcb5b),
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -652,8 +774,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
                     TextButton(
                       // button8hv (0:1291)
                       onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const PaymentSuccessPage()));
+                        //go to success page
                       },
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.zero,

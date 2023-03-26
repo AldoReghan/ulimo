@@ -25,6 +25,7 @@ class _MyTicketPageState extends State<MyTicketPage> {
   final _databaseRef = FirebaseDatabase.instance.ref();
   final authData = FirebaseAuth.instance;
   late List _ticketListData;
+  final ticketPageController = PageController(initialPage: 0);
   bool _isLoading = true;
 
   Future<void> _fetchData() async {
@@ -222,15 +223,20 @@ class _MyTicketPageState extends State<MyTicketPage> {
             : Column(
                 children: [
                   MyTicketButton(
-                      fem: fem,
-                      ffem: ffem,
-                      labels: labels,
-                      count: getCount(),
-                      onTap: (index) {
-                        setState(() {
-                          _selectedIndex = index;
-                        });
-                      }, selectedIndex: _selectedIndex,),
+                    fem: fem,
+                    ffem: ffem,
+                    labels: labels,
+                    count: getCount(),
+                    onTap: (index) {
+                      setState(() {
+                        _selectedIndex = index;
+                      });
+                      ticketPageController.animateToPage(_selectedIndex,
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.easeInOut);
+                    },
+                    selectedIndex: _selectedIndex,
+                  ),
                   Container(
                     // editprofileKYL (0:1096)
                     margin: EdgeInsets.fromLTRB(
@@ -263,7 +269,8 @@ class _MyTicketPageState extends State<MyTicketPage> {
                   const SizedBox(height: 10),
                   Expanded(
                     child: PageView(
-                      physics: const BouncingScrollPhysics(),
+                        physics: const BouncingScrollPhysics(),
+                        controller: ticketPageController,
                         children: getTicketList(fem, ffem),
                         onPageChanged: (index) {
                           setState(() {

@@ -72,13 +72,15 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
     final destinationDataSnapshot = await FirebaseDatabase.instance
         .ref('destination')
         .orderByKey()
-        .equalTo(destinationId)
+        // .equalTo(destinationId)
+        .equalTo("-as7dadjkkldsa")
         .once();
 
     final destinationTicketSnapshot = await FirebaseDatabase.instance
         .ref('rideShareBusTicket')
         .orderByChild('destination_id')
-        .equalTo(destinationId)
+        // .equalTo(destinationId)
+        .equalTo("-as7dadjkkldsa")
         .once();
 
     final Map<dynamic, dynamic>? ticketData =
@@ -682,6 +684,10 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                                               [
                                                               _selectedTimeIndex]
                                                           ['ride_price'];
+                                                      _selectedTime =
+                                                          _destinationData[
+                                                                  'available_time']
+                                                              [value];
                                                     });
                                                     updateAvailableSeat();
                                                   },
@@ -811,24 +817,28 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                       ),
                                       SizedBox(
                                         width: double.infinity,
-                                        child: _availableRide == 0 ? const Text("No ticket available") : Slider(
-                                          value: _selectedRide.toDouble(),
-                                          min: 1,
-                                          max: _availableRide.toDouble(),
-                                          onChanged: (newValue) {
-                                            setState(() {
-                                              _selectedRide = newValue.round();
-                                              // setState(() {
-                                              //   _totalPrice +=
-                                              //       double.parse(_entryPrice);
-                                              // });
-                                              _rideSubTotalPrice =
-                                                  double.parse(_ridePrice) *
-                                                      _selectedRide;
-                                            });
-                                          },
-                                          activeColor: yellowPrimary,
-                                        ),
+                                        child: _availableRide == 0
+                                            ? const Text("No ticket available")
+                                            : Slider(
+                                                value: _selectedRide.toDouble(),
+                                                min: 1,
+                                                max: _availableRide.toDouble(),
+                                                onChanged: (newValue) {
+                                                  setState(() {
+                                                    _selectedRide =
+                                                        newValue.round();
+                                                    // setState(() {
+                                                    //   _totalPrice +=
+                                                    //       double.parse(_entryPrice);
+                                                    // });
+                                                    _rideSubTotalPrice =
+                                                        double.parse(
+                                                                _ridePrice) *
+                                                            _selectedRide;
+                                                  });
+                                                },
+                                                activeColor: yellowPrimary,
+                                              ),
                                       ),
                                       SizedBox(
                                         height: 6 * fem,
@@ -969,20 +979,25 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                       ),
                                       SizedBox(
                                         width: double.infinity,
-                                        child: _availableEntry == 0 ? const Text("No ticket available") : Slider(
-                                          value: _selectedEntry.toDouble(),
-                                          min: 1,
-                                          max: _availableEntry.toDouble(),
-                                          onChanged: (newValue) {
-                                            setState(() {
-                                              _selectedEntry = newValue.round();
-                                              _entrySubTotalPrice =
-                                                  double.parse(_entryPrice) *
-                                                      _selectedEntry;
-                                            });
-                                          },
-                                          activeColor: yellowPrimary,
-                                        ),
+                                        child: _availableEntry == 0
+                                            ? const Text("No ticket available")
+                                            : Slider(
+                                                value:
+                                                    _selectedEntry.toDouble(),
+                                                min: 1,
+                                                max: _availableEntry.toDouble(),
+                                                onChanged: (newValue) {
+                                                  setState(() {
+                                                    _selectedEntry =
+                                                        newValue.round();
+                                                    _entrySubTotalPrice =
+                                                        double.parse(
+                                                                _entryPrice) *
+                                                            _selectedEntry;
+                                                  });
+                                                },
+                                                activeColor: yellowPrimary,
+                                              ),
                                       ),
                                       SizedBox(
                                         height: 6 * fem,
@@ -1016,60 +1031,6 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                           ),
                         ],
                       ),
-                      // child: Container(
-                      //   // group7533cRW (0:1255)
-                      //   margin: EdgeInsets.fromLTRB(
-                      //       19.94 * fem, 0 * fem, 20.06 * fem, 46 * fem),
-                      //   width: double.infinity,
-                      //   child: Column(
-                      //     crossAxisAlignment: CrossAxisAlignment.start,
-                      //     children: [
-                      //       Container(
-                      //         // group7532Mdz (0:1256)
-                      //         margin: EdgeInsets.fromLTRB(
-                      //             0.11 * fem, 0 * fem, 241.89 * fem, 10 * fem),
-                      //         width: double.infinity,
-                      //         child: Row(
-                      //           crossAxisAlignment: CrossAxisAlignment.center,
-                      //           children: [
-                      //             Container(
-                      //                 // framet88 (0:1259)
-                      //                 margin: EdgeInsets.fromLTRB(
-                      //                     0 * fem, 0 * fem, 4 * fem, 0 * fem),
-                      //                 width: 20 * fem,
-                      //                 height: 20 * fem,
-                      //                 child: SvgPicture.asset(
-                      //                     "assets/icon/checkbox.svg")),
-                      //             Text(
-                      //               'Ride ticket',
-                      //               style: SafeGoogleFont(
-                      //                 'Saira',
-                      //                 fontSize: 14 * ffem,
-                      //                 fontWeight: FontWeight.w500,
-                      //                 height: 1.4285714286 * ffem / fem,
-                      //                 color: const Color(0xfffdcb5b),
-                      //               ),
-                      //             ),
-                      //           ],
-                      //         ),
-                      //       ),
-                      //       Container(
-                      //           // group7528ArL (0:1262)
-                      //           padding: EdgeInsets.fromLTRB(
-                      //               6.53 * fem, 6.35 * fem, 6.53 * fem, 6.35 * fem),
-                      //           width: double.infinity,
-                      //           height: 100 * fem,
-                      //           decoration: BoxDecoration(
-                      //             border: Border.all(color: const Color(0x0caaaaaa)),
-                      //             color: const Color(0xff2c2b2b),
-                      //             borderRadius: BorderRadius.circular(8 * fem),
-                      //           ),
-                      //           child: DateAvailableList(fem: fem, ffem: ffem, onTap: (index){
-                      //             //do something when clicked
-                      //           })),
-                      //     ],
-                      //   ),
-                      // ),
                     ),
                     Container(
                       // group7530qqJ (0:1290)
@@ -1132,8 +1093,15 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                               Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) =>
                                       // CartPage(user_id: "user_id")));
-                                      const CheckOutPage(
-                                        privateRideId: '',
+                                      CheckOutPage(
+                                        price: countTotalPrice(_rideSubTotalPrice, _entrySubTotalPrice),
+                                        date: DateFormat("dd-MM-yyyy")
+                                            .format(_date),
+                                        time: _selectedTime ?? "00:00",
+                                        rideType: '',
+                                        orderId: '',
+                                        destinationName: _destinationData['name'],
+                                        destinationAddress: _destinationData['address'],
                                       )));
                             },
                             style: TextButton.styleFrom(
@@ -1168,197 +1136,6 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
         ),
       ),
     ));
-    // return Scaffold(
-    //   appBar: AppBar(
-    //     title: const Text('Ride Share Bus'),
-    //   ),
-    //   body: Column(
-    //     crossAxisAlignment: CrossAxisAlignment.start,
-    //     children: [
-    //       Container(
-    //         height: 80,
-    //         padding: const EdgeInsets.symmetric(horizontal: 16),
-    //         child: _destinationList.isEmpty
-    //             ? const Center(child: CircularProgressIndicator())
-    //             : ListView.builder(
-    //                 scrollDirection: Axis.horizontal,
-    //                 itemCount: _destinationList.length,
-    //                 itemBuilder: (context, index) {
-    //                   return GestureDetector(
-    //                     onTap: () {
-    //                       setState(() {
-    //                         _selectedTime =
-    //                             _destinationList[index]['time'] as String?;
-    //                       });
-    //                     },
-    //                     child: Container(
-    //                       margin: const EdgeInsets.symmetric(
-    //                           horizontal: 10, vertical: 10),
-    //                       padding: const EdgeInsets.symmetric(
-    //                           horizontal: 16, vertical: 12),
-    //                       decoration: BoxDecoration(
-    //                         color: _isSelectedTime(
-    //                                 _destinationList[index]['time'] as String)
-    //                             ? Colors.blue
-    //                             : Colors.white,
-    //                         border: Border.all(
-    //                           color: Colors.blue,
-    //                           width: 2,
-    //                         ),
-    //                         borderRadius: BorderRadius.circular(10),
-    //                       ),
-    //                       child: Text(
-    //                         _destinationList[index]['time'] as String,
-    //                         style: TextStyle(
-    //                           color: _isSelectedTime(
-    //                                   _destinationList[index]['time'] as String)
-    //                               ? Colors.white
-    //                               : Colors.black,
-    //                           fontWeight: FontWeight.bold,
-    //                           fontSize: 16,
-    //                         ),
-    //                       ),
-    //                     ),
-    //                   );
-    //                 },
-    //               ),
-    //       ),
-    //       Expanded(
-    //         child: _selectedTime == null
-    //             ? const Center(child: Text('Please select time'))
-    //             : ListView.builder(
-    //                 padding: const EdgeInsets.all(16),
-    //                 itemCount: _destinationList.length,
-    //                 itemBuilder: (context, index) {
-    //                   if (_destinationList[index]['time'] == _selectedTime &&
-    //                       _isSelectedTime(_selectedTime!)) {
-    //                     return Form(
-    //                       key: _formKey,
-    //                       child: Card(
-    //                         margin: const EdgeInsets.symmetric(vertical: 8),
-    //                         elevation: 4,
-    //                         shape: RoundedRectangleBorder(
-    //                           borderRadius: BorderRadius.circular(10),
-    //                         ),
-    //                         child: Padding(
-    //                           padding: const EdgeInsets.all(16),
-    //                           child: Column(
-    //                             crossAxisAlignment: CrossAxisAlignment.start,
-    //                             children: [
-    //                               const Text(
-    //                                 'Quantity',
-    //                                 style: TextStyle(
-    //                                   fontWeight: FontWeight.bold,
-    //                                   fontSize: 18,
-    //                                 ),
-    //                               ),
-    //                               const SizedBox(height: 8),
-    //                               Row(
-    //                                 children: [
-    //                                   IconButton(
-    //                                     onPressed: () {
-    //                                       if (_quantityController
-    //                                           .text.isNotEmpty) {
-    //                                         int currentValue = int.parse(
-    //                                             _quantityController.text);
-    //                                         setState(() {
-    //                                           currentValue--;
-    //                                           _quantityController.text =
-    //                                               (currentValue > 0
-    //                                                       ? currentValue
-    //                                                       : 0)
-    //                                                   .toString();
-    //                                         });
-    //                                       }
-    //                                     },
-    //                                     icon: const Icon(Icons.remove),
-    //                                   ),
-    //                                   Expanded(
-    //                                     child: TextFormField(
-    //                                       keyboardType: TextInputType.number,
-    //                                       controller: _quantityController,
-    //                                       decoration: const InputDecoration(
-    //                                         labelText: 'Quantity',
-    //                                         hintText: 'Enter the quantity',
-    //                                       ),
-    //                                       validator: (value) {
-    //                                         if (value == null ||
-    //                                             value.isEmpty) {
-    //                                           return 'Please enter a quantity';
-    //                                         }
-    //                                         return null;
-    //                                       },
-    //                                     ),
-    //                                   ),
-    //                                   IconButton(
-    //                                     onPressed: () {
-    //                                       if (_quantityController
-    //                                           .text.isNotEmpty) {
-    //                                         int currentValue = int.parse(
-    //                                             _quantityController.text);
-    //                                         setState(() {
-    //                                           currentValue++;
-    //                                           _quantityController.text =
-    //                                               currentValue.toString();
-    //                                         });
-    //                                       }
-    //                                     },
-    //                                     icon: const Icon(Icons.add),
-    //                                   ),
-    //                                 ],
-    //                               ),
-    //                               const SizedBox(height: 16),
-    //                               Row(
-    //                                 mainAxisAlignment:
-    //                                     MainAxisAlignment.spaceBetween,
-    //                                 children: [
-    //                                   const Text(
-    //                                     'Price',
-    //                                     style: TextStyle(
-    //                                       fontWeight: FontWeight.bold,
-    //                                       fontSize: 18,
-    //                                     ),
-    //                                   ),
-    //                                   Text(
-    //                                     '\$${NumberFormat("#,##0.00", "en_US").format((_destinationList[index]['price'] ?? 0) * int.parse(_quantityController.text))}',
-    //                                     style: const TextStyle(
-    //                                       fontWeight: FontWeight.bold,
-    //                                       fontSize: 18,
-    //                                       color: Colors.green,
-    //                                     ),
-    //                                   ),
-    //                                 ],
-    //                               ),
-    //                               const SizedBox(height: 16),
-    //                               SizedBox(
-    //                                 width: MediaQuery.of(context).size.width,
-    //                                 child: ElevatedButton(
-    //                                   onPressed: () {
-    //                                     // redirect to thank you page
-    //                                     Navigator.pushReplacement(
-    //                                       context,
-    //                                       MaterialPageRoute(
-    //                                         builder: (context) =>
-    //                                             const ThankYouPage(),
-    //                                       ),
-    //                                     );
-    //                                   },
-    //                                   child: const Text('Add to Cart'),
-    //                                 ),
-    //                               )
-    //                             ],
-    //                           ),
-    //                         ),
-    //                       ),
-    //                     );
-    //                   }
-    //                   return const SizedBox.shrink();
-    //                 },
-    //               ),
-    //       ),
-    //     ],
-    //   ),
-    // );
   }
 
   Future<void> _selectDate(BuildContext context) async {

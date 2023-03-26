@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:ulimo/widget/ticket_active_item.dart';
 import 'package:ulimo/widget/ticket_pending_item.dart';
 
+import '../check_out_page.dart';
+
 class PendingTicket extends StatefulWidget {
   final double fem;
   final double ffem;
@@ -34,7 +36,23 @@ class _PendingTicketState extends State<PendingTicket> {
                   time: widget.pendingData[index]['time'],
                   status: widget.pendingData[index]['status'],
                   price: widget.pendingData[index]['price'],
-                  onTap: () {});
+                  onTap: () {
+
+                    //go to checkout page
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) =>
+                        // CartPage(user_id: "user_id")));
+                        CheckOutPage(
+                          price: widget.pendingData[index]['price'],
+                          date: widget.pendingData[index]['date'],
+                          time: widget.pendingData[index]['time'],
+                          rideType: 'private',
+                          orderId: widget.pendingData[index]['id'],
+                          destinationName: '',
+                          destinationAddress: '',
+                        )));
+
+                  });
             });
     ;
   }
