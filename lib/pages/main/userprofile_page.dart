@@ -14,6 +14,8 @@ import '../../widget/profile_menu.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_share/flutter_share.dart';
 
+import '../phone_login_pages.dart';
+
 class UserProfilePage extends StatefulWidget {
   final BuildContext parentContext;
 
@@ -530,7 +532,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                               top: 0 * fem,
                                               child: Align(
                                                 child: SizedBox(
-                                                  width: 11 * fem,
                                                   height: 26 * fem,
                                                   child: Text(
                                                     "${_ticketListData.length}",
@@ -744,7 +745,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         GestureDetector(
                           onTap: () {
                             authData.signOut();
-                            Navigator.popUntil(context, (route) => route.isFirst);
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                  builder: (_) => const PhoneLoginPage()),
+                            );
                           },
                           child: Container(
                             // logoutbutton8tg (0:559)
