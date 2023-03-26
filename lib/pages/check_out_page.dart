@@ -198,7 +198,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
               "date": widget.date,
               "entry_quantity": widget.entryQuantity,
               "ride_quantity": widget.rideQuantity,
-              "rideShareBusTicket_id": widget.orderId,
+              "nightlife_id": widget.orderId,
               "status": "paid",
               "users_id": authData.currentUser?.uid
             });

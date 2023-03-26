@@ -9,17 +9,16 @@ import '../base/utils.dart';
 
 Widget ticketCheckoutItem(
     {required double fem,
-      required double ffem,
-      required String title,
-      required String address,
-      required String date,
-      required String time,
-      required Function() onTap}) {
-
+    required double ffem,
+    required String title,
+    required String address,
+    required String date,
+    required String time,
+    required Function() onTap}) {
   return Container(
     // autogroup8kvhNC8 (B1LcCTg9vHsnNENVyN8kVh)
     padding:
-    EdgeInsets.fromLTRB(22.43 * fem, 16.83 * fem, 21.52 * fem, 8.26 * fem),
+        EdgeInsets.fromLTRB(22.43 * fem, 16.83 * fem, 21.52 * fem, 8.26 * fem),
     margin: const EdgeInsets.only(bottom: 24),
     width: double.infinity,
     decoration: const BoxDecoration(
@@ -34,7 +33,7 @@ Widget ticketCheckoutItem(
         Container(
           // group7607UFA (1:1384)
           margin:
-          EdgeInsets.fromLTRB(8.04 * fem, 0 * fem, 4.41 * fem, 25.6 * fem),
+              EdgeInsets.fromLTRB(8.04 * fem, 0 * fem, 4.41 * fem, 25.6 * fem),
           width: double.infinity,
           height: 41 * fem,
           child: Row(
@@ -43,7 +42,7 @@ Widget ticketCheckoutItem(
               Container(
                 // group15oHS (1:1385)
                 margin:
-                EdgeInsets.fromLTRB(0 * fem, 0 * fem, 27.6 * fem, 0 * fem),
+                    EdgeInsets.fromLTRB(0 * fem, 0 * fem, 27.6 * fem, 0 * fem),
                 width: 177 * fem,
                 height: double.infinity,
                 child: Column(
@@ -71,13 +70,13 @@ Widget ticketCheckoutItem(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Container(
-                            // frameowe (1:1389)
+                              // frameowe (1:1389)
                               margin: EdgeInsets.fromLTRB(
                                   0 * fem, 0 * fem, 5 * fem, 0 * fem),
                               width: 14 * fem,
                               height: 14 * fem,
                               child:
-                              SvgPicture.asset("assets/icon/location.svg")),
+                                  SvgPicture.asset("assets/icon/location.svg")),
                           Text(
                             // wplattsttampafl33606LRn (1:1388)
                             address,
@@ -98,15 +97,17 @@ Widget ticketCheckoutItem(
               Container(
                 // group7606sRi (1:1392)
                 margin:
-                EdgeInsets.fromLTRB(0 * fem, 1.5 * fem, 0 * fem, 1.5 * fem),
+                    EdgeInsets.fromLTRB(0 * fem, 1.5 * fem, 0 * fem, 1.5 * fem),
                 height: double.infinity,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       // pmQwS (1:1394)
-                      time == ''? '' : DateFormat("h:mm a")
-                          .format(DateFormat("H:mm").parse(time)),
+                      time == ''
+                          ? ''
+                          : DateFormat("h:mm a")
+                              .format(DateFormat("H:mm").parse(time)),
                       style: SafeGoogleFont(
                         'Saira',
                         fontSize: 12 * ffem,
@@ -117,8 +118,9 @@ Widget ticketCheckoutItem(
                     ),
                     Text(
                       // feb2023kkQ (1:1393)
+                      // date,
                       DateFormat("dd MMM yyyy")
-                          .format(DateFormat("yyyy-MM-dd").parse(date)),
+                          .format(DateFormat("dd-MM-yyyy").parse(date)),
                       style: SafeGoogleFont(
                         'Saira',
                         fontSize: 12 * ffem,
@@ -170,7 +172,7 @@ Widget ticketCheckoutItem(
                       margin: EdgeInsets.fromLTRB(
                           8.04 * fem, 0 * fem, 0 * fem, 0 * fem),
                       child: Text(
-                      'Confirmed',
+                        'Confirmed',
                         style: SafeGoogleFont(
                           'Saira',
                           fontSize: 12 * ffem,

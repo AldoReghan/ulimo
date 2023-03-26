@@ -97,6 +97,7 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
           backgroundColor: Colors.green,
         ),
       );
+      Navigator.of(context).pop();
 
       SchedulerBinding.instance.addPostFrameCallback((_) {
         _formKey.currentState!.reset();
@@ -107,8 +108,8 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
         //         CheckOutPage(privateRideId: databaseRef.key ?? ""),
         //   ),
         // );
-        Fluttertoast.showToast(msg: 'Invalid OTP code');
-        Navigator.of(context).pop();
+        // Fluttertoast.showToast(msg: 'Invalid OTP code');
+        // Navigator.of(context).pop();
       });
     } catch (e) {
       print('makePayment() was canceled');
