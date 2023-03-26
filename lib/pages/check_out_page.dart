@@ -1,7 +1,9 @@
 import 'package:connectivity/connectivity.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -21,6 +23,8 @@ class CheckOutPage extends StatefulWidget {
   final String date;
   final String time;
   final String price;
+  final int rideQuantity;
+  final int entryQuantity;
 
   const CheckOutPage(
       {Key? key,
@@ -30,7 +34,9 @@ class CheckOutPage extends StatefulWidget {
       required this.destinationAddress,
       required this.date,
       required this.time,
-      required this.price})
+      required this.price,
+      required this.rideQuantity,
+      required this.entryQuantity})
       : super(key: key);
 
   @override
@@ -46,11 +52,13 @@ class _CheckOutPageState extends State<CheckOutPage> {
   double _discountRate = 0.00;
   String _discountName = "";
   bool isCodeValid = false;
+  bool _isLoading = false;
   DateTime _discountExpiredDate = DateTime.now();
   final promoController = TextEditingController();
   final cardController = CardFormEditController();
 
   final _databaseRef = FirebaseDatabase.instance.ref();
+  final authData = FirebaseAuth.instance;
 
   Future<void> _getCheckoutData() async {
     if (widget.rideType == 'private') {
@@ -123,7 +131,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
     if (promoCodeData != null) {
       promoCodeData.forEach((key, value) async {
         setState(() {
-          _discountRate =  double.parse(value['discount_rate']);
+          _discountRate = double.parse(value['discount_rate']);
           _discountName = value['discount_name'];
           //format yyyy-MM-dd
           _discountExpiredDate = DateTime.parse(value['discount_date_expired']);
@@ -146,7 +154,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
               textColor: Colors.white);
         }
       });
-    }else{
+    } else {
       Fluttertoast.showToast(
           msg: "Promo code is not available",
           backgroundColor: Colors.red,
@@ -158,7 +166,82 @@ class _CheckOutPageState extends State<CheckOutPage> {
     }
   }
 
-  String countTotalPrice(){
+  void _checkOutTicket() async {
+    setState(() {
+      _isLoading = true;
+    });
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult != ConnectivityResult.none) {
+      switch (widget.rideType) {
+        case "private":
+          {
+            await _databaseRef.child("privateRide").child(widget.orderId).update({"status": "paid"});
+          }
+          break;
+
+        case "ridesharebus":
+          {
+            await _databaseRef.child("rideShareBusTicketOrder").push().set({
+              "date": widget.date,
+              "entry_quantity": widget.entryQuantity,
+              "ride_quantity": widget.rideQuantity,
+              "rideShareBusTicket_id": widget.orderId,
+              "status": "paid",
+              "users_id": authData.currentUser?.uid
+            });
+          }
+          break;
+
+        case "nightlife":
+          {
+            await _databaseRef.child("nightlifeOrder").push().set({
+              "date": widget.date,
+              "entry_quantity": widget.entryQuantity,
+              "ride_quantity": widget.rideQuantity,
+              "rideShareBusTicket_id": widget.orderId,
+              "status": "paid",
+              "users_id": authData.currentUser?.uid
+            });
+          }
+          break;
+      }
+
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (context) => PaymentSuccessPage(
+                  destinationName: _title,
+                  destinationAddress: _subtitle,
+                  date: _date,
+                  time: _time,
+              status: 'Confirmed'
+                )));
+      });
+    } else {
+      // ignore: use_build_context_synchronously
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("No Internet Connection"),
+            content: const Text("Please check your internet connection."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  String countTotalPrice() {
     final totalDiscount = double.parse(_price) * (_discountRate / 100);
     final totalPrice = double.parse(_price) - totalDiscount;
     return totalPrice.toStringAsFixed(2);
@@ -648,13 +731,12 @@ class _CheckOutPageState extends State<CheckOutPage> {
               // ),
               CardFormField(
                 style: CardFormStyle(
-                  placeholderColor: Colors.grey,
-                  backgroundColor: darkPrimary,
-                  textColor: yellowPrimary,
-                  borderColor: yellowPrimary,
-                  cursorColor: yellowPrimary,
-                  borderRadius: 10
-                ),
+                    placeholderColor: Colors.grey,
+                    backgroundColor: darkPrimary,
+                    textColor: yellowPrimary,
+                    borderColor: yellowPrimary,
+                    cursorColor: yellowPrimary,
+                    borderRadius: 10),
                 controller: cardController,
                 enablePostalCode: false,
                 countryCode: 'USD',
@@ -728,7 +810,8 @@ class _CheckOutPageState extends State<CheckOutPage> {
                               _getPromoCode();
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: isCodeValid ? Colors.green : yellowPrimary,
+                              backgroundColor:
+                                  isCodeValid ? Colors.green : yellowPrimary,
                             ),
                             child: const Icon(Icons.check),
                           ),
@@ -797,30 +880,35 @@ class _CheckOutPageState extends State<CheckOutPage> {
                       // button8hv (0:1291)
                       onPressed: () {
                         //go to success page
+                        _checkOutTicket();
                       },
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.zero,
                       ),
-                      child: Container(
-                        width: 215.47 * fem,
-                        height: double.infinity,
-                        decoration: BoxDecoration(
-                          color: const Color(0xfffdcb5b),
-                          borderRadius: BorderRadius.circular(5 * fem),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Purchase Ticket',
-                            style: SafeGoogleFont(
-                              'Saira',
-                              fontSize: 20 * ffem,
-                              fontWeight: FontWeight.w500,
-                              height: 1.575 * ffem / fem,
-                              color: const Color(0xff000000),
+                      child:  Container(
+                              width: 215.47 * fem,
+                              height: double.infinity,
+                              decoration: BoxDecoration(
+                                color: const Color(0xfffdcb5b),
+                                borderRadius: BorderRadius.circular(5 * fem),
+                              ),
+                              child: Center(
+                                child: _isLoading
+                                    ? const AspectRatio(
+                                    aspectRatio: 1,
+                                    child: CircularProgressIndicator())
+                                    : Text(
+                                  'Purchase Ticket',
+                                  style: SafeGoogleFont(
+                                    'Saira',
+                                    fontSize: 20 * ffem,
+                                    fontWeight: FontWeight.w500,
+                                    height: 1.575 * ffem / fem,
+                                    color: const Color(0xff000000),
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      ),
                     ),
                   ],
                 ),

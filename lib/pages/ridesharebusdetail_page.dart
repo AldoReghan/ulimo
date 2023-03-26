@@ -1117,20 +1117,25 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                             onPressed: () {
                               if (_isRideTicket || _isEntryTicket) {
                                 Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        CheckOutPage(
+                                    builder: (context) => CheckOutPage(
                                           price: countTotalPrice(
                                               _rideSubTotalPrice,
                                               _entrySubTotalPrice),
                                           date: DateFormat("dd-MM-yyyy")
                                               .format(_date),
                                           time: '',
-                                          rideType: 'nightlife',
-                                          orderId: '',
+                                          rideType: 'ridesharebus',
+                                          orderId: _rideShareBusTicketOrderId[
+                                              _selectedTimeIndex],
                                           destinationName:
                                               _destinationData['name'],
                                           destinationAddress:
                                               _destinationData['address'],
+                                          rideQuantity:
+                                              _isRideTicket ? _selectedRide : 0,
+                                          entryQuantity: _isEntryTicket
+                                              ? _selectedEntry
+                                              : 0,
                                         )));
                               }
                             },

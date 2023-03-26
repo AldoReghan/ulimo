@@ -33,6 +33,14 @@ Widget recommendationListLayout(BuildContext context,
                 child: Image.network(
                   imageUrl,
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Center(
+                      child: Text(
+                        "Image Load Error",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
+                  },
                 ),
               ),
             ),

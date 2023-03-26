@@ -963,60 +963,6 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                           ),
                         ],
                       ),
-                      // child: Container(
-                      //   // group7533cRW (0:1255)
-                      //   margin: EdgeInsets.fromLTRB(
-                      //       19.94 * fem, 0 * fem, 20.06 * fem, 46 * fem),
-                      //   width: double.infinity,
-                      //   child: Column(
-                      //     crossAxisAlignment: CrossAxisAlignment.start,
-                      //     children: [
-                      //       Container(
-                      //         // group7532Mdz (0:1256)
-                      //         margin: EdgeInsets.fromLTRB(
-                      //             0.11 * fem, 0 * fem, 241.89 * fem, 10 * fem),
-                      //         width: double.infinity,
-                      //         child: Row(
-                      //           crossAxisAlignment: CrossAxisAlignment.center,
-                      //           children: [
-                      //             Container(
-                      //                 // framet88 (0:1259)
-                      //                 margin: EdgeInsets.fromLTRB(
-                      //                     0 * fem, 0 * fem, 4 * fem, 0 * fem),
-                      //                 width: 20 * fem,
-                      //                 height: 20 * fem,
-                      //                 child: SvgPicture.asset(
-                      //                     "assets/icon/checkbox.svg")),
-                      //             Text(
-                      //               'Ride ticket',
-                      //               style: SafeGoogleFont(
-                      //                 'Saira',
-                      //                 fontSize: 14 * ffem,
-                      //                 fontWeight: FontWeight.w500,
-                      //                 height: 1.4285714286 * ffem / fem,
-                      //                 color: const Color(0xfffdcb5b),
-                      //               ),
-                      //             ),
-                      //           ],
-                      //         ),
-                      //       ),
-                      //       Container(
-                      //           // group7528ArL (0:1262)
-                      //           padding: EdgeInsets.fromLTRB(
-                      //               6.53 * fem, 6.35 * fem, 6.53 * fem, 6.35 * fem),
-                      //           width: double.infinity,
-                      //           height: 100 * fem,
-                      //           decoration: BoxDecoration(
-                      //             border: Border.all(color: const Color(0x0caaaaaa)),
-                      //             color: const Color(0xff2c2b2b),
-                      //             borderRadius: BorderRadius.circular(8 * fem),
-                      //           ),
-                      //           child: DateAvailableList(fem: fem, ffem: ffem, onTap: (index){
-                      //             //do something when clicked
-                      //           })),
-                      //     ],
-                      //   ),
-                      // ),
                     ),
                     Container(
                       // group7530qqJ (0:1290)
@@ -1088,11 +1034,16 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                               .format(_date),
                                           time: '',
                                           rideType: 'nightlife',
-                                          orderId: '',
+                                          orderId: widget.nightlifeDestinationId,
                                           destinationName:
                                               _destinationData['name'],
                                           destinationAddress:
                                               _destinationData['address'],
+                                          rideQuantity:
+                                              _isRideTicket ? _selectedRide : 0,
+                                          entryQuantity: _isEntryTicket
+                                              ? _selectedEntry
+                                              : 0,
                                         )));
                               }
                             },

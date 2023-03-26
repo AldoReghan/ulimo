@@ -26,6 +26,16 @@ class _MainPageState extends State<MainPage> {
   int selectedIndex = 0;
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    setState(() {
+      selectedIndex = 0;
+    });
+
+  }
+
+  @override
   Widget build(BuildContext context) {
 
 

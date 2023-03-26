@@ -744,7 +744,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         GestureDetector(
                           onTap: () {
                             authData.signOut();
-                            Navigator.pop(widget.parentContext);
+                            Navigator.popUntil(context, (route) => route.isFirst);
                           },
                           child: Container(
                             // logoutbutton8tg (0:559)
