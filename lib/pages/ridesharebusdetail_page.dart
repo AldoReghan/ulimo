@@ -166,6 +166,10 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
         _availableRide = int.parse(_totalRideQuantity);
       });
     }
+    setState(() {
+      _selectedRide = 1;
+      _selectedEntry = 1;
+    });
   }
 
   void _saveData(String quantity) async {
@@ -679,6 +683,7 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                                               _selectedTimeIndex]
                                                           ['ride_price'];
                                                     });
+                                                    updateAvailableSeat();
                                                   },
                                                 ),
                                               ),
@@ -806,7 +811,7 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                       ),
                                       SizedBox(
                                         width: double.infinity,
-                                        child: Slider(
+                                        child: _availableRide == 0 ? const Text("No ticket available") : Slider(
                                           value: _selectedRide.toDouble(),
                                           min: 1,
                                           max: _availableRide.toDouble(),
@@ -964,7 +969,7 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                       ),
                                       SizedBox(
                                         width: double.infinity,
-                                        child: Slider(
+                                        child: _availableEntry == 0 ? const Text("No ticket available") : Slider(
                                           value: _selectedEntry.toDouble(),
                                           min: 1,
                                           max: _availableEntry.toDouble(),

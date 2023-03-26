@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
@@ -13,6 +15,56 @@ class NotificationPage extends StatefulWidget {
 }
 
 class _NotificationPageState extends State<NotificationPage> {
+  FirebaseAuth authData = FirebaseAuth.instance;
+
+  final _databaseRef = FirebaseDatabase.instance.ref();
+  late List _notificationData;
+  bool _isLoading = true;
+
+  Future<void> _fetchData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final notificationSnapshot = await _databaseRef
+        .child('notifications')
+        .orderByChild('user_id')
+        .equalTo(authData.currentUser?.uid)
+        .once();
+
+    final Map<dynamic, dynamic>? notificationData =
+        notificationSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+
+    if (notificationData != null) {
+      final List tempNotificationData = [];
+      notificationData.forEach((key, value) {
+        final notificationMap = {
+          'title': value['title'],
+          'subtitle': value['subtitle'],
+          'date': value['date'],
+          'time': value['time']
+        };
+
+        tempNotificationData.add(notificationMap);
+      });
+      setState(() {
+        _notificationData = tempNotificationData;
+      });
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _notificationData = [];
+    _fetchData();
+  }
+
   @override
   Widget build(BuildContext context) {
     double baseWidth = 375;
@@ -70,14 +122,15 @@ class _NotificationPageState extends State<NotificationPage> {
               Expanded(
                 child: ListView.builder(
                     physics: const BouncingScrollPhysics(),
-                    itemCount: 10,
+                    itemCount: _notificationData.length,
                     itemBuilder: (context, index) {
                       return notificationItem(
                           fem: fem,
                           ffem: ffem,
-                          title: "Private ride",
-                          subtitle: "Your request has been accepted, visit the Ticket tab to pay.",
-                          timeStamp: "03 FEB 2023 6:20 PM");
+                          title: _notificationData[index]['title'],
+                          subtitle: _notificationData[index]['subtitle'],
+                          timeStamp:
+                              "${_notificationData[index]['date']} ${_notificationData[index]['time']}");
                     }),
               ),
             ],

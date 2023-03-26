@@ -16,6 +16,7 @@ import 'package:flutter_share/flutter_share.dart';
 
 class UserProfilePage extends StatefulWidget {
   final BuildContext parentContext;
+
   const UserProfilePage({Key? key, required this.parentContext})
       : super(key: key);
 
@@ -32,6 +33,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   final _databaseRef = FirebaseDatabase.instance.ref();
   late List _ticketListData;
   bool _isLoading = true;
+  int _notificationCount = 0;
 
   Future<void> _fetchData() async {
     setState(() {
@@ -50,8 +52,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
       final rideShareBusOrderSnapshot = await _databaseRef
           .child('rideShareBusTicketOrder')
           .orderByChild('users_id')
-          // .equalTo(authData.currentUser?.uid)
+          .equalTo(authData.currentUser?.uid)
           .once();
+
+      final notificationSnapshot = await _databaseRef
+          .child('notifications')
+          .orderByChild('user_id')
+          .equalTo(authData.currentUser?.uid)
+          .once();
+
+      final Map<dynamic, dynamic>? notificationData =
+          notificationSnapshot.snapshot.value as Map<dynamic, dynamic>?;
 
       final Map<dynamic, dynamic>? privateRideData =
           privateRideSnapshot.snapshot.value as Map<dynamic, dynamic>?;
@@ -128,6 +139,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
           });
         });
       }
+
+      if(notificationData !=null){
+        setState(() {
+          _notificationCount = notificationData.length;
+        });
+      }
+
     } else {
       // ignore: use_build_context_synchronously
       showDialog(
@@ -200,24 +218,18 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         // arrowuRi (0:604)
                         margin: EdgeInsets.fromLTRB(
                             0 * fem, 0 * fem, 27 * fem, 0 * fem),
-                        width: 24 * fem,
-                        height: 24 * fem,
-                        child: const Icon(
-                          Icons.arrow_back_ios,
-                          color: Colors.white,
-                          size: 24,
-                        )),
-                    Text(
-                      // myprofilecqv (0:608)
-                      'My Profile',
-                      style: SafeGoogleFont(
-                        'Saira',
-                        fontSize: 24 * ffem,
-                        fontWeight: FontWeight.w500,
-                        height: 1.575 * ffem / fem,
-                        color: const Color(0xffffffff),
-                      ),
-                    ),
+                        child: Text(
+                          // myprofilecqv (0:608)
+                          'My Profile',
+                          style: SafeGoogleFont(
+                            'Saira',
+                            fontSize: 24 * ffem,
+                            fontWeight: FontWeight.w500,
+                            height: 1.575 * ffem / fem,
+                            color: const Color(0xffffffff),
+                          ),
+                        ),),
+
                   ],
                 ),
               ),
@@ -644,7 +656,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     ),
                                     child: Center(
                                       child: Text(
-                                        '0',
+                                        "$_notificationCount",
                                         style: SafeGoogleFont(
                                           'Saira',
                                           fontSize: 14 * ffem,

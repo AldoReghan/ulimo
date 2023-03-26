@@ -27,7 +27,6 @@ class _MyTicketPageState extends State<MyTicketPage> {
   late List _ticketListData;
   bool _isLoading = true;
 
-
   Future<void> _fetchData() async {
     setState(() {
       _isLoading = true;
@@ -45,7 +44,7 @@ class _MyTicketPageState extends State<MyTicketPage> {
       final rideShareBusOrderSnapshot = await _databaseRef
           .child('rideShareBusTicketOrder')
           .orderByChild('users_id')
-          // .equalTo(authData.currentUser?.uid)
+          .equalTo(authData.currentUser?.uid)
           .once();
 
       final Map<dynamic, dynamic>? privateRideData =
@@ -157,8 +156,12 @@ class _MyTicketPageState extends State<MyTicketPage> {
     _fetchData();
   }
 
-  List<int> getCount(){
-    return [getActiveData().length,getPendingData().length, getExpiredData().length];
+  List<int> getCount() {
+    return [
+      getActiveData().length,
+      getPendingData().length,
+      getExpiredData().length
+    ];
   }
 
   List getActiveData() {
@@ -211,8 +214,7 @@ class _MyTicketPageState extends State<MyTicketPage> {
       backgroundColor: Colors.transparent,
       body: SafeArea(
           child: Container(
-        padding:
-            EdgeInsets.fromLTRB(20 * fem, 40.21 * fem, 20 * fem, 4 * fem),
+        padding: EdgeInsets.fromLTRB(20 * fem, 40.21 * fem, 20 * fem, 4 * fem),
         child: _isLoading
             ? const Center(
                 child: CircularProgressIndicator(),
@@ -228,7 +230,7 @@ class _MyTicketPageState extends State<MyTicketPage> {
                         setState(() {
                           _selectedIndex = index;
                         });
-                      }),
+                      }, selectedIndex: _selectedIndex,),
                   Container(
                     // editprofileKYL (0:1096)
                     margin: EdgeInsets.fromLTRB(
@@ -259,7 +261,16 @@ class _MyTicketPageState extends State<MyTicketPage> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Expanded(child: getTicketList(fem, ffem)[_selectedIndex])
+                  Expanded(
+                    child: PageView(
+                      physics: const BouncingScrollPhysics(),
+                        children: getTicketList(fem, ffem),
+                        onPageChanged: (index) {
+                          setState(() {
+                            _selectedIndex = index;
+                          });
+                        }),
+                  )
                 ],
               ),
       )),
