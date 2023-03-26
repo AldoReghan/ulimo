@@ -102,7 +102,7 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
 
   Future<void> _selectPickupTime(BuildContext context) async {
     final TimeOfDay? picked =
-    await showTimePicker(context: context, initialTime: _pickupTime);
+        await showTimePicker(context: context, initialTime: _pickupTime);
     if (picked != null && picked != _pickupTime) {
       setState(() {
         _pickupTime = picked;
@@ -485,25 +485,22 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                               width: double.infinity,
                               height: double.infinity,
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 15),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 15),
                                 child: Row(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     GestureDetector(
                                       onTap: () => _selectDate(context),
                                       child: Text(
-                                        DateFormat('dd MMM yyyy')
-                                            .format(_date),
+                                        DateFormat('dd MMM yyyy').format(_date),
                                         style: SafeGoogleFont(
                                           'Saira',
                                           fontSize: 14 * ffem,
                                           fontWeight: FontWeight.w500,
-                                          height:
-                                          1.4285714286 * ffem / fem,
+                                          height: 1.4285714286 * ffem / fem,
                                           color: const Color(0xfffdcb5b),
                                         ),
                                       ),
@@ -524,7 +521,6 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                   ],
                 ),
               ),
-
               Visibility(
                 maintainSize: false,
                 visible: _isEntryTicket,
@@ -696,10 +692,10 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                   height: double.infinity,
                                   child: Row(
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.center,
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Container(
-                                        // frameGwz (0:1244)
+                                          // frameGwz (0:1244)
                                           margin: EdgeInsets.fromLTRB(0 * fem,
                                               0 * fem, 4 * fem, 0 * fem),
                                           width: 20 * fem,
@@ -741,7 +737,7 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                             width: double.infinity,
                             decoration: BoxDecoration(
                               border:
-                              Border.all(color: const Color(0x0caaaaaa)),
+                                  Border.all(color: const Color(0x0caaaaaa)),
                               color: const Color(0xff2c2b2b),
                               borderRadius: BorderRadius.circular(8 * fem),
                             ),
@@ -918,7 +914,9 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) =>
                                 // CartPage(user_id: "user_id")));
-                                const CheckOutPage(privateRideId: '',)));
+                                const CheckOutPage(
+                                  privateRideId: '',
+                                )));
                       },
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.zero,

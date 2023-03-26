@@ -61,6 +61,7 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
     _destinationData = {};
     _rideShareBusTicketOrderId = [];
     _fetchData(widget.destinationId);
+    print(widget.destinationId);
   }
 
   Future<void> _fetchData(String destinationId) async {
@@ -71,28 +72,17 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
     final destinationDataSnapshot = await FirebaseDatabase.instance
         .ref('destination')
         .orderByKey()
-        .equalTo('-as7dadjkkldsa')
+        .equalTo(destinationId)
         .once();
 
     final destinationTicketSnapshot = await FirebaseDatabase.instance
         .ref('rideShareBusTicket')
         .orderByChild('destination_id')
-        .equalTo('-as7dadjkkldsa')
+        .equalTo(destinationId)
         .once();
 
     final Map<dynamic, dynamic>? ticketData =
-    destinationTicketSnapshot.snapshot.value as Map<dynamic, dynamic>?;
-
-    //old data
-    // final destinationTicketSnapshot = await FirebaseDatabase.instance
-    //     .ref('rideShareBusTicket')
-    //     .child('-as7dadjkkldsa')
-    //     .child('ticket_price')
-    //     // .orderByKey()
-    //     // .orderByChild('destination_id')
-    //     // .equalTo(destinationId)
-    //     // .equalTo("-as7dadjkkldsa")
-    //     .once();
+        destinationTicketSnapshot.snapshot.value as Map<dynamic, dynamic>?;
 
     final Map<dynamic, dynamic>? destinationData =
         destinationDataSnapshot.snapshot.value as Map<dynamic, dynamic>?;
@@ -100,14 +90,11 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
     if (destinationData != null) {
       Map<String, dynamic> tempDestinationData;
       destinationData.forEach((dataKey, dataValue) async {
-
-
         if (ticketData != null) {
           final availableTime = [];
           final ticketPriceList = [];
           final List<String> tempRideShareBusOrderIds = [];
           ticketData.forEach((ticketKey, ticketValue) {
-
             availableTime.add(ticketValue['time']);
             ticketPriceList.add(ticketValue);
 
@@ -137,6 +124,7 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
       _isLoading = false;
       _ridePrice =
           _destinationData['ticket_price'][_selectedTimeIndex]['ride_price'];
+
       _entryPrice =
           _destinationData['ticket_price'][_selectedTimeIndex]['entry_price'];
 

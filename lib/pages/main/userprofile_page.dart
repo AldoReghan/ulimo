@@ -11,10 +11,13 @@ import 'package:ulimo/pages/profile/notification_page.dart';
 
 import '../../base/utils.dart';
 import '../../widget/profile_menu.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_share/flutter_share.dart';
 
 class UserProfilePage extends StatefulWidget {
   final BuildContext parentContext;
-  const UserProfilePage({Key? key, required this.parentContext}) : super(key: key);
+  const UserProfilePage({Key? key, required this.parentContext})
+      : super(key: key);
 
   @override
   _UserProfilePageState createState() => _UserProfilePageState();
@@ -29,7 +32,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
   final _databaseRef = FirebaseDatabase.instance.ref();
   late List _ticketListData;
   bool _isLoading = true;
-
 
   Future<void> _fetchData() async {
     setState(() {
@@ -48,17 +50,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
       final rideShareBusOrderSnapshot = await _databaseRef
           .child('rideShareBusTicketOrder')
           .orderByChild('users_id')
-      // .equalTo(authData.currentUser?.uid)
+          // .equalTo(authData.currentUser?.uid)
           .once();
 
       final Map<dynamic, dynamic>? privateRideData =
-      privateRideSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+          privateRideSnapshot.snapshot.value as Map<dynamic, dynamic>?;
       final List tempPrivateRideList = [];
       List filteredListPrivateRide = [];
       final List tempActiveData = [];
 
       final Map<dynamic, dynamic>? rideShareBusOrderData =
-      rideShareBusOrderSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+          rideShareBusOrderSnapshot.snapshot.value as Map<dynamic, dynamic>?;
       final List tempRideShareBusOrderList = [];
       List filteredListShareBusOrder = [];
 
@@ -104,8 +106,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     .once();
 
                 final Map<dynamic, dynamic>? destinationData =
-                destinationSnapshot.snapshot.value
-                as Map<dynamic, dynamic>?;
+                    destinationSnapshot.snapshot.value
+                        as Map<dynamic, dynamic>?;
 
                 destinationData?.forEach((destinationKey, destinationValue) {
                   final rideShareBusOrderMap = {
@@ -665,31 +667,46 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         ),
                         profileMenu(
                             context: context,
-                            title: 'Setting',
-                            iconAsset: "assets/icon/profile_setting.svg",
-                            onTap: () {
-                              // do something
-                            }),
-                        profileMenu(
-                            context: context,
                             title: 'Instagram',
                             iconAsset: "assets/icon/profile_instagram.svg",
-                            onTap: () {
-                              // do something
+                            onTap: () async {
+                              final instagramUrl = Uri(
+                                  scheme: 'https',
+                                  host: 'www.instagram.com',
+                                  path: '/ulimoinc');
+                              if (await canLaunchUrl(instagramUrl)) {
+                                await launchUrl(instagramUrl);
+                              } else {
+                                throw 'Could not launch $instagramUrl';
+                              }
                             }),
                         profileMenu(
-                            context: context,
-                            title: 'Invite a friend',
-                            iconAsset: "assets/icon/profile_invite.svg",
-                            onTap: () {
-                              // do something
-                            }),
+                          context: context,
+                          title: 'Invite a friend',
+                          iconAsset: "assets/icon/profile_invite.svg",
+                          onTap: () async {
+                            await FlutterShare.share(
+                              title: 'Invite a friend',
+                              text: 'Check out this cool app!',
+                              linkUrl: 'https://www.ulimo.co/',
+                              chooserTitle: 'Invite a friend',
+                            );
+                          },
+                        ),
                         profileMenu(
                             context: context,
                             title: 'More info',
                             iconAsset: "assets/icon/profile_info.svg",
-                            onTap: () {
-                              // do something
+                            onTap: () async {
+                              final ulimoWeb = Uri(
+                                  scheme: 'https',
+                                  host: 'www.ulimo.co',
+                                  path: '/');
+                              if (await canLaunchUrl(ulimoWeb)) {
+                                await launchUrl(ulimoWeb);
+                              } else {
+                                throw 'Could not launch $ulimoWeb';
+                              }
                             }),
                         GestureDetector(
                           onTap: () {
