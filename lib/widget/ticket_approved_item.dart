@@ -15,7 +15,7 @@ Widget ticketApprovedItem({required double fem, required double ffem}){
     width: double.infinity,
     decoration: const BoxDecoration(
       image: DecorationImage(
-        fit: BoxFit.fill,
+        fit: BoxFit.fitHeight,
         image:
         AssetImage("assets/ticket_approved_background.png"),
       ),

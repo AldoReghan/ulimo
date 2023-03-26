@@ -48,20 +48,21 @@ class _MyTicketPageState extends State<MyTicketPage> {
           .equalTo(authData.currentUser?.uid)
           .once();
 
-      print("uidddd ${authData.currentUser?.uid}");
+      final nightlifeOrderSnapshot = await _databaseRef
+          .child('nightlifeOrder')
+          .orderByChild('users_id')
+          .equalTo(authData.currentUser?.uid)
+          .once();
 
       final Map<dynamic, dynamic>? privateRideData =
           privateRideSnapshot.snapshot.value as Map<dynamic, dynamic>?;
-      final List tempPrivateRideList = [];
-      List filteredListPrivateRide = [];
-      final List tempActiveData = [];
+
+      final Map<dynamic, dynamic>? nightlifeOrderData =
+          nightlifeOrderSnapshot.snapshot.value as Map<dynamic, dynamic>?;
 
       final Map<dynamic, dynamic>? rideShareBusOrderData =
           rideShareBusOrderSnapshot.snapshot.value as Map<dynamic, dynamic>?;
       final List tempRideShareBusOrderList = [];
-      List filteredListShareBusOrder = [];
-
-      print("data orderr $rideShareBusOrderData");
 
       if (privateRideData != null || rideShareBusOrderData != null) {
         privateRideData?.forEach((key, value) async {
@@ -81,48 +82,71 @@ class _MyTicketPageState extends State<MyTicketPage> {
         });
 
         rideShareBusOrderData?.forEach((key, value) async {
-          // final mapValue = orderValue as Map<dynamic, dynamic>?;
-          //
-          // mapValue?.forEach((key, value) async {
-            final destinationTicketSnapshot = await FirebaseDatabase.instance
-                .ref('rideShareBusTicket')
-                .orderByKey()
-                .equalTo(value['rideShareBusTicket_id'])
-                .once();
+          final destinationTicketSnapshot = await FirebaseDatabase.instance
+              .ref('rideShareBusTicket')
+              .orderByKey()
+              .equalTo(value['rideShareBusTicket_id'])
+              .once();
 
-            final Map<dynamic, dynamic>? ticketData = destinationTicketSnapshot
-                .snapshot.value as Map<dynamic, dynamic>?;
+          final Map<dynamic, dynamic>? ticketData = destinationTicketSnapshot
+              .snapshot.value as Map<dynamic, dynamic>?;
 
-            if (ticketData != null) {
-              // final availableDate = <String>{};
-              ticketData.forEach((ticketKey, ticketValue) async {
-                final destinationSnapshot = await FirebaseDatabase.instance
-                    .ref('rideShareBusDestination')
-                    .orderByKey()
-                    .equalTo(ticketValue['destination_id'])
-                    .once();
+          if (ticketData != null) {
+            // final availableDate = <String>{};
+            ticketData.forEach((ticketKey, ticketValue) async {
+              final destinationSnapshot = await FirebaseDatabase.instance
+                  .ref('rideShareBusDestination')
+                  .orderByKey()
+                  .equalTo(ticketValue['destination_id'])
+                  .once();
 
-                final Map<dynamic, dynamic>? destinationData =
-                    destinationSnapshot.snapshot.value
-                        as Map<dynamic, dynamic>?;
+              final Map<dynamic, dynamic>? destinationData =
+                  destinationSnapshot.snapshot.value as Map<dynamic, dynamic>?;
 
-                destinationData?.forEach((destinationKey, destinationValue) {
-                  final rideShareBusOrderMap = {
-                    'id': key,
-                    'address': destinationValue['destination_address'],
-                    'date': value['date'],
-                    'time': ticketValue['time'],
-                    'name': destinationValue['destination_name'],
-                    'status': value['status']
-                  };
-                  tempRideShareBusOrderList.add(rideShareBusOrderMap);
-                  setState(() {
-                    _ticketListData.add(rideShareBusOrderMap);
-                  });
+              destinationData?.forEach((destinationKey, destinationValue) {
+                final rideShareBusOrderMap = {
+                  'id': key,
+                  'address': destinationValue['destination_address'],
+                  'date': value['date'],
+                  'time': ticketValue['time'],
+                  'name': destinationValue['destination_name'],
+                  'status': value['status']
+                };
+                tempRideShareBusOrderList.add(rideShareBusOrderMap);
+                setState(() {
+                  _ticketListData.add(rideShareBusOrderMap);
                 });
               });
-            }
+            });
+          }
           // });
+        });
+
+        nightlifeOrderData?.forEach((key, value) async {
+          final nightlifeDestinationSnapshot = await FirebaseDatabase.instance
+              .ref('nightlifeDestination')
+              .orderByKey()
+              .equalTo(value['nightlife_id'])
+              .once();
+
+          final Map<dynamic, dynamic>? nightlifeDestinationData =
+              nightlifeDestinationSnapshot.snapshot.value
+                  as Map<dynamic, dynamic>?;
+
+          nightlifeDestinationData?.forEach((destinationKey, destinationValue) {
+            final nightlifeOrderMap = {
+              'id': key,
+              'address': destinationValue['destination_address'],
+              'date': value['date'],
+              'time': '',
+              'name': destinationValue['destination_name'],
+              'status': value['status']
+            };
+            setState(() {
+              _ticketListData.add(nightlifeOrderMap);
+            });
+          });
+
         });
       }
     } else {

@@ -55,27 +55,20 @@ class _UserProfilePageState extends State<UserProfilePage> {
           .equalTo(authData.currentUser?.uid)
           .once();
 
-      final notificationSnapshot = await _databaseRef
-          .child('notifications')
-          .orderByChild('user_id')
+      final nightlifeOrderSnapshot = await _databaseRef
+          .child('nightlifeOrder')
+          .orderByChild('users_id')
           .equalTo(authData.currentUser?.uid)
           .once();
 
-      final Map<dynamic, dynamic>? notificationData =
-          notificationSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+      final Map<dynamic, dynamic>? nightlifeOrderData =
+          nightlifeOrderSnapshot.snapshot.value as Map<dynamic, dynamic>?;
 
       final Map<dynamic, dynamic>? privateRideData =
           privateRideSnapshot.snapshot.value as Map<dynamic, dynamic>?;
-      final List tempPrivateRideList = [];
-      List filteredListPrivateRide = [];
-      final List tempActiveData = [];
-
       final Map<dynamic, dynamic>? rideShareBusOrderData =
           rideShareBusOrderSnapshot.snapshot.value as Map<dynamic, dynamic>?;
       final List tempRideShareBusOrderList = [];
-      List filteredListShareBusOrder = [];
-
-      print("data orderr $rideShareBusOrderData");
 
       if (privateRideData != null || rideShareBusOrderData != null) {
         privateRideData?.forEach((key, value) async {
@@ -94,58 +87,86 @@ class _UserProfilePageState extends State<UserProfilePage> {
           });
         });
 
-        rideShareBusOrderData?.forEach((orderKey, orderValue) async {
-          final mapValue = orderValue as Map<dynamic, dynamic>?;
+        rideShareBusOrderData?.forEach((key, value) async {
+          final destinationTicketSnapshot = await FirebaseDatabase.instance
+              .ref('rideShareBusTicket')
+              .orderByKey()
+              .equalTo(value['rideShareBusTicket_id'])
+              .once();
 
-          mapValue?.forEach((key, value) async {
-            final destinationTicketSnapshot = await FirebaseDatabase.instance
-                .ref('rideShareBusTicket')
-                .orderByKey()
-                .equalTo(value['rideShareBusTicket_id'])
-                .once();
+          final Map<dynamic, dynamic>? ticketData = destinationTicketSnapshot
+              .snapshot.value as Map<dynamic, dynamic>?;
 
-            final Map<dynamic, dynamic>? ticketData = destinationTicketSnapshot
-                .snapshot.value as Map<dynamic, dynamic>?;
+          if (ticketData != null) {
+            ticketData.forEach((ticketKey, ticketValue) async {
+              final destinationSnapshot = await FirebaseDatabase.instance
+                  .ref('rideShareBusDestination')
+                  .orderByKey()
+                  .equalTo(ticketValue['destination_id'])
+                  .once();
 
-            if (ticketData != null) {
-              // final availableDate = <String>{};
-              ticketData.forEach((ticketKey, ticketValue) async {
-                final destinationSnapshot = await FirebaseDatabase.instance
-                    .ref('rideShareBusDestination')
-                    .orderByKey()
-                    .equalTo(ticketValue['destination_id'])
-                    .once();
+              final Map<dynamic, dynamic>? destinationData =
+                  destinationSnapshot.snapshot.value as Map<dynamic, dynamic>?;
 
-                final Map<dynamic, dynamic>? destinationData =
-                    destinationSnapshot.snapshot.value
-                        as Map<dynamic, dynamic>?;
-
-                destinationData?.forEach((destinationKey, destinationValue) {
-                  final rideShareBusOrderMap = {
-                    'id': key,
-                    'address': destinationValue['destination_address'],
-                    'date': value['date'],
-                    'time': ticketValue['time'],
-                    'name': destinationValue['destination_name'],
-                    'status': value['status']
-                  };
-                  tempRideShareBusOrderList.add(rideShareBusOrderMap);
-                  setState(() {
-                    _ticketListData.add(rideShareBusOrderMap);
-                  });
+              destinationData?.forEach((destinationKey, destinationValue) {
+                final rideShareBusOrderMap = {
+                  'id': key,
+                  'address': destinationValue['destination_address'],
+                  'date': value['date'],
+                  'time': ticketValue['time'],
+                  'name': destinationValue['destination_name'],
+                  'status': value['status']
+                };
+                tempRideShareBusOrderList.add(rideShareBusOrderMap);
+                setState(() {
+                  _ticketListData.add(rideShareBusOrderMap);
                 });
               });
-            }
+            });
+          }
+        });
+
+        nightlifeOrderData?.forEach((key, value) async {
+          final nightlifeDestinationSnapshot = await FirebaseDatabase.instance
+              .ref('nightlifeDestination')
+              .orderByKey()
+              .equalTo(value['nightlife_id'])
+              .once();
+
+          final Map<dynamic, dynamic>? nightlifeDestinationData =
+              nightlifeDestinationSnapshot.snapshot.value
+                  as Map<dynamic, dynamic>?;
+
+          nightlifeDestinationData?.forEach((destinationKey, destinationValue) {
+            final nightlifeOrderMap = {
+              'id': key,
+              'address': destinationValue['destination_address'],
+              'date': value['date'],
+              'time': '',
+              'name': destinationValue['destination_name'],
+              'status': value['status']
+            };
+            setState(() {
+              _ticketListData.add(nightlifeOrderMap);
+            });
           });
         });
       }
 
-      if(notificationData !=null){
+      final notificationSnapshot = await _databaseRef
+          .child('notifications')
+          .orderByChild('user_id')
+          .equalTo(authData.currentUser?.uid)
+          .once();
+
+      final Map<dynamic, dynamic>? notificationData =
+          notificationSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+
+      if (notificationData != null) {
         setState(() {
           _notificationCount = notificationData.length;
         });
       }
-
     } else {
       // ignore: use_build_context_synchronously
       showDialog(
@@ -215,21 +236,21 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Container(
-                        // arrowuRi (0:604)
-                        margin: EdgeInsets.fromLTRB(
-                            0 * fem, 0 * fem, 27 * fem, 0 * fem),
-                        child: Text(
-                          // myprofilecqv (0:608)
-                          'My Profile',
-                          style: SafeGoogleFont(
-                            'Saira',
-                            fontSize: 24 * ffem,
-                            fontWeight: FontWeight.w500,
-                            height: 1.575 * ffem / fem,
-                            color: const Color(0xffffffff),
-                          ),
-                        ),),
-
+                      // arrowuRi (0:604)
+                      margin: EdgeInsets.fromLTRB(
+                          0 * fem, 0 * fem, 27 * fem, 0 * fem),
+                      child: Text(
+                        // myprofilecqv (0:608)
+                        'My Profile',
+                        style: SafeGoogleFont(
+                          'Saira',
+                          fontSize: 24 * ffem,
+                          fontWeight: FontWeight.w500,
+                          height: 1.575 * ffem / fem,
+                          color: const Color(0xffffffff),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

@@ -22,7 +22,7 @@ Widget ticketExpiredItem(
     width: double.infinity,
     decoration: const BoxDecoration(
       image: DecorationImage(
-        fit: BoxFit.cover,
+        fit: BoxFit.fitHeight,
         image: AssetImage("assets/ticket_expired_background.png"),
       ),
     ),
@@ -103,7 +103,7 @@ Widget ticketExpiredItem(
                   children: [
                     Text(
                       // pmQwS (1:1394)
-                      DateFormat("h:mm a")
+                      time == ''? '' : DateFormat("h:mm a")
                           .format(DateFormat("H:mm").parse(time)),
                       style: SafeGoogleFont(
                         'Saira',

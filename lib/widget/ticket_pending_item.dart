@@ -33,7 +33,7 @@ Widget ticketPendingItem(
     width: double.infinity,
     decoration: BoxDecoration(
       image: DecorationImage(
-        fit: BoxFit.cover,
+        fit: BoxFit.fitHeight,
         image: backgroundTicket,
       ),
     ),
@@ -114,7 +114,7 @@ Widget ticketPendingItem(
                   children: [
                     Text(
                       // pmQwS (1:1394)
-                      DateFormat("h:mm a")
+                      time == ''? '' : DateFormat("h:mm a")
                           .format(DateFormat("H:mm").parse(time)),
                       style: SafeGoogleFont(
                         'Saira',

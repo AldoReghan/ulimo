@@ -36,7 +36,7 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
   String _ridePrice = "0.00";
   double _entrySubTotalPrice = 0.00;
   double _rideSubTotalPrice = 0.00;
-  double _totalPrice = 0.00;
+  String _totalPrice = "0.00";
   String? _selectedTime;
   String? _selectedDate;
   int _selectedTimeIndex = 0;
@@ -154,7 +154,8 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
       int tempQuantityEntry = 0;
 
       ticketOrderData.forEach((key, value) {
-        if(value['rideShareBusTicket_id'] == _rideShareBusTicketOrderId[_selectedTimeIndex]){
+        if (value['rideShareBusTicket_id'] ==
+            _rideShareBusTicketOrderId[_selectedTimeIndex]) {
           tempQuantityRide += value['ride_quantity'] as int;
           tempQuantityEntry += value['entry_quantity'] as int;
         }
@@ -174,6 +175,26 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
       _selectedRide = 1;
       _selectedEntry = 1;
     });
+
+    if (_isRideTicket) {
+      setState(() {
+        _rideSubTotalPrice = double.parse(_ridePrice) * _selectedRide;
+      });
+    } else {
+      setState(() {
+        _rideSubTotalPrice = 0.00;
+      });
+    }
+
+    if (_isEntryTicket) {
+      setState(() {
+        _entrySubTotalPrice = double.parse(_entryPrice) * _selectedEntry;
+      });
+    } else {
+      setState(() {
+        _entrySubTotalPrice = 0.00;
+      });
+    }
   }
 
   void _saveData(String quantity) async {
@@ -415,6 +436,7 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                               } else {
                                                 setState(() {
                                                   _rideSubTotalPrice = 0.00;
+                                                  _selectedRide = 1;
                                                   // _totalPrice -= (double.parse(
                                                   //     _rideSubTotalPrice));
                                                 });
@@ -488,6 +510,7 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                               } else {
                                                 setState(() {
                                                   _entrySubTotalPrice = 0.00;
+                                                  _selectedEntry = 1;
                                                   // _totalPrice -= double.parse(
                                                   //     _entrySubTotalPrice);
                                                 });
@@ -1092,19 +1115,24 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                           TextButton(
                             // button8hv (0:1291)
                             onPressed: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) =>
-                                      // CartPage(user_id: "user_id")));
-                                      CheckOutPage(
-                                        price: countTotalPrice(_rideSubTotalPrice, _entrySubTotalPrice),
-                                        date: DateFormat("dd-MM-yyyy")
-                                            .format(_date),
-                                        time: _selectedTime ?? "00:00",
-                                        rideType: 'sharebus',
-                                        orderId: '',
-                                        destinationName: _destinationData['name'],
-                                        destinationAddress: _destinationData['address'],
-                                      )));
+                              if (_isRideTicket || _isEntryTicket) {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) =>
+                                        CheckOutPage(
+                                          price: countTotalPrice(
+                                              _rideSubTotalPrice,
+                                              _entrySubTotalPrice),
+                                          date: DateFormat("dd-MM-yyyy")
+                                              .format(_date),
+                                          time: '',
+                                          rideType: 'nightlife',
+                                          orderId: '',
+                                          destinationName:
+                                              _destinationData['name'],
+                                          destinationAddress:
+                                              _destinationData['address'],
+                                        )));
+                              }
                             },
                             style: TextButton.styleFrom(
                               padding: EdgeInsets.zero,
@@ -1113,7 +1141,9 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                               width: 215.47 * fem,
                               height: double.infinity,
                               decoration: BoxDecoration(
-                                color: const Color(0xfffdcb5b),
+                                color: (_isRideTicket || _isEntryTicket)
+                                    ? const Color(0xfffdcb5b)
+                                    : Colors.grey,
                                 borderRadius: BorderRadius.circular(5 * fem),
                               ),
                               child: Center(

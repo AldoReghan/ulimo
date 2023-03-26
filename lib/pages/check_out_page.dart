@@ -133,6 +133,9 @@ class _CheckOutPageState extends State<CheckOutPage> {
               msg: "Promo code is expired",
               backgroundColor: Colors.red,
               textColor: Colors.white);
+          setState(() {
+            _discountRate = 0;
+          });
         } else {
           setState(() {
             isCodeValid = true;
@@ -144,6 +147,10 @@ class _CheckOutPageState extends State<CheckOutPage> {
         }
       });
     }else{
+      Fluttertoast.showToast(
+          msg: "Promo code is not available",
+          backgroundColor: Colors.red,
+          textColor: Colors.white);
       setState(() {
         _discountRate = 0;
         isCodeValid = false;
