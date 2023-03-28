@@ -1,5 +1,7 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
@@ -181,35 +183,101 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _date,
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: ThemeData(
-            primaryColor: darkPrimary, // change the selected date color
-            colorScheme: const ColorScheme.light(
-              primary: darkPrimary,
-              // change the text color of the header
-              onPrimary: Colors.white,
-              // change the color of the icons in the header
-              surface: darkPrimary,
-              // change the background color of the calendar
-              onSurface: Colors.black, // change the text color of the calendar
+
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      // if (true) {
+      //show ios date picker
+
+      showCupertinoModalPopup(
+        context: context,
+        builder: (BuildContext context) {
+          return Center(
+            child: Container(
+              height: 250,
+              width: MediaQuery.of(context).size.width * 0.8,
+              color: Colors.white,
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 200.0,
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    child: CupertinoDatePicker(
+                      initialDateTime: _date,
+                      mode: CupertinoDatePickerMode.date,
+                      onDateTimeChanged: (value) {
+                        setState(() {
+                          _date = value;
+                        });
+                      },
+                    ),
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        "Select",
+                        style: TextStyle(color: yellowPrimary),
+                      ))
+                ],
+              ),
             ),
-          ),
-          child: child ?? const SizedBox.shrink(),
-        );
-      },
-    );
-    if (picked != null && picked != _date) {
-      setState(() {
-        _date = picked;
-      });
-      updateAvailableSeat();
+          );
+        },
+      );
+
+      // showCupertinoDialog(
+      //   context: context,
+      //   builder: (context) {
+      //     return CupertinoAlertDialog(
+      //       content: CupertinoDatePicker(
+      //         initialDateTime: _date,
+      //         mode: CupertinoDatePickerMode.date,
+      //         onDateTimeChanged: (value) {
+      //           setState(() {
+      //             _date = value;
+      //           });
+      //           Navigator.pop(context);
+      //         },
+      //       ),
+      //     );
+      //   },
+      // );
+    } else {
+      //show android date picker
+      final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: _date,
+        firstDate: DateTime.now(),
+        lastDate: DateTime(2100),
+        builder: (BuildContext context, Widget? child) {
+          return Theme(
+            data: ThemeData(
+              primaryColor: darkPrimary, // change the selected date color
+              colorScheme: const ColorScheme.light(
+                primary: darkPrimary,
+                // change the text color of the header
+                onPrimary: Colors.white,
+                // change the color of the icons in the header
+                surface: darkPrimary,
+                // change the background color of the calendar
+                onSurface: Colors.black, // change the text color of the calendar
+              ),
+            ),
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
+      );
+      if (picked != null && picked != _date) {
+        setState(() {
+          _date = picked;
+        });
+        updateAvailableSeat();
+      }
     }
+
+
+
   }
 
   String countTotalPrice(double rideSubTotalPrice, double entrySubTotalPrice) {
@@ -591,49 +659,47 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                             // group7540L6t (0:1163)
                             width: double.infinity,
                             height: 46 * fem,
-                            child: Flexible(
-                              child: DottedBorder(
-                                borderType: BorderType.RRect,
-                                radius: const Radius.circular(6),
-                                color: const Color(0xFFFDCB5B),
-                                strokeWidth: 1,
+                            child: DottedBorder(
+                              borderType: BorderType.RRect,
+                              radius: const Radius.circular(6),
+                              color: const Color(0xFFFDCB5B),
+                              strokeWidth: 1,
+                              child: SizedBox(
+                                height: double.infinity,
                                 child: SizedBox(
+                                  // group7535hLk (0:1167)
+                                  width: double.infinity,
                                   height: double.infinity,
-                                  child: SizedBox(
-                                    // group7535hLk (0:1167)
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 15),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () => _selectDate(context),
-                                            child: Text(
-                                              DateFormat('dd MMM yyyy')
-                                                  .format(_date),
-                                              style: SafeGoogleFont(
-                                                'Saira',
-                                                fontSize: 14 * ffem,
-                                                fontWeight: FontWeight.w500,
-                                                height:
-                                                    1.4285714286 * ffem / fem,
-                                                color: const Color(0xfffdcb5b),
-                                              ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 15),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () => _selectDate(context),
+                                          child: Text(
+                                            DateFormat('dd MMM yyyy')
+                                                .format(_date),
+                                            style: SafeGoogleFont(
+                                              'Saira',
+                                              fontSize: 14 * ffem,
+                                              fontWeight: FontWeight.w500,
+                                              height:
+                                                  1.4285714286 * ffem / fem,
+                                              color: const Color(0xfffdcb5b),
                                             ),
                                           ),
-                                          Icon(
-                                            Icons.keyboard_arrow_down,
-                                            size: 20 * fem,
-                                            color: Colors.white,
-                                          ),
-                                        ],
-                                      ),
+                                        ),
+                                        Icon(
+                                          Icons.keyboard_arrow_down,
+                                          size: 20 * fem,
+                                          color: Colors.white,
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -1081,197 +1147,6 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
         ),
       ),
     ));
-    // return Scaffold(
-    //   appBar: AppBar(
-    //     title: const Text('Ride Share Bus'),
-    //   ),
-    //   body: Column(
-    //     crossAxisAlignment: CrossAxisAlignment.start,
-    //     children: [
-    //       Container(
-    //         height: 80,
-    //         padding: const EdgeInsets.symmetric(horizontal: 16),
-    //         child: _destinationList.isEmpty
-    //             ? const Center(child: CircularProgressIndicator())
-    //             : ListView.builder(
-    //                 scrollDirection: Axis.horizontal,
-    //                 itemCount: _destinationList.length,
-    //                 itemBuilder: (context, index) {
-    //                   return GestureDetector(
-    //                     onTap: () {
-    //                       setState(() {
-    //                         _selectedTime =
-    //                             _destinationList[index]['time'] as String?;
-    //                       });
-    //                     },
-    //                     child: Container(
-    //                       margin: const EdgeInsets.symmetric(
-    //                           horizontal: 10, vertical: 10),
-    //                       padding: const EdgeInsets.symmetric(
-    //                           horizontal: 16, vertical: 12),
-    //                       decoration: BoxDecoration(
-    //                         color: _isSelectedTime(
-    //                                 _destinationList[index]['time'] as String)
-    //                             ? Colors.blue
-    //                             : Colors.white,
-    //                         border: Border.all(
-    //                           color: Colors.blue,
-    //                           width: 2,
-    //                         ),
-    //                         borderRadius: BorderRadius.circular(10),
-    //                       ),
-    //                       child: Text(
-    //                         _destinationList[index]['time'] as String,
-    //                         style: TextStyle(
-    //                           color: _isSelectedTime(
-    //                                   _destinationList[index]['time'] as String)
-    //                               ? Colors.white
-    //                               : Colors.black,
-    //                           fontWeight: FontWeight.bold,
-    //                           fontSize: 16,
-    //                         ),
-    //                       ),
-    //                     ),
-    //                   );
-    //                 },
-    //               ),
-    //       ),
-    //       Expanded(
-    //         child: _selectedTime == null
-    //             ? const Center(child: Text('Please select time'))
-    //             : ListView.builder(
-    //                 padding: const EdgeInsets.all(16),
-    //                 itemCount: _destinationList.length,
-    //                 itemBuilder: (context, index) {
-    //                   if (_destinationList[index]['time'] == _selectedTime &&
-    //                       _isSelectedTime(_selectedTime!)) {
-    //                     return Form(
-    //                       key: _formKey,
-    //                       child: Card(
-    //                         margin: const EdgeInsets.symmetric(vertical: 8),
-    //                         elevation: 4,
-    //                         shape: RoundedRectangleBorder(
-    //                           borderRadius: BorderRadius.circular(10),
-    //                         ),
-    //                         child: Padding(
-    //                           padding: const EdgeInsets.all(16),
-    //                           child: Column(
-    //                             crossAxisAlignment: CrossAxisAlignment.start,
-    //                             children: [
-    //                               const Text(
-    //                                 'Quantity',
-    //                                 style: TextStyle(
-    //                                   fontWeight: FontWeight.bold,
-    //                                   fontSize: 18,
-    //                                 ),
-    //                               ),
-    //                               const SizedBox(height: 8),
-    //                               Row(
-    //                                 children: [
-    //                                   IconButton(
-    //                                     onPressed: () {
-    //                                       if (_quantityController
-    //                                           .text.isNotEmpty) {
-    //                                         int currentValue = int.parse(
-    //                                             _quantityController.text);
-    //                                         setState(() {
-    //                                           currentValue--;
-    //                                           _quantityController.text =
-    //                                               (currentValue > 0
-    //                                                       ? currentValue
-    //                                                       : 0)
-    //                                                   .toString();
-    //                                         });
-    //                                       }
-    //                                     },
-    //                                     icon: const Icon(Icons.remove),
-    //                                   ),
-    //                                   Expanded(
-    //                                     child: TextFormField(
-    //                                       keyboardType: TextInputType.number,
-    //                                       controller: _quantityController,
-    //                                       decoration: const InputDecoration(
-    //                                         labelText: 'Quantity',
-    //                                         hintText: 'Enter the quantity',
-    //                                       ),
-    //                                       validator: (value) {
-    //                                         if (value == null ||
-    //                                             value.isEmpty) {
-    //                                           return 'Please enter a quantity';
-    //                                         }
-    //                                         return null;
-    //                                       },
-    //                                     ),
-    //                                   ),
-    //                                   IconButton(
-    //                                     onPressed: () {
-    //                                       if (_quantityController
-    //                                           .text.isNotEmpty) {
-    //                                         int currentValue = int.parse(
-    //                                             _quantityController.text);
-    //                                         setState(() {
-    //                                           currentValue++;
-    //                                           _quantityController.text =
-    //                                               currentValue.toString();
-    //                                         });
-    //                                       }
-    //                                     },
-    //                                     icon: const Icon(Icons.add),
-    //                                   ),
-    //                                 ],
-    //                               ),
-    //                               const SizedBox(height: 16),
-    //                               Row(
-    //                                 mainAxisAlignment:
-    //                                     MainAxisAlignment.spaceBetween,
-    //                                 children: [
-    //                                   const Text(
-    //                                     'Price',
-    //                                     style: TextStyle(
-    //                                       fontWeight: FontWeight.bold,
-    //                                       fontSize: 18,
-    //                                     ),
-    //                                   ),
-    //                                   Text(
-    //                                     '\$${NumberFormat("#,##0.00", "en_US").format((_destinationList[index]['price'] ?? 0) * int.parse(_quantityController.text))}',
-    //                                     style: const TextStyle(
-    //                                       fontWeight: FontWeight.bold,
-    //                                       fontSize: 18,
-    //                                       color: Colors.green,
-    //                                     ),
-    //                                   ),
-    //                                 ],
-    //                               ),
-    //                               const SizedBox(height: 16),
-    //                               SizedBox(
-    //                                 width: MediaQuery.of(context).size.width,
-    //                                 child: ElevatedButton(
-    //                                   onPressed: () {
-    //                                     // redirect to thank you page
-    //                                     Navigator.pushReplacement(
-    //                                       context,
-    //                                       MaterialPageRoute(
-    //                                         builder: (context) =>
-    //                                             const ThankYouPage(),
-    //                                       ),
-    //                                     );
-    //                                   },
-    //                                   child: const Text('Add to Cart'),
-    //                                 ),
-    //                               )
-    //                             ],
-    //                           ),
-    //                         ),
-    //                       ),
-    //                     );
-    //                   }
-    //                   return const SizedBox.shrink();
-    //                 },
-    //               ),
-    //       ),
-    //     ],
-    //   ),
-    // );
   }
 
   bool _isSelectedTime(String time) {

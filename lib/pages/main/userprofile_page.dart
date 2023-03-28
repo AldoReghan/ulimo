@@ -333,14 +333,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                 borderRadius:
                                                     BorderRadius.circular(
                                                         6 * fem),
-                                                color: const Color(0xff6e6e6e),
+                                                // color: const Color(0xff6e6e6e),
                                               ),
-                                              child: Image.network(
-                                                  "https://cdn3d.iconscout.com/"
-                                                  "3d/premium/thumb/male-"
-                                                  "customer-call-service-"
-                                                  "portrait-6760890-"
-                                                  "5600697.png?f=webp"),
+                                              child: SvgPicture.asset(
+                                                  'assets/icon/bottom_nav_profile_selected.svg'),
                                             ),
                                             Container(
                                               // group7578oBe (0:500)
@@ -438,54 +434,54 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                       ],
                                                     ),
                                                   ),
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      //do something when edit profile clicked
-                                                      Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  const EditProfilePage()));
-                                                    },
-                                                    child: Container(
-                                                      width: 68.46 * fem,
-                                                      height: 24 * fem,
-                                                      decoration: BoxDecoration(
-                                                        color: const Color(
-                                                            0x0cfdcb5b),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(
-                                                                    2 * fem),
-                                                      ),
-                                                      child: DottedBorder(
-                                                        color: yellowPrimary,
-                                                        borderType:
-                                                            BorderType.RRect,
-                                                        radius: const Radius
-                                                            .circular(6),
-                                                        child: Center(
-                                                          child: Text(
-                                                            'Edit profile',
-                                                            style:
-                                                                SafeGoogleFont(
-                                                              'Saira',
-                                                              fontSize:
-                                                                  10 * ffem,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              height: 1.575 *
-                                                                  ffem /
-                                                                  fem,
-                                                              color: const Color(
-                                                                  0xfffdcb5b),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
+                                                  // GestureDetector(
+                                                  //   onTap: () {
+                                                  //     //do something when edit profile clicked
+                                                  //     Navigator.push(
+                                                  //         context,
+                                                  //         MaterialPageRoute(
+                                                  //             builder: (context) =>
+                                                  //                 const EditProfilePage()));
+                                                  //   },
+                                                  //   child: Container(
+                                                  //     width: 68.46 * fem,
+                                                  //     height: 24 * fem,
+                                                  //     decoration: BoxDecoration(
+                                                  //       color: const Color(
+                                                  //           0x0cfdcb5b),
+                                                  //       borderRadius:
+                                                  //           BorderRadius
+                                                  //               .circular(
+                                                  //                   2 * fem),
+                                                  //     ),
+                                                  //     child: DottedBorder(
+                                                  //       color: yellowPrimary,
+                                                  //       borderType:
+                                                  //           BorderType.RRect,
+                                                  //       radius: const Radius
+                                                  //           .circular(6),
+                                                  //       child: Center(
+                                                  //         child: Text(
+                                                  //           'Edit profile',
+                                                  //           style:
+                                                  //               SafeGoogleFont(
+                                                  //             'Saira',
+                                                  //             fontSize:
+                                                  //                 10 * ffem,
+                                                  //             fontWeight:
+                                                  //                 FontWeight
+                                                  //                     .w500,
+                                                  //             height: 1.575 *
+                                                  //                 ffem /
+                                                  //                 fem,
+                                                  //             color: const Color(
+                                                  //                 0xfffdcb5b),
+                                                  //           ),
+                                                  //         ),
+                                                  //       ),
+                                                  //     ),
+                                                  //   ),
+                                                  // ),
                                                 ],
                                               ),
                                             ),
@@ -714,19 +710,19 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 throw 'Could not launch $instagramUrl';
                               }
                             }),
-                        profileMenu(
-                          context: context,
-                          title: 'Invite a friend',
-                          iconAsset: "assets/icon/profile_invite.svg",
-                          onTap: () async {
-                            await FlutterShare.share(
-                              title: 'Invite a friend',
-                              text: 'Check out this cool app!',
-                              linkUrl: 'https://www.ulimo.co/',
-                              chooserTitle: 'Invite a friend',
-                            );
-                          },
-                        ),
+                        // profileMenu(
+                        //   context: context,
+                        //   title: 'Invite a friend',
+                        //   iconAsset: "assets/icon/profile_invite.svg",
+                        //   onTap: () async {
+                        //     await FlutterShare.share(
+                        //       title: 'Invite a friend',
+                        //       text: 'Check out this cool app!',
+                        //       linkUrl: 'https://www.ulimo.co/',
+                        //       chooserTitle: 'Invite a friend',
+                        //     );
+                        //   },
+                        // ),
                         profileMenu(
                             context: context,
                             title: 'More info',

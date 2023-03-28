@@ -1,5 +1,7 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
@@ -1176,35 +1178,100 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _date,
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: ThemeData(
-            primaryColor: darkPrimary, // change the selected date color
-            colorScheme: const ColorScheme.light(
-              primary: darkPrimary,
-              // change the text color of the header
-              onPrimary: Colors.white,
-              // change the color of the icons in the header
-              surface: darkPrimary,
-              // change the background color of the calendar
-              onSurface: Colors.black, // change the text color of the calendar
+
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      // if (true) {
+      //show ios date picker
+
+      showCupertinoModalPopup(
+        context: context,
+        builder: (BuildContext context) {
+          return Center(
+            child: Container(
+              height: 250,
+              width: MediaQuery.of(context).size.width * 0.8,
+              color: Colors.white,
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 200.0,
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    child: CupertinoDatePicker(
+                      initialDateTime: _date,
+                      mode: CupertinoDatePickerMode.date,
+                      onDateTimeChanged: (value) {
+                        setState(() {
+                          _date = value;
+                        });
+                      },
+                    ),
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        "Select",
+                        style: TextStyle(color: yellowPrimary),
+                      ))
+                ],
+              ),
             ),
-          ),
-          child: child ?? const SizedBox.shrink(),
-        );
-      },
-    );
-    if (picked != null && picked != _date) {
-      setState(() {
-        _date = picked;
-      });
-      updateAvailableSeat();
+          );
+        },
+      );
+
+      // showCupertinoDialog(
+      //   context: context,
+      //   builder: (context) {
+      //     return CupertinoAlertDialog(
+      //       content: CupertinoDatePicker(
+      //         initialDateTime: _date,
+      //         mode: CupertinoDatePickerMode.date,
+      //         onDateTimeChanged: (value) {
+      //           setState(() {
+      //             _date = value;
+      //           });
+      //           Navigator.pop(context);
+      //         },
+      //       ),
+      //     );
+      //   },
+      // );
+    } else {
+      //show android date picker
+      final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: _date,
+        firstDate: DateTime.now(),
+        lastDate: DateTime(2100),
+        builder: (BuildContext context, Widget? child) {
+          return Theme(
+            data: ThemeData(
+              primaryColor: darkPrimary, // change the selected date color
+              colorScheme: const ColorScheme.light(
+                primary: darkPrimary,
+                // change the text color of the header
+                onPrimary: Colors.white,
+                // change the color of the icons in the header
+                surface: darkPrimary,
+                // change the background color of the calendar
+                onSurface: Colors.black, // change the text color of the calendar
+              ),
+            ),
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
+      );
+      if (picked != null && picked != _date) {
+        setState(() {
+          _date = picked;
+        });
+        updateAvailableSeat();
+      }
     }
+
+
   }
 
   String countTotalPrice(double rideSubTotalPrice, double entrySubTotalPrice) {

@@ -36,8 +36,8 @@ class _RideShareBusPageState extends State<RideShareBusPage> {
     if (connectivityResult != ConnectivityResult.none) {
       final destinationSnapshot = await _databaseRef
           .child('rideShareBusDestination')
-          .orderByChild('destination_type')
-          .equalTo('share')
+          // .orderByChild('destination_type')
+          // .equalTo('share')
           .once();
 
       final Map<dynamic, dynamic>? destinationData =

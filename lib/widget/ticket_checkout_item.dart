@@ -54,6 +54,7 @@ Widget ticketCheckoutItem(
                           0 * fem, 0 * fem, 0 * fem, 1 * fem),
                       child: Text(
                         title,
+                        overflow: TextOverflow.ellipsis,
                         style: SafeGoogleFont(
                           'Saira',
                           fontSize: 16 * ffem,
@@ -65,7 +66,6 @@ Widget ticketCheckoutItem(
                     ),
                     SizedBox(
                       // group14eor (1:1387)
-                      width: double.infinity,
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -77,15 +77,19 @@ Widget ticketCheckoutItem(
                               height: 14 * fem,
                               child:
                                   SvgPicture.asset("assets/icon/location.svg")),
-                          Text(
-                            // wplattsttampafl33606LRn (1:1388)
-                            address,
-                            style: SafeGoogleFont(
-                              'Saira',
-                              fontSize: 10 * ffem,
-                              fontWeight: FontWeight.w500,
-                              height: 1.4 * ffem / fem,
-                              color: const Color(0xff3586ff),
+                          SizedBox(
+                            width: 150*fem,
+                            child: Text(
+                              // wplattsttampafl33606LRn (1:1388)
+                              address,
+                              overflow: TextOverflow.ellipsis,
+                              style: SafeGoogleFont(
+                                'Saira',
+                                fontSize: 10 * ffem,
+                                fontWeight: FontWeight.w500,
+                                height: 1.4 * ffem / fem,
+                                color: const Color(0xff3586ff),
+                              ),
                             ),
                           ),
                         ],

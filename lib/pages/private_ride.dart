@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -75,9 +78,9 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
       'user_id': authData.currentUser?.uid,
       'date': DateFormat('yyyy-MM-dd').format(_date),
       'pickup_time': _pickupTime.format(context),
-      'pickup_address': _pickupAddressController.text.trim(),
-      'destination': _destinationController.text.trim(),
-      'phone_number': _phoneNumberController.text.trim(),
+      'pickup_address': _pickupAddressController.text,
+      'destination': _destinationController.text,
+      'phone_number': authData.currentUser?.phoneNumber,
       'email': _emailController.text.trim(),
       'passenger': _passengersController.text.trim(),
       'is_round_trip': _isRoundTrip,
@@ -121,43 +124,152 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _date,
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: ThemeData(
-            primaryColor: darkPrimary, // change the selected date color
-            colorScheme: const ColorScheme.light(
-              primary: darkPrimary,
-              // change the text color of the header
-              onPrimary: Colors.white,
-              // change the color of the icons in the header
-              surface: darkPrimary,
-              // change the background color of the calendar
-              onSurface: Colors.black, // change the text color of the calendar
+    if (Platform.isIOS) {
+    // if (true) {
+      //show ios date picker
+      showCupertinoModalPopup(
+        context: context,
+        builder: (BuildContext context) {
+          return Center(
+            child: Container(
+              height: 250,
+              width: MediaQuery.of(context).size.width * 0.8,
+              color: Colors.white,
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 200.0,
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    child: CupertinoDatePicker(
+                      initialDateTime: _date,
+                      mode: CupertinoDatePickerMode.date,
+                      onDateTimeChanged: (value) {
+                        setState(() {
+                          _date = value;
+                        });
+                      },
+                    ),
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        "Select",
+                        style: TextStyle(color: yellowPrimary),
+                      ))
+                ],
+              ),
             ),
-          ),
-          child: child ?? const SizedBox.shrink(),
-        );
-      },
-    );
-    if (picked != null && picked != _date) {
-      setState(() {
-        _date = picked;
-      });
+          );
+        },
+      );
+
+    } else {
+      //show android date picker
+      final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: _date,
+        firstDate: DateTime.now(),
+        lastDate: DateTime(2100),
+        builder: (BuildContext context, Widget? child) {
+          return Theme(
+            data: ThemeData(
+              primaryColor: darkPrimary, // change the selected date color
+              colorScheme: const ColorScheme.light(
+                primary: darkPrimary,
+                // change the text color of the header
+                onPrimary: Colors.white,
+                // change the color of the icons in the header
+                surface: darkPrimary,
+                // change the background color of the calendar
+                onSurface:
+                    Colors.black, // change the text color of the calendar
+              ),
+            ),
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
+      );
+      if (picked != null && picked != _date) {
+        setState(() {
+          _date = picked;
+        });
+      }
     }
+
+    // showCupertinoDialog(context: context, builder: (context) {
+    //
+    // },);
   }
 
   Future<void> _selectPickupTime(BuildContext context) async {
-    final TimeOfDay? picked =
-        await showTimePicker(context: context, initialTime: _pickupTime);
-    if (picked != null && picked != _pickupTime) {
-      setState(() {
-        _pickupTime = picked;
-      });
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+
+      showCupertinoModalPopup(
+        context: context,
+        builder: (BuildContext context) {
+          return Center(
+            child: Container(
+              height: 250,
+              width: MediaQuery.of(context).size.width * 0.8,
+              color: Colors.white,
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 200.0,
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    child: CupertinoDatePicker(
+                      initialDateTime: _date,
+                      mode: CupertinoDatePickerMode.time,
+                      onDateTimeChanged: (value) {
+                        setState(() {
+                          _pickupTime = TimeOfDay.fromDateTime(value);
+                        });
+                      },
+                    ),
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        "Select",
+                        style: TextStyle(color: yellowPrimary),
+                      ))
+                ],
+              ),
+            ),
+          );
+        },
+      );
+      // showCupertinoDialog(
+      //   context: context,
+      //   builder: (context) {
+      //     return CupertinoAlertDialog(
+      //       content: CupertinoDatePicker(
+      //         initialDateTime: _date,
+      //         mode: CupertinoDatePickerMode.time,
+      //         onDateTimeChanged: (value) {
+      //           setState(() {
+      //             _pickupTime = TimeOfDay.fromDateTime(value);
+      //           });
+      //           Navigator.pop(context);
+      //         },
+      //       ),
+      //     );
+      //   },
+      // );
+    } else {
+      final TimeOfDay? picked = await showTimePicker(
+        context: context,
+        initialTime: _pickupTime,
+      );
+      if (picked != null && picked != _pickupTime) {
+        setState(() {
+          _pickupTime = picked;
+        });
+      }
     }
   }
 
@@ -166,12 +278,13 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
       '120000',
       'USD',
     );
+
     await StripeServices.displayPaymentSheet(
-      paymentIntent!['client_secret'],
-      _nameController.text.trim(),
-      _emailController.text.trim(),
-      '12000',
-    );
+        paymentIntent!['client_secret'],
+        _nameController.text.trim(),
+        _emailController.text.trim(),
+        '12000',
+        () {});
     await StripeServices.savePaymentToFirebase(
       '9876678',
       _nameController.text.trim(),
@@ -215,7 +328,7 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                           width: 24 * fem,
                           height: 24 * fem,
                           child: GestureDetector(
-                            onTap: (){
+                            onTap: () {
                               Navigator.pop(context);
                             },
                             child: Icon(

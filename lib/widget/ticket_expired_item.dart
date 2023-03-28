@@ -53,6 +53,7 @@ Widget ticketExpiredItem(
                           0 * fem, 0 * fem, 0 * fem, 1 * fem),
                       child: Text(
                         rideName,
+                        overflow: TextOverflow.ellipsis,
                         style: SafeGoogleFont(
                           'Saira',
                           fontSize: 16 * ffem,
@@ -79,6 +80,7 @@ Widget ticketExpiredItem(
                           Text(
                             // wplattsttampafl33606LRn (1:1388)
                             address,
+                            overflow: TextOverflow.ellipsis,
                             style: SafeGoogleFont(
                               'Saira',
                               fontSize: 10 * ffem,

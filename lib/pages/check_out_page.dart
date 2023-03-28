@@ -10,6 +10,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
 import 'package:ulimo/pages/payment_success_page.dart';
 import 'package:intl/intl.dart';
+import 'package:ulimo/services/stripe_services.dart';
 
 import '../base/base_color.dart';
 import '../base/utils.dart';
@@ -56,6 +57,8 @@ class _CheckOutPageState extends State<CheckOutPage> {
   DateTime _discountExpiredDate = DateTime.now();
   final promoController = TextEditingController();
   final cardController = CardFormEditController();
+
+  Map<String, dynamic>? paymentIntent;
 
   final _databaseRef = FirebaseDatabase.instance.ref();
   final authData = FirebaseAuth.instance;
@@ -175,7 +178,10 @@ class _CheckOutPageState extends State<CheckOutPage> {
       switch (widget.rideType) {
         case "private":
           {
-            await _databaseRef.child("privateRide").child(widget.orderId).update({"status": "paid"});
+            await _databaseRef
+                .child("privateRide")
+                .child(widget.orderId)
+                .update({"status": "paid"});
           }
           break;
 
@@ -209,12 +215,11 @@ class _CheckOutPageState extends State<CheckOutPage> {
       SchedulerBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (context) => PaymentSuccessPage(
-                  destinationName: _title,
-                  destinationAddress: _subtitle,
-                  date: _date,
-                  time: _time,
-              status: 'Confirmed'
-                )));
+                destinationName: _title,
+                destinationAddress: _subtitle,
+                date: _date,
+                time: _time,
+                status: 'Confirmed')));
       });
     } else {
       // ignore: use_build_context_synchronously
@@ -239,6 +244,30 @@ class _CheckOutPageState extends State<CheckOutPage> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Future<void> makePayment() async {
+    paymentIntent = await StripeServices.createPaymentIntent(
+      "${(double.parse(countTotalPrice()) * 100).toInt()}",
+      'USD',
+    );
+
+    print("payment intenttt $paymentIntent");
+
+    await StripeServices.displayPaymentSheet(
+        paymentIntent!['client_secret'],
+        authData.currentUser?.displayName ?? "",
+        authData.currentUser?.email ?? "",
+        "${(double.parse(countTotalPrice()) * 100).toInt()}",
+        () {
+          _checkOutTicket();
+        });
+    await StripeServices.savePaymentToFirebase(
+      '9876678',
+      authData.currentUser?.displayName ?? "",
+      authData.currentUser?.email ?? "",
+      "${(double.parse(countTotalPrice()) * 100).toInt()}",
+    );
   }
 
   String countTotalPrice() {
@@ -729,18 +758,18 @@ class _CheckOutPageState extends State<CheckOutPage> {
               //     ),
               //   ),
               // ),
-              CardFormField(
-                style: CardFormStyle(
-                    placeholderColor: Colors.grey,
-                    backgroundColor: darkPrimary,
-                    textColor: yellowPrimary,
-                    borderColor: yellowPrimary,
-                    cursorColor: yellowPrimary,
-                    borderRadius: 10),
-                controller: cardController,
-                enablePostalCode: false,
-                countryCode: 'USD',
-              ),
+              // CardFormField(
+              //   style: CardFormStyle(
+              //       placeholderColor: Colors.grey,
+              //       backgroundColor: darkPrimary,
+              //       textColor: yellowPrimary,
+              //       borderColor: yellowPrimary,
+              //       cursorColor: yellowPrimary,
+              //       borderRadius: 10),
+              //   controller: cardController,
+              //   enablePostalCode: false,
+              //   countryCode: 'USD',
+              // ),
               Container(
                 // info4ZoN (0:1063)
                 margin: EdgeInsets.fromLTRB(
@@ -878,26 +907,27 @@ class _CheckOutPageState extends State<CheckOutPage> {
                     ),
                     TextButton(
                       // button8hv (0:1291)
-                      onPressed: () {
+                      onPressed: () async {
                         //go to success page
                         _checkOutTicket();
+                        // await makePayment();
                       },
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.zero,
                       ),
-                      child:  Container(
-                              width: 215.47 * fem,
-                              height: double.infinity,
-                              decoration: BoxDecoration(
-                                color: const Color(0xfffdcb5b),
-                                borderRadius: BorderRadius.circular(5 * fem),
-                              ),
-                              child: Center(
-                                child: _isLoading
-                                    ? const AspectRatio(
-                                    aspectRatio: 1,
-                                    child: CircularProgressIndicator())
-                                    : Text(
+                      child: Container(
+                        width: 215.47 * fem,
+                        height: double.infinity,
+                        decoration: BoxDecoration(
+                          color: const Color(0xfffdcb5b),
+                          borderRadius: BorderRadius.circular(5 * fem),
+                        ),
+                        child: Center(
+                          child: _isLoading
+                              ? const AspectRatio(
+                                  aspectRatio: 1,
+                                  child: CircularProgressIndicator())
+                              : Text(
                                   'Purchase Ticket',
                                   style: SafeGoogleFont(
                                     'Saira',
@@ -907,8 +937,8 @@ class _CheckOutPageState extends State<CheckOutPage> {
                                     color: const Color(0xff000000),
                                   ),
                                 ),
-                              ),
-                            ),
+                        ),
+                      ),
                     ),
                   ],
                 ),

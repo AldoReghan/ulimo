@@ -90,6 +90,7 @@ Widget ticketPendingItem(
                           Text(
                             // wplattsttampafl33606LRn (1:1388)
                             address,
+                            overflow: TextOverflow.ellipsis,
                             style: SafeGoogleFont(
                               'Saira',
                               fontSize: 10 * ffem,

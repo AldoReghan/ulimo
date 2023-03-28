@@ -36,6 +36,7 @@ class _StripePayState extends State<StripePay> {
       widget.name,
       widget.email,
       widget.amount,
+        (){}
     );
     await StripeServices.savePaymentToFirebase(
       widget.documentId,

@@ -45,7 +45,7 @@ class StripeServices {
 
 
   static Future<void> displayPaymentSheet(
-      String clientSecret, String name, String email, String amount) async {
+      String clientSecret, String name, String email, String amount, Function() onSuccess) async {
     try {
       var gpay = const PaymentSheetGooglePay(
           merchantCountryCode: "USD", currencyCode: "USD", testEnv: true);
@@ -80,6 +80,7 @@ class StripeServices {
 
       await Stripe.instance.presentPaymentSheet().then((value) {
         print("Payment Successfully");
+        onSuccess.call();
       });
     } catch (e) {
       print('$e');
