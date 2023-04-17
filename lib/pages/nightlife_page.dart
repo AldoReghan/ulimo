@@ -120,10 +120,15 @@ class _NightLifePageState extends State<NightLifePage> {
                                 0 * fem, 0 * fem, 27 * fem, 0 * fem),
                             width: 24 * fem,
                             height: 24 * fem,
-                            child: Icon(
-                              Icons.arrow_back_ios,
-                              size: 24 * fem,
-                              color: Colors.white,
+                            child: GestureDetector(
+                              onTap: (){
+                                Navigator.pop(context);
+                              },
+                              child: Icon(
+                                Icons.arrow_back_ios,
+                                size: 24 * fem,
+                                color: Colors.white,
+                              ),
                             )),
                         RichText(
                           // nightlifedealsK7n (0:372)

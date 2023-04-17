@@ -140,7 +140,7 @@ class _RideShareBusPageState extends State<RideShareBusPage> {
                             ),
                             children: [
                               const TextSpan(
-                                text: 'Ride ',
+                                text: 'Ride Share ',
                               ),
                               TextSpan(
                                 text: 'Tickets',
@@ -193,59 +193,4 @@ class _RideShareBusPageState extends State<RideShareBusPage> {
     ));
   }
 
-// @override
-// Widget build(BuildContext context) {
-//   return Scaffold(
-//     appBar: AppBar(
-//       title: const Text('Ride Share Bus'),
-//     ),
-//     body: Column(
-//       children: [
-//         Container(
-//           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-//           child: Row(
-//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//             children: [
-//               Text(
-//                 _selectedDate,
-//                 style: const TextStyle(fontSize: 18),
-//               ),
-//               ElevatedButton(
-//                 onPressed: () {
-//                   _selectDate(context);
-//                 },
-//                 child: const Text("Select Date"),
-//               ),
-//             ],
-//           ),
-//         ),
-//         Expanded(
-//           child: _destinationIds.isEmpty
-//               ? const Center(
-//                   child: Text("Data Kosong"),
-//                 )
-//               : ListView.builder(
-//                   itemCount: _destinationIds.length,
-//                   itemBuilder: (context, index) {
-//                     return ListTile(
-//                       title: Text(_destinationIds[index]['name']),
-//                       subtitle: Text(_destinationIds[index]['description']),
-//                       onTap: () {
-//                         //Navigate to detail page
-//                         Navigator.push(
-//                             context,
-//                             MaterialPageRoute(
-//                                 builder: (context) => RideShareBusDetailPage(
-//                                       destinationId: _destinationIds[index]
-//                                           ['id'],
-//                                     )));
-//                       },
-//                     );
-//                   },
-//                 ),
-//         ),
-//       ],
-//     ),
-//   );
-// }
 }

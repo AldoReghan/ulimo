@@ -136,23 +136,9 @@ class _HomePageState extends State<HomePage> {
                       ])),
               const SizedBox(height: 24),
               homeCard(
-                  title: "Ride Share Bus",
-                  subtitle: "Socialize and make new friends",
-                  imageAsset: "assets/icon/home_bus.png",
-                  onTap: () {
-                    //go to share bus page
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: ((context) => const RideShareBusPage())));
-                  }),
-              const SizedBox(
-                height: 10,
-              ),
-              homeCard(
                   title: "Private Ride",
                   subtitle: "Custom trips for just you and group",
-                  imageAsset: "assets/icon/home_private_ride.png",
+                  imageAsset: "assets/icon/home_private_ride.svg",
                   onTap: () {
                     //go to private ride page
                     if (getCurrentUser()?.displayName == "") {
@@ -170,9 +156,23 @@ class _HomePageState extends State<HomePage> {
                 height: 10,
               ),
               homeCard(
+                  title: "Ride Share Bus",
+                  subtitle: "Socialize and make new friends",
+                  imageAsset: "assets/icon/home_ride_share.svg",
+                  onTap: () {
+                    //go to share bus page
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: ((context) => const RideShareBusPage())));
+                  }),
+              const SizedBox(
+                height: 10,
+              ),
+              homeCard(
                   title: "Nightlife Deals For You",
                   subtitle: "The best nightlife deals around you",
-                  imageAsset: "assets/icon/home_moon.png",
+                  imageAsset: "assets/icon/home_nightlife.svg",
                   onTap: () {
                     //go to night life page
                     Navigator.push(

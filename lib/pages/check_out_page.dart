@@ -4,10 +4,11 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:pay/pay.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
+import 'package:ulimo/base/payment_configuration.dart';
 import 'package:ulimo/pages/payment_success_page.dart';
 import 'package:intl/intl.dart';
 import 'package:ulimo/services/stripe_services.dart';
@@ -56,7 +57,8 @@ class _CheckOutPageState extends State<CheckOutPage> {
   bool _isLoading = false;
   DateTime _discountExpiredDate = DateTime.now();
   final promoController = TextEditingController();
-  final cardController = CardFormEditController();
+  final _holderNameController = TextEditingController();
+  // final cardController = CardFormEditController();
 
   Map<String, dynamic>? paymentIntent;
 
@@ -65,6 +67,9 @@ class _CheckOutPageState extends State<CheckOutPage> {
 
   Future<void> _getCheckoutData() async {
     if (widget.rideType == 'private') {
+      setState(() {
+        _price = widget.price;
+      });
       var connectivityResult = await (Connectivity().checkConnectivity());
       if (connectivityResult != ConnectivityResult.none) {
         final privateRideSnapshot = await _databaseRef
@@ -84,7 +89,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
                   "${value['pickup_address']} to ${value['destination']}";
               _time = "${value['pickup_time']}";
               _date = "${value['date']}";
-              _price = value['price'];
+              // _price = value['price'];
             });
           });
         }
@@ -117,6 +122,16 @@ class _CheckOutPageState extends State<CheckOutPage> {
         _price = widget.price;
       });
     }
+  }
+
+  List<PaymentItem> getPaymentItem(){
+    return [
+      PaymentItem(
+        label: 'Total',
+        amount: countTotalPrice(),
+        status: PaymentItemStatus.final_price,
+      )
+    ];
   }
 
   Future<void> _getPromoCode() async {
@@ -212,6 +227,15 @@ class _CheckOutPageState extends State<CheckOutPage> {
           break;
       }
 
+      final databaseReference = FirebaseDatabase.instance.ref('payments');
+      await databaseReference.push().set({
+        'customerId': authData.currentUser?.uid,
+        'name': _holderNameController.text,
+        'email': authData.currentUser?.email,
+        'amount': countTotalPrice(),
+        'status': 'Paid',
+      });
+
       SchedulerBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (context) => PaymentSuccessPage(
@@ -246,6 +270,16 @@ class _CheckOutPageState extends State<CheckOutPage> {
     });
   }
 
+  void onApplePayResult(paymentResult) {
+    // Send the resulting Apple Pay token to your server / PSP
+    _checkOutTicket();
+  }
+
+  void onGooglePayResult(paymentResult) {
+    // Send the resulting Google Pay token to your server / PSP
+    _checkOutTicket();
+  }
+
   Future<void> makePayment() async {
     paymentIntent = await StripeServices.createPaymentIntent(
       "${(double.parse(countTotalPrice()) * 100).toInt()}",
@@ -258,10 +292,9 @@ class _CheckOutPageState extends State<CheckOutPage> {
         paymentIntent!['client_secret'],
         authData.currentUser?.displayName ?? "",
         authData.currentUser?.email ?? "",
-        "${(double.parse(countTotalPrice()) * 100).toInt()}",
-        () {
-          _checkOutTicket();
-        });
+        "${(double.parse(countTotalPrice()) * 100).toInt()}", () {
+      _checkOutTicket();
+    });
     await StripeServices.savePaymentToFirebase(
       '9876678',
       authData.currentUser?.displayName ?? "",
@@ -281,6 +314,8 @@ class _CheckOutPageState extends State<CheckOutPage> {
     // TODO: implement initState
     super.initState();
     _getCheckoutData();
+    _holderNameController.text = authData.currentUser?.displayName??"";
+
   }
 
   @override
@@ -509,7 +544,8 @@ class _CheckOutPageState extends State<CheckOutPage> {
                         border: Border.all(color: const Color(0x0caaaaaa)),
                         color: const Color(0xff2c2b2b),
                       ),
-                      child: TextField(
+                      child: TextFormField(
+                        controller: _holderNameController,
                         cursorColor: yellowPrimary,
                         decoration: InputDecoration(
                           border: InputBorder.none,
@@ -905,39 +941,79 @@ class _CheckOutPageState extends State<CheckOutPage> {
                         ],
                       ),
                     ),
-                    TextButton(
-                      // button8hv (0:1291)
-                      onPressed: () async {
-                        //go to success page
-                        _checkOutTicket();
-                        // await makePayment();
-                      },
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
+                    // TextButton(
+                    //   // button8hv (0:1291)
+                    //   onPressed: () async {
+                    //     //go to success page
+                    //     _checkOutTicket();
+                    //     // await makePayment();
+                    //   },
+                    //   style: TextButton.styleFrom(
+                    //     padding: EdgeInsets.zero,
+                    //   ),
+                    //   child: Container(
+                    //     width: 215.47 * fem,
+                    //     height: double.infinity,
+                    //     decoration: BoxDecoration(
+                    //       color: const Color(0xfffdcb5b),
+                    //       borderRadius: BorderRadius.circular(5 * fem),
+                    //     ),
+                    //     child: Center(
+                    //       child: _isLoading
+                    //           ? const AspectRatio(
+                    //               aspectRatio: 1,
+                    //               child: CircularProgressIndicator())
+                    //           : Text(
+                    //               'Purchase Ticket',
+                    //               style: SafeGoogleFont(
+                    //                 'Saira',
+                    //                 fontSize: 20 * ffem,
+                    //                 fontWeight: FontWeight.w500,
+                    //                 height: 1.575 * ffem / fem,
+                    //                 color: const Color(0xff000000),
+                    //               ),
+                    //             ),
+                    //     ),
+                    //   ),
+                    // ),
+
+                    ApplePayButton(
+                      paymentConfiguration:
+                          PaymentConfiguration.fromJsonString(defaultApplePay),
+                      paymentItems: [
+                        PaymentItem(
+                          label: 'Total',
+                          amount: countTotalPrice(),
+                          status: PaymentItemStatus.final_price,
+                        )
+                      ],
+                      width: 215.47 * fem,
+                      height: double.infinity,
+                      style: ApplePayButtonStyle.white,
+                      type: ApplePayButtonType.checkout,
+                      margin: const EdgeInsets.only(top: 15.0),
+                      onPaymentResult: onApplePayResult,
+                      loadingIndicator: const Center(
+                        child: CircularProgressIndicator(),
                       ),
-                      child: Container(
-                        width: 215.47 * fem,
-                        height: double.infinity,
-                        decoration: BoxDecoration(
-                          color: const Color(0xfffdcb5b),
-                          borderRadius: BorderRadius.circular(5 * fem),
-                        ),
-                        child: Center(
-                          child: _isLoading
-                              ? const AspectRatio(
-                                  aspectRatio: 1,
-                                  child: CircularProgressIndicator())
-                              : Text(
-                                  'Purchase Ticket',
-                                  style: SafeGoogleFont(
-                                    'Saira',
-                                    fontSize: 20 * ffem,
-                                    fontWeight: FontWeight.w500,
-                                    height: 1.575 * ffem / fem,
-                                    color: const Color(0xff000000),
-                                  ),
-                                ),
-                        ),
+                    ),
+
+                    GooglePayButton(
+                      paymentConfiguration:
+                          PaymentConfiguration.fromJsonString(defaultGooglePay),
+                      paymentItems: [
+                        PaymentItem(
+                          label: 'Total',
+                          amount: countTotalPrice(),
+                          status: PaymentItemStatus.final_price,
+                        )
+                      ],
+                      width: 215.47 * fem,
+                      height: double.infinity,
+                      type: GooglePayButtonType.checkout,
+                      onPaymentResult: onGooglePayResult,
+                      loadingIndicator: const Center(
+                        child: CircularProgressIndicator(),
                       ),
                     ),
                   ],
@@ -946,39 +1022,6 @@ class _CheckOutPageState extends State<CheckOutPage> {
               const SizedBox(
                 height: 22,
               ),
-              SizedBox(
-                // poweredbystriperZW (1:945)
-                width: double.infinity,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      // poweredbyBrg (1:946)
-                      margin: EdgeInsets.fromLTRB(
-                          0 * fem, 0 * fem, 12 * fem, 0 * fem),
-                      child: Text(
-                        'Powered by',
-                        textAlign: TextAlign.center,
-                        style: SafeGoogleFont(
-                          'Saira',
-                          fontSize: 12 * ffem,
-                          fontWeight: FontWeight.w700,
-                          height: 1.8333333333 * ffem / fem,
-                          color: const Color(0xff707070),
-                        ),
-                      ),
-                    ),
-                    Container(
-                        // stripe42ha8 (1:947)
-                        margin: EdgeInsets.fromLTRB(
-                            0 * fem, 0 * fem, 0 * fem, 0.07 * fem),
-                        width: 38 * fem,
-                        height: 15.93 * fem,
-                        child: Image.asset("assets/icon/stripe_flat.png")),
-                  ],
-                ),
-              ),
             ],
           ),
         ),
@@ -986,3 +1029,5 @@ class _CheckOutPageState extends State<CheckOutPage> {
     ));
   }
 }
+
+

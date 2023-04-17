@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
 import 'package:ulimo/base/base_color.dart';
+import 'package:ulimo/pages/register_page.dart';
 import 'package:ulimo/services/phone_auth_service.dart';
 import 'package:ulimo/widget/otp_number_field.dart';
 import '../base/utils.dart';
@@ -110,10 +111,17 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
     if (userCredential != null) {
       // Sign in successful
       // ignore: use_build_context_synchronously
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const MainPage()),
-      );
+      if(userCredential.user?.displayName == null){
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => RegisterPage(phoneNumber: widget.phoneNumber,)),
+        );
+      }else{
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MainPage()),
+        );
+      }
     } else {
       Fluttertoast.showToast(msg: 'Invalid OTP code');
     }

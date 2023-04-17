@@ -4,6 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
 import 'package:ulimo/base/base_color.dart';
+import 'package:ulimo/pages/register_page.dart';
 import 'package:ulimo/services/phone_auth_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'otp_verification_page.dart';
@@ -59,13 +60,21 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
     void verificationCompleted(PhoneAuthCredential credential) async {
       final userCredential =
           await _phoneAuthService.signInWithCredential(credential);
+
       if (userCredential != null) {
         // Sign in successful
         // ignore: use_build_context_synchronously
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MainPage()),
-        );
+        if(userCredential.user?.displayName == null){
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => RegisterPage(phoneNumber: phoneNumber,)),
+          );
+        }else{
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const MainPage()),
+          );
+        }
       } else {
         Fluttertoast.showToast(msg: 'Failed to sign in with phone number');
       }
@@ -243,8 +252,8 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
                     //   context,
                     //   MaterialPageRoute(builder: (context) => const HomePage()),
                     // )
-                    // _isLoading ? null : _handleSignIn(context)
-                    _isLoading ? null : _handleFakeLoginForTest(context)
+                    _isLoading ? null : _handleSignIn(context)
+                    // _isLoading ? null : _handleFakeLoginForTest(context)
                     // Navigator.push(
                     //   context,
                     //   MaterialPageRoute(

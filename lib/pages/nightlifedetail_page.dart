@@ -29,9 +29,6 @@ class NightLifePageDetailPage extends StatefulWidget {
 
 class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
   late Map<dynamic, dynamic> _destinationData;
-  final _databaseRef = FirebaseDatabase.instance.ref('rideShareBusTicket');
-  late int _passengerSeat = 1;
-  late int _availableSeat = 1;
   late int _availableRide = 1;
   late int _availableEntry = 1;
   int _selectedEntry = 1;
@@ -40,21 +37,14 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
   String _ridePrice = "0.00";
   double _entrySubTotalPrice = 0.00;
   double _rideSubTotalPrice = 0.00;
-  double _totalPrice = 0.00;
   String? _selectedTime;
-  String? _selectedDate;
-  int _selectedTimeIndex = 0;
   late List<String> nightlifeOrderId;
-  int _selectedDateIndex = 0;
   late String _totalRideQuantity = "";
   late String _totalEntryQuantity = "";
-  DateTime? _selectedDateTime;
-  String? _selectedDateISO;
   bool _isRideTicket = false;
   bool _isEntryTicket = false;
   bool _isLoading = true;
   DateTime _date = DateTime.now();
-  TimeOfDay _pickupTime = TimeOfDay.now();
 
   final _formKey = GlobalKey<FormState>();
   final _quantityController = TextEditingController(text: '0');
@@ -183,7 +173,6 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       // if (true) {
       //show ios date picker
@@ -261,7 +250,8 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                 // change the color of the icons in the header
                 surface: darkPrimary,
                 // change the background color of the calendar
-                onSurface: Colors.black, // change the text color of the calendar
+                onSurface:
+                    Colors.black, // change the text color of the calendar
               ),
             ),
             child: child ?? const SizedBox.shrink(),
@@ -275,9 +265,6 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
         updateAvailableSeat();
       }
     }
-
-
-
   }
 
   String countTotalPrice(double rideSubTotalPrice, double entrySubTotalPrice) {
@@ -688,8 +675,7 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                               'Saira',
                                               fontSize: 14 * ffem,
                                               fontWeight: FontWeight.w500,
-                                              height:
-                                                  1.4285714286 * ffem / fem,
+                                              height: 1.4285714286 * ffem / fem,
                                               color: const Color(0xfffdcb5b),
                                             ),
                                           ),
@@ -816,7 +802,13 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                       SizedBox(
                                         width: double.infinity,
                                         child: _availableRide == 0
-                                            ? const Text("No ticket available")
+                                            ? const Center(
+                                                child: Text(
+                                                  "No ticket available",
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              )
                                             : Slider(
                                                 value: _selectedRide.toDouble(),
                                                 min: 1,
@@ -843,7 +835,9 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                       ),
                                       Text(
                                         // seatxrk (0:1251)
-                                        '$_selectedRide Seat',
+                                        _availableRide == 0
+                                            ? ""
+                                            : '$_selectedRide Seat',
                                         style: SafeGoogleFont(
                                           'Saira',
                                           fontSize: 12 * ffem,
@@ -978,7 +972,13 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                       SizedBox(
                                         width: double.infinity,
                                         child: _availableEntry == 0
-                                            ? const Text("No ticket available")
+                                            ? const Center(
+                                                child: Text(
+                                                  "No ticket available",
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              )
                                             : Slider(
                                                 value:
                                                     _selectedEntry.toDouble(),
@@ -1002,7 +1002,9 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                       ),
                                       Text(
                                         // seatxrk (0:1251)
-                                        '$_selectedEntry Seat',
+                                        _availableEntry == 0
+                                            ? ""
+                                            : '$_selectedEntry Seat',
                                         style: SafeGoogleFont(
                                           'Saira',
                                           fontSize: 12 * ffem,
@@ -1041,54 +1043,62 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Container(
-                            // group7529Asa (0:1295)
-                            margin: EdgeInsets.fromLTRB(
-                                0 * fem, 0 * fem, 25.42 * fem, 0 * fem),
-                            height: double.infinity,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  // totalpriceKVa (0:1296)
-                                  margin: EdgeInsets.fromLTRB(
-                                      0 * fem, 0 * fem, 0 * fem, 4 * fem),
-                                  child: Text(
-                                    'Total Price',
-                                    style: SafeGoogleFont(
-                                      'Barlow',
-                                      fontSize: 14 * ffem,
-                                      fontWeight: FontWeight.w500,
-                                      height: 1.2 * ffem / fem,
-                                      color: const Color(0xffffffff),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 80 * fem,
-                                  child: FittedBox(
-                                    fit: BoxFit.scaleDown,
+                          Visibility(
+                            visible:
+                                !(_availableEntry == 0 && _availableRide == 0),
+                            maintainSize: false,
+                            child: Container(
+                              // group7529Asa (0:1295)
+                              margin: EdgeInsets.fromLTRB(
+                                  0 * fem, 0 * fem, 25.42 * fem, 0 * fem),
+                              height: double.infinity,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    // totalpriceKVa (0:1296)
+                                    margin: EdgeInsets.fromLTRB(
+                                        0 * fem, 0 * fem, 0 * fem, 4 * fem),
                                     child: Text(
-                                      // QX2 (0:1297)
-                                      '\$${countTotalPrice(_rideSubTotalPrice, _entrySubTotalPrice)}',
+                                      'Total Price',
                                       style: SafeGoogleFont(
                                         'Barlow',
-                                        fontSize: 24 * ffem,
-                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14 * ffem,
+                                        fontWeight: FontWeight.w500,
                                         height: 1.2 * ffem / fem,
-                                        color: const Color(0xfffdcb5b),
+                                        color: const Color(0xffffffff),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                  SizedBox(
+                                    width: 80 * fem,
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        // QX2 (0:1297)
+                                        '\$${countTotalPrice(_rideSubTotalPrice, _entrySubTotalPrice)}',
+                                        style: SafeGoogleFont(
+                                          'Barlow',
+                                          fontSize: 24 * ffem,
+                                          fontWeight: FontWeight.w600,
+                                          height: 1.2 * ffem / fem,
+                                          color: const Color(0xfffdcb5b),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           TextButton(
                             // button8hv (0:1291)
                             onPressed: () {
-                              if (_isRideTicket || _isEntryTicket) {
+                              if ((_isRideTicket || _isEntryTicket) &&
+                                  !(_availableEntry == 0 &&
+                                      _availableRide == 0)) {
                                 Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) =>
                                         // CartPage(user_id: "user_id")));
@@ -1100,7 +1110,8 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                               .format(_date),
                                           time: '',
                                           rideType: 'nightlife',
-                                          orderId: widget.nightlifeDestinationId,
+                                          orderId:
+                                              widget.nightlifeDestinationId,
                                           destinationName:
                                               _destinationData['name'],
                                           destinationAddress:
@@ -1120,20 +1131,28 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                               width: 215.47 * fem,
                               height: double.infinity,
                               decoration: BoxDecoration(
-                                color: (_isRideTicket || _isEntryTicket)
-                                    ? const Color(0xfffdcb5b)
-                                    : Colors.grey,
+                                color: (_availableEntry == 0 &&
+                                        _availableRide == 0)
+                                    ? const Color(0xFFFB1B1B)
+                                    : (_isRideTicket || _isEntryTicket)
+                                        ? const Color(0xfffdcb5b)
+                                        : Colors.grey,
                                 borderRadius: BorderRadius.circular(5 * fem),
                               ),
                               child: Center(
                                 child: Text(
-                                  'Purchase Ticket',
+                                  (_availableEntry == 0 && _availableRide == 0)
+                                      ? 'SOLD OUT'
+                                      : 'Purchase Ticket',
                                   style: SafeGoogleFont(
                                     'Saira',
                                     fontSize: 20 * ffem,
                                     fontWeight: FontWeight.w500,
                                     height: 1.575 * ffem / fem,
-                                    color: const Color(0xff000000),
+                                    color: (_availableEntry == 0 &&
+                                            _availableRide == 0)
+                                        ? Colors.white
+                                        : const Color(0xff000000),
                                   ),
                                 ),
                               ),
@@ -1147,9 +1166,5 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
         ),
       ),
     ));
-  }
-
-  bool _isSelectedTime(String time) {
-    return _selectedTime != null && _selectedTime == time;
   }
 }

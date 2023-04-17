@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../base/base_color.dart';
 
@@ -28,7 +29,7 @@ Widget homeCard(
                   flex: 1,
                   child: Padding(
                     padding: const EdgeInsets.all(4.0),
-                    child: Image.asset(imageAsset),
+                    child: SvgPicture.asset(imageAsset),
                   )),
               const SizedBox(width: 10),
               Expanded(

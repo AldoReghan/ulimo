@@ -33,12 +33,13 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
   final _nameController = TextEditingController();
   final _pickupAddressController = TextEditingController();
   final _destinationController = TextEditingController();
-  final _phoneNumberController = TextEditingController();
-  final _emailController = TextEditingController();
+  final _extraInfoController = TextEditingController();
   final _passengersController = TextEditingController();
   bool _isRoundTrip = false;
-  DateTime _date = DateTime.now();
+  DateTime _pickupDate = DateTime.now();
+  DateTime _returnDate = DateTime.now();
   TimeOfDay _pickupTime = TimeOfDay.now();
+  TimeOfDay _returnTime = TimeOfDay.now();
   bool _isLoading = false;
 
   FirebaseAuth authData = FirebaseAuth.instance;
@@ -76,13 +77,17 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
     final rideDetails = {
       'name': authData.currentUser?.displayName,
       'user_id': authData.currentUser?.uid,
-      'date': DateFormat('yyyy-MM-dd').format(_date),
+      'date': DateFormat('yyyy-MM-dd').format(_pickupDate),
+      'return_date':
+          _isRoundTrip ? DateFormat('yyyy-MM-dd').format(_returnDate) : '',
       'pickup_time': _pickupTime.format(context),
+      'return_time': _isRoundTrip ? _returnTime.format(context) : '',
       'pickup_address': _pickupAddressController.text,
       'destination': _destinationController.text,
       'phone_number': authData.currentUser?.phoneNumber,
-      'email': _emailController.text.trim(),
+      'email': authData.currentUser?.email ?? "",
       'passenger': _passengersController.text.trim(),
+      'extra_info': _extraInfoController.text,
       'is_round_trip': _isRoundTrip,
       'price': '',
       'status': 'pending'
@@ -125,7 +130,7 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
 
   Future<void> _selectDate(BuildContext context) async {
     if (Platform.isIOS) {
-    // if (true) {
+      // if (true) {
       //show ios date picker
       showCupertinoModalPopup(
         context: context,
@@ -141,11 +146,11 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                     height: 200.0,
                     width: MediaQuery.of(context).size.width * 0.8,
                     child: CupertinoDatePicker(
-                      initialDateTime: _date,
+                      initialDateTime: _pickupDate,
                       mode: CupertinoDatePickerMode.date,
                       onDateTimeChanged: (value) {
                         setState(() {
-                          _date = value;
+                          _pickupDate = value;
                         });
                       },
                     ),
@@ -164,12 +169,11 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
           );
         },
       );
-
     } else {
       //show android date picker
       final DateTime? picked = await showDatePicker(
         context: context,
-        initialDate: _date,
+        initialDate: _pickupDate,
         firstDate: DateTime.now(),
         lastDate: DateTime(2100),
         builder: (BuildContext context, Widget? child) {
@@ -191,21 +195,18 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
           );
         },
       );
-      if (picked != null && picked != _date) {
+      if (picked != null && picked != _pickupDate) {
         setState(() {
-          _date = picked;
+          _pickupDate = picked;
         });
       }
     }
-
-    // showCupertinoDialog(context: context, builder: (context) {
-    //
-    // },);
   }
 
-  Future<void> _selectPickupTime(BuildContext context) async {
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
-
+  Future<void> _selectReturnDate(BuildContext context) async {
+    if (Platform.isIOS) {
+      // if (true) {
+      //show ios date picker
       showCupertinoModalPopup(
         context: context,
         builder: (BuildContext context) {
@@ -220,7 +221,80 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                     height: 200.0,
                     width: MediaQuery.of(context).size.width * 0.8,
                     child: CupertinoDatePicker(
-                      initialDateTime: _date,
+                      initialDateTime: _returnDate,
+                      mode: CupertinoDatePickerMode.date,
+                      onDateTimeChanged: (value) {
+                        setState(() {
+                          _returnDate = value;
+                        });
+                      },
+                    ),
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        "Select",
+                        style: TextStyle(color: yellowPrimary),
+                      ))
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    } else {
+      //show android date picker
+      final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: _returnDate,
+        firstDate: DateTime.now(),
+        lastDate: DateTime(2100),
+        builder: (BuildContext context, Widget? child) {
+          return Theme(
+            data: ThemeData(
+              primaryColor: darkPrimary, // change the selected date color
+              colorScheme: const ColorScheme.light(
+                primary: darkPrimary,
+                // change the text color of the header
+                onPrimary: Colors.white,
+                // change the color of the icons in the header
+                surface: darkPrimary,
+                // change the background color of the calendar
+                onSurface:
+                    Colors.black, // change the text color of the calendar
+              ),
+            ),
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
+      );
+      if (picked != null && picked != _returnDate) {
+        setState(() {
+          _returnDate = picked;
+        });
+      }
+    }
+  }
+
+  Future<void> _selectPickupTime(BuildContext context) async {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      showCupertinoModalPopup(
+        context: context,
+        builder: (BuildContext context) {
+          return Center(
+            child: Container(
+              height: 250,
+              width: MediaQuery.of(context).size.width * 0.8,
+              color: Colors.white,
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 200.0,
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    child: CupertinoDatePicker(
+                      initialDateTime: _pickupDate,
                       mode: CupertinoDatePickerMode.time,
                       onDateTimeChanged: (value) {
                         setState(() {
@@ -243,23 +317,6 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
           );
         },
       );
-      // showCupertinoDialog(
-      //   context: context,
-      //   builder: (context) {
-      //     return CupertinoAlertDialog(
-      //       content: CupertinoDatePicker(
-      //         initialDateTime: _date,
-      //         mode: CupertinoDatePickerMode.time,
-      //         onDateTimeChanged: (value) {
-      //           setState(() {
-      //             _pickupTime = TimeOfDay.fromDateTime(value);
-      //           });
-      //           Navigator.pop(context);
-      //         },
-      //       ),
-      //     );
-      //   },
-      // );
     } else {
       final TimeOfDay? picked = await showTimePicker(
         context: context,
@@ -273,24 +330,56 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
     }
   }
 
-  Future<void> makePayment() async {
-    paymentIntent = await StripeServices.createPaymentIntent(
-      '120000',
-      'USD',
-    );
-
-    await StripeServices.displayPaymentSheet(
-        paymentIntent!['client_secret'],
-        _nameController.text.trim(),
-        _emailController.text.trim(),
-        '12000',
-        () {});
-    await StripeServices.savePaymentToFirebase(
-      '9876678',
-      _nameController.text.trim(),
-      _emailController.text.trim(),
-      '12000',
-    );
+  Future<void> _selectReturnTime(BuildContext context) async {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      showCupertinoModalPopup(
+        context: context,
+        builder: (BuildContext context) {
+          return Center(
+            child: Container(
+              height: 250,
+              width: MediaQuery.of(context).size.width * 0.8,
+              color: Colors.white,
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 200.0,
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    child: CupertinoDatePicker(
+                      initialDateTime: _returnDate,
+                      mode: CupertinoDatePickerMode.time,
+                      onDateTimeChanged: (value) {
+                        setState(() {
+                          _returnTime = TimeOfDay.fromDateTime(value);
+                        });
+                      },
+                    ),
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        "Select",
+                        style: TextStyle(color: yellowPrimary),
+                      ))
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    } else {
+      final TimeOfDay? picked = await showTimePicker(
+        context: context,
+        initialTime: _returnTime,
+      );
+      if (picked != null && picked != _returnTime) {
+        setState(() {
+          _returnTime = picked;
+        });
+      }
+    }
   }
 
   @override
@@ -375,7 +464,7 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                     maxWidth: 325 * fem,
                   ),
                   child: Text(
-                    'Get a custom trip for just you and your group. You will receive a quote from us within 24 hours !',
+                    'Book a custom trip for just you and your group. You will receive a quote from us within 24 hours !',
                     style: SafeGoogleFont(
                       'Saira',
                       fontSize: 14 * ffem,
@@ -429,7 +518,7 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                             disabledBorder: InputBorder.none,
                             contentPadding: EdgeInsets.fromLTRB(
                                 12.5 * fem, 15 * fem, 12.5 * fem, 15 * fem),
-                            hintText: 'E.g 14, Oliver street, Quake Rd, Tampa',
+                            hintText: 'E.g 11100 Bloomington Drive, Tampa',
                             hintStyle:
                                 const TextStyle(color: Color(0x59ffffff)),
                           ),
@@ -532,7 +621,7 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                         margin: EdgeInsets.fromLTRB(
                             0 * fem, 0 * fem, 0 * fem, 9 * fem),
                         child: Text(
-                          'Where will you like to go?',
+                          'When will you like to go?',
                           style: SafeGoogleFont(
                             'Saira',
                             fontSize: 16 * ffem,
@@ -575,7 +664,7 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                                             onTap: () => _selectDate(context),
                                             child: Text(
                                               DateFormat('dd MMM yyyy')
-                                                  .format(_date),
+                                                  .format(_pickupDate),
                                               style: SafeGoogleFont(
                                                 'Saira',
                                                 fontSize: 14 * ffem,
@@ -726,6 +815,7 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                 IntrinsicHeight(
                   child: Container(
                     width: double.infinity,
+                    margin: EdgeInsets.only(bottom: 24 * fem),
                     decoration: BoxDecoration(
                       color: const Color(0xff2c2b2b),
                       borderRadius: BorderRadius.circular(6 * fem),
@@ -774,8 +864,153 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                Visibility(
+                  visible: _isRoundTrip,
+                  maintainSize: false,
+                  child: Container(
+                    // info3HeQ (0:1161)
+                    margin: EdgeInsets.fromLTRB(
+                        0.11 * fem, 0 * fem, 0.11 * fem, 30 * fem),
+                    width: double.infinity,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          // wherewillyouliketogop8Y (0:1162)
+                          margin: EdgeInsets.fromLTRB(
+                              0 * fem, 0 * fem, 0 * fem, 9 * fem),
+                          child: Text(
+                            'When will you like to return?',
+                            style: SafeGoogleFont(
+                              'Saira',
+                              fontSize: 16 * ffem,
+                              fontWeight: FontWeight.w500,
+                              height: 1.575 * ffem / fem,
+                              color: const Color(0xffffffff),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          // group7540L6t (0:1163)
+                          width: double.infinity,
+                          height: 46 * fem,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Flexible(
+                                child: DottedBorder(
+                                  borderType: BorderType.RRect,
+                                  radius: const Radius.circular(6),
+                                  color: const Color(0xFFFDCB5B),
+                                  strokeWidth: 1,
+                                  child: SizedBox(
+                                    height: double.infinity,
+                                    child: SizedBox(
+                                      // group7535hLk (0:1167)
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 15),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            GestureDetector(
+                                              onTap: () =>
+                                                  _selectReturnDate(context),
+                                              child: Text(
+                                                DateFormat('dd MMM yyyy')
+                                                    .format(_returnDate),
+                                                style: SafeGoogleFont(
+                                                  'Saira',
+                                                  fontSize: 14 * ffem,
+                                                  fontWeight: FontWeight.w500,
+                                                  height:
+                                                      1.4285714286 * ffem / fem,
+                                                  color:
+                                                      const Color(0xfffdcb5b),
+                                                ),
+                                              ),
+                                            ),
+                                            Icon(
+                                              Icons.keyboard_arrow_down,
+                                              size: 20 * fem,
+                                              color: Colors.white,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 15,
+                              ),
+                              Flexible(
+                                child: DottedBorder(
+                                  borderType: BorderType.RRect,
+                                  radius: const Radius.circular(6),
+                                  color: const Color(0xFFFDCB5B),
+                                  strokeWidth: 1,
+                                  child: SizedBox(
+                                    height: double.infinity,
+                                    child: SizedBox(
+                                      // group7537o2Q (0:1175)
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 15),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            GestureDetector(
+                                              onTap: () =>
+                                                  _selectReturnTime(context),
+                                              child: Text(
+                                                _returnTime.format(context),
+                                                style: SafeGoogleFont(
+                                                  'Saira',
+                                                  fontSize: 14 * ffem,
+                                                  fontWeight: FontWeight.w500,
+                                                  height:
+                                                      1.4285714286 * ffem / fem,
+                                                  color:
+                                                      const Color(0xfffdcb5b),
+                                                ),
+                                              ),
+                                            ),
+                                            Icon(
+                                              Icons.keyboard_arrow_down,
+                                              size: 20 * fem,
+                                              color: Colors.white,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 Container(
+                  // info1pYx (0:1186)
+                  margin: EdgeInsets.fromLTRB(
+                      0.11 * fem, 0 * fem, 0.11 * fem, 30 * fem),
                   width: double.infinity,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8 * fem),
@@ -784,11 +1019,11 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        // emailQYQ (0:1140)
+                        // whereshouldwepickyoufrom9r8 (0:1187)
                         margin: EdgeInsets.fromLTRB(
                             0 * fem, 0 * fem, 0 * fem, 5 * fem),
                         child: Text(
-                          'Email',
+                          'Extra Info',
                           style: SafeGoogleFont(
                             'Saira',
                             fontSize: 16 * ffem,
@@ -799,7 +1034,7 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                         ),
                       ),
                       Container(
-                        // group68jJ (0:1141)
+                        // group6GA4 (0:1188)
                         width: double.infinity,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8 * fem),
@@ -807,9 +1042,9 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                           color: const Color(0xff2c2b2b),
                         ),
                         child: TextFormField(
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
                           cursorColor: yellowPrimary,
+                          keyboardType: TextInputType.multiline,
+                          maxLines: 7,
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             focusedBorder: InputBorder.none,
@@ -818,23 +1053,22 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                             disabledBorder: InputBorder.none,
                             contentPadding: EdgeInsets.fromLTRB(
                                 12.5 * fem, 15 * fem, 12.5 * fem, 15 * fem),
-                            hintText: 'xyz.edu@hotmail.com',
+                            hintText: 'Anything else you’d like to note',
                             hintStyle:
                                 const TextStyle(color: Color(0x59ffffff)),
                           ),
+                          controller: _extraInfoController,
                           style: SafeGoogleFont(
                             'Saira',
                             fontSize: 14 * ffem,
                             fontWeight: FontWeight.w400,
+                            height: 1.1428571429 * ffem / fem,
                             color: Colors.white,
                           ),
                         ),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(
-                  height: 24,
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
