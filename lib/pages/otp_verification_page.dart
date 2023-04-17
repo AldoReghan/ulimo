@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -124,6 +125,67 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
       }
     } else {
       Fluttertoast.showToast(msg: 'Invalid OTP code');
+    }
+  }
+
+  Future<void> _handleSignIn(BuildContext context) async {
+    final phoneNumber = widget.phoneNumber;
+    final isValid = _formKey.currentState?.validate() ?? false;
+    if (!isValid) return;
+
+    void verificationCompleted(PhoneAuthCredential credential) async {
+      final userCredential =
+      await _phoneAuthService.signInWithCredential(credential);
+
+      if (userCredential != null) {
+        // Sign in successful
+        // ignore: use_build_context_synchronously
+        if(userCredential.user?.displayName == null){
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => RegisterPage(phoneNumber: phoneNumber,)),
+          );
+        }else{
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const MainPage()),
+          );
+        }
+      } else {
+        Fluttertoast.showToast(msg: 'Failed to sign in with phone number');
+      }
+    }
+
+    void verificationFailed(FirebaseAuthException exception) {
+      Fluttertoast.showToast(
+          msg: 'Failed to verify phone number: ${exception.message}');
+    }
+
+    void codeSent(String verificationId, int? forceResendingToken) {
+      // Navigate to OTP verification page
+      Navigator.pop(context);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => OTPVerificationPage(
+              verificationId: verificationId,
+              phoneNumber: phoneNumber,
+            )),
+      );
+    }
+
+    void codeAutoRetrievalTimeout(String verificationId) {}
+
+    try {
+      await _phoneAuthService.verifyPhoneNumber(
+        phoneNumber,
+        verificationCompleted,
+        verificationFailed,
+        codeSent,
+        codeAutoRetrievalTimeout,
+      );
+    } catch (e) {
+      Fluttertoast.showToast(msg: 'Failed to verify phone number');
     }
   }
 
@@ -286,6 +348,10 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
                           height: 1.575 * ffem / fem,
                           color: const Color(0xfffdcb5b),
                         ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () async {
+                            _handleSignIn(context);
+                          },
                       ),
                       TextSpan(
                         text: ' ',
