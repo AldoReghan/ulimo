@@ -9,6 +9,8 @@ import 'package:ulimo/pages/ticket/expired_ticket.dart';
 import 'package:ulimo/pages/ticket/pending_ticket.dart';
 import 'package:ulimo/widget/my_ticket_button.dart';
 
+import 'package:intl/intl.dart';
+
 import '../../base/utils.dart';
 
 class MyTicketPage extends StatefulWidget {
@@ -73,7 +75,9 @@ class _MyTicketPageState extends State<MyTicketPage> {
             'time': value['pickup_time'],
             'name': 'PRIVATE RIDE',
             'price': value['price'],
-            'status': value['status']
+            'status': value['status'],
+            'rideQuantity': 0,
+            'entryQuantity': 0
           };
           // tempPrivateRideList.add(privateRideMap);
           setState(() {
@@ -110,7 +114,9 @@ class _MyTicketPageState extends State<MyTicketPage> {
                   'date': value['date'],
                   'time': ticketValue['time'],
                   'name': destinationValue['destination_name'],
-                  'status': value['status']
+                  'status': value['status'],
+                  'rideQuantity': value['ride_quantity'],
+                  'entryQuantity': value['entry_quantity']
                 };
                 tempRideShareBusOrderList.add(rideShareBusOrderMap);
                 setState(() {
@@ -140,13 +146,14 @@ class _MyTicketPageState extends State<MyTicketPage> {
               'date': value['date'],
               'time': '',
               'name': destinationValue['destination_name'],
-              'status': value['status']
+              'status': value['status'],
+              'rideQuantity': value['ride_quantity'],
+              'entryQuantity': value['entry_quantity']
             };
             setState(() {
               _ticketListData.add(nightlifeOrderMap);
             });
           });
-
         });
       }
     } else {
@@ -193,7 +200,29 @@ class _MyTicketPageState extends State<MyTicketPage> {
 
   List getActiveData() {
     return _ticketListData.where((element) {
-      return (element['status'] == 'paid');
+      final timeNow = DateTime.now();
+      final dataDate = element['date'];
+      final DateFormat dateFormat = DateFormat('dd-MM-yyyy');
+      String todayDate = dateFormat.format(DateTime.now());
+
+      if ((todayDate != dataDate) &&
+          element['status'] == 'paid') {
+
+        return (DateFormat('dd-MM-yyyy')
+            .parse(element['date'])
+            .isAfter(timeNow));
+      }else if (todayDate == dataDate && element['status'] == 'paid') {
+        if(element['time'] == ''){
+          return true;
+        }else{
+          final DateTime currentTime =
+          DateFormat('dd-MM-yyyy h:mm a').parse("${element['date']} ${element['time']}");
+
+          return (currentTime.isAfter(timeNow));
+        }
+      } else {
+        return false;
+      }
     }).toList();
   }
 
@@ -206,9 +235,34 @@ class _MyTicketPageState extends State<MyTicketPage> {
 
   List getExpiredData() {
     return _ticketListData.where((element) {
-      return (element['status'] == 'expired') ||
-          (element['status'] == 'denied');
+
+      final timeNow = DateTime.now();
+      final dataDate = element['date'];
+      final DateFormat dateFormat = DateFormat('dd-MM-yyyy');
+      String todayDate = dateFormat.format(DateTime.now());
+
+      if((element['status'] == 'expired') ||
+          (element['status'] == 'denied')){
+        return true;
+      }else{
+        if ((todayDate != dataDate)) {
+
+          return (DateFormat('dd-MM-yyyy')
+              .parse(element['date'])
+              .isBefore(timeNow));
+        }else{
+          if(element['time'] == ''){
+            return false;
+          }else{
+            final DateTime currentTime =
+            DateFormat('dd-MM-yyyy h:mm a').parse("${element['date']} ${element['time']}");
+
+            return (currentTime.isAfter(timeNow));
+          }
+        }
+      }
     }).toList();
+
   }
 
   List<Widget> getTicketList(double fem, double ffem) {

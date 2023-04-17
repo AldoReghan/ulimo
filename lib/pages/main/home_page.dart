@@ -184,7 +184,7 @@ class _HomePageState extends State<HomePage> {
                 height: 36,
               ),
               const Text(
-                "Tampa",
+                "Nightlife Deals",
                 style: TextStyle(fontSize: 18, color: yellowPrimary),
               ),
               const SizedBox(

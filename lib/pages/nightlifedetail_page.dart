@@ -513,7 +513,9 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                                 fontWeight: FontWeight.w500,
                                                 height:
                                                     1.4285714286 * ffem / fem,
-                                                color: const Color(0xffffffff),
+                                                color: _isRideTicket
+                                                    ? yellowPrimary
+                                                    : const Color(0xffffffff),
                                               ),
                                             ),
                                             side: const BorderSide(
@@ -586,7 +588,9 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                                 fontWeight: FontWeight.w500,
                                                 height:
                                                     1.4285714286 * ffem / fem,
-                                                color: const Color(0xffffffff),
+                                                color: _isEntryTicket
+                                                    ? yellowPrimary
+                                                    : const Color(0xffffffff),
                                               ),
                                             ),
                                             side: const BorderSide(

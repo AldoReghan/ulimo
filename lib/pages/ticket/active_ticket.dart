@@ -11,7 +11,11 @@ class ActiveTicket extends StatefulWidget {
   final double ffem;
   final List activeTicketData;
 
-  const ActiveTicket({Key? key, required this.fem, required this.ffem, required this.activeTicketData})
+  const ActiveTicket(
+      {Key? key,
+      required this.fem,
+      required this.ffem,
+      required this.activeTicketData})
       : super(key: key);
 
   @override
@@ -19,22 +23,23 @@ class ActiveTicket extends StatefulWidget {
 }
 
 class _ActiveTicketState extends State<ActiveTicket> {
-
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-            physics: const BouncingScrollPhysics(),
-            itemCount: widget.activeTicketData.length,
-            itemBuilder: (context, index) {
-              return ticketActiveItem(
-                fem: widget.fem,
-                ffem: widget.ffem,
-                address: widget.activeTicketData[index]['address'],
-                date: widget.activeTicketData[index]['date'],
-                time: widget.activeTicketData[index]['time'],
-                status: widget.activeTicketData[index]['status'],
-                rideName: widget.activeTicketData[index]['name'],
-              );
-            });
+        physics: const BouncingScrollPhysics(),
+        itemCount: widget.activeTicketData.length,
+        itemBuilder: (context, index) {
+          return ticketActiveItem(
+            fem: widget.fem,
+            ffem: widget.ffem,
+            address: widget.activeTicketData[index]['address'],
+            date: widget.activeTicketData[index]['date'],
+            time: widget.activeTicketData[index]['time'],
+            status: widget.activeTicketData[index]['status'],
+            rideName: widget.activeTicketData[index]['name'],
+            isRide: (widget.activeTicketData[index]['rideQuantity'] != 0),
+            isEntry: (widget.activeTicketData[index]['entryQuantity'] != 0 ),
+          );
+        });
   }
 }

@@ -411,7 +411,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                               width: 114 * fem,
                                                               height: 19 * fem,
                                                               child: Text(
-                                                                '+1 (045) 0000 0025',
+                                                                authData.currentUser
+                                                                        ?.phoneNumber ??
+                                                                    "",
                                                                 style:
                                                                     SafeGoogleFont(
                                                                   'Saira',
@@ -530,7 +532,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                 child: SizedBox(
                                                   height: 26 * fem,
                                                   child: Text(
-                                                    "${_ticketListData.length}",
+                                                    "${_ticketListData.where((element) {
+                                                          return (element[
+                                                                  'status'] ==
+                                                              'paid');
+                                                        }).toList().length}",
                                                     style: SafeGoogleFont(
                                                       'Saira',
                                                       fontSize: 16 * ffem,

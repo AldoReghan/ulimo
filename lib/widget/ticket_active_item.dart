@@ -12,7 +12,9 @@ Widget ticketActiveItem(
     required String date,
     required String time,
     required String status,
-    required String rideName}) {
+    required String rideName,
+    required bool isRide,
+    required bool isEntry}) {
   return Container(
     padding:
         EdgeInsets.fromLTRB(22.43 * fem, 16.83 * fem, 21.52 * fem, 18.26 * fem),
@@ -20,7 +22,7 @@ Widget ticketActiveItem(
     width: double.infinity,
     decoration: const BoxDecoration(
       image: DecorationImage(
-        fit: BoxFit.cover,
+        fit: BoxFit.fitWidth,
         image: AssetImage("assets/ticket_active_background.png"),
       ),
     ),
@@ -138,33 +140,98 @@ Widget ticketActiveItem(
           ),
         ),
         Container(
-          // ticketstatusEfa (1:1382)
-          margin: EdgeInsets.fromLTRB(6.41 * fem, 0 * fem, 0 * fem, 6 * fem),
-          child: Text(
-            'Ticket Status',
-            style: SafeGoogleFont(
-              'Saira',
-              fontSize: 16 * ffem,
-              fontWeight: FontWeight.w500,
-              height: 0.875 * ffem / fem,
-              color: const Color(0xffffffff),
+          margin: const EdgeInsets.only(left: 6, right: 6, bottom: 10),
+          width: double.infinity,
+          child: IntrinsicHeight(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      // ticketstatusEfa (1:1382)
+                      margin: EdgeInsets.fromLTRB(6.41 * fem, 0 * fem, 0 * fem, 6 * fem),
+                      child: Text(
+                        'Ticket Status',
+                        style: SafeGoogleFont(
+                          'Saira',
+                          fontSize: 16 * ffem,
+                          fontWeight: FontWeight.w500,
+                          height: 0.875 * ffem / fem,
+                          color: const Color(0xffffffff),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      // confirmedkdv (1:1383)
+                      margin: EdgeInsets.fromLTRB(8.04 * fem, 0 * fem, 0 * fem, 0 * fem),
+                      child: Text(
+                        'Active',
+                        style: SafeGoogleFont(
+                          'Saira',
+                          fontSize: 12 * ffem,
+                          fontWeight: FontWeight.w500,
+                          height: 1.1666666667 * ffem / fem,
+                          color: const Color(0xff0B7E00),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      // ticketstatusEfa (1:1382)
+                      margin: EdgeInsets.fromLTRB(6.41 * fem, 0 * fem, 0 * fem, 6 * fem),
+                      child: Text(
+                        isEntry? 'Entry Ticket' :'',
+                        style: SafeGoogleFont(
+                          'Saira',
+                          fontSize: 12 * ffem,
+                          fontWeight: FontWeight.w500,
+                          height: 0.875 * ffem / fem,
+                          color: yellowPrimary,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      // ticketstatusEfa (1:1382)
+                      margin: EdgeInsets.fromLTRB(6.41 * fem, 0 * fem, 0 * fem, 6 * fem),
+                      child: Text(
+                        isRide? 'Ride Ticket' :'',
+                        style: SafeGoogleFont(
+                          'Saira',
+                          fontSize: 12 * ffem,
+                          fontWeight: FontWeight.w500,
+                          height: 0.875 * ffem / fem,
+                          color: yellowPrimary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                // SizedBox(
+                //   height: 30 * fem,
+                //   child: Text(
+                //     'Ride Ticket',
+                //     style: SafeGoogleFont(
+                //       'Saira',
+                //       fontSize: 16 * ffem,
+                //       fontWeight: FontWeight.w500,
+                //       height: 0.875 * ffem / fem,
+                //       color: yellowPrimary,
+                //     ),
+                //   ),
+                // )
+              ],
             ),
           ),
         ),
-        Container(
-          // confirmedkdv (1:1383)
-          margin: EdgeInsets.fromLTRB(8.04 * fem, 0 * fem, 0 * fem, 0 * fem),
-          child: Text(
-            'Active',
-            style: SafeGoogleFont(
-              'Saira',
-              fontSize: 12 * ffem,
-              fontWeight: FontWeight.w500,
-              height: 1.1666666667 * ffem / fem,
-              color: const Color(0xff0B7E00),
-            ),
-          ),
-        ),
+
       ],
     ),
   );
