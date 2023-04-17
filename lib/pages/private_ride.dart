@@ -7,16 +7,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
 import 'package:ulimo/base/base_color.dart';
-import 'package:ulimo/pages/check_out_page.dart';
-import 'package:ulimo/pages/thank_you_page.dart';
 import 'package:connectivity/connectivity.dart';
-import 'package:ulimo/services/stripe_services.dart';
 
 import '../base/utils.dart';
 

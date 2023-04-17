@@ -10,8 +10,6 @@ import 'package:pay/pay.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
 import 'package:ulimo/base/payment_configuration.dart';
 import 'package:ulimo/pages/payment_success_page.dart';
-import 'package:intl/intl.dart';
-import 'package:ulimo/services/stripe_services.dart';
 
 import '../base/base_color.dart';
 import '../base/utils.dart';
@@ -278,29 +276,6 @@ class _CheckOutPageState extends State<CheckOutPage> {
   void onGooglePayResult(paymentResult) {
     // Send the resulting Google Pay token to your server / PSP
     _checkOutTicket();
-  }
-
-  Future<void> makePayment() async {
-    paymentIntent = await StripeServices.createPaymentIntent(
-      "${(double.parse(countTotalPrice()) * 100).toInt()}",
-      'USD',
-    );
-
-    print("payment intenttt $paymentIntent");
-
-    await StripeServices.displayPaymentSheet(
-        paymentIntent!['client_secret'],
-        authData.currentUser?.displayName ?? "",
-        authData.currentUser?.email ?? "",
-        "${(double.parse(countTotalPrice()) * 100).toInt()}", () {
-      _checkOutTicket();
-    });
-    await StripeServices.savePaymentToFirebase(
-      '9876678',
-      authData.currentUser?.displayName ?? "",
-      authData.currentUser?.email ?? "",
-      "${(double.parse(countTotalPrice()) * 100).toInt()}",
-    );
   }
 
   String countTotalPrice() {
