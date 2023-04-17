@@ -5,13 +5,13 @@ import 'package:ulimo/base/base_color.dart';
 
 import '../base/utils.dart';
 
-Widget otpNumberField(BuildContext context, TextEditingController controller,
+Widget otpNumberField(BuildContext context, TextEditingController controller, Color statusColor ,
     FocusNode focusNode, Function() onChanged) {
   return Flexible(
     child: DottedBorder(
       borderType: BorderType.RRect,
       radius: const Radius.circular(6),
-      color: const Color(0xFFFDCB5B),
+      color: statusColor,
       strokeWidth: 1,
       child: Center(
         child: TextField(

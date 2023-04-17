@@ -4,7 +4,7 @@ class PhoneAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<bool> signInWithPhoneNumber(
-      String phoneNumber, Function(PhoneAuthCredential) verificationCompleted) async {
+      String phoneNumber, Function(PhoneAuthCredential) verificationCompleted, Function(String, int?) codeSent) async {
     try {
       await _auth.verifyPhoneNumber(
         phoneNumber: phoneNumber,
@@ -12,10 +12,7 @@ class PhoneAuthService {
         verificationFailed: (FirebaseAuthException e) {
           print(e.message);
         },
-        codeSent: (String verificationId, int? resendToken) {
-          // Save verification ID to be used later
-          print('Verification ID: $verificationId');
-        },
+        codeSent: codeSent,
         codeAutoRetrievalTimeout: (String verificationId) {},
       );
       return true;
@@ -43,6 +40,6 @@ class PhoneAuthService {
       Function(FirebaseAuthException) verificationFailed,
       Function(String, int?) codeSent,
       Function(String) codeAutoRetrievalTimeout) async {
-    await signInWithPhoneNumber(phoneNumber, verificationCompleted);
+    await signInWithPhoneNumber(phoneNumber, verificationCompleted, codeSent);
   }
 }

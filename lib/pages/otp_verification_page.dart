@@ -39,6 +39,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
   final FocusNode _digitFiveFocusNode = FocusNode();
   final FocusNode _digitSixFocusNode = FocusNode();
   late String _verificationId;
+  Color otpStatusColor = yellowPrimary;
 
   @override
   void dispose() {
@@ -59,6 +60,9 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
   }
 
   void _submitOtp() {
+    setState(() {
+      otpStatusColor = yellowPrimary;
+    });
     final String digitOne = _digitOneController.text;
     final String digitTwo = _digitTwoController.text;
     final String digitThree = _digitThreeController.text;
@@ -101,23 +105,29 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
 
   Future<void> _handleOTPVerification(
       BuildContext context, String verificationId, String otpCode) async {
-    final isValid = _formKey.currentState?.validate() ?? false;
-    if (!isValid) return;
+    // final isValid = _formKey.currentState?.validate() ?? false;
+    // if (!isValid) return;
 
     final credential = PhoneAuthProvider.credential(
         verificationId: verificationId, smsCode: otpCode);
-    final userCredential =
-        await _phoneAuthService.signInWithCredential(credential);
+    final userCredential = await _phoneAuthService
+        .signInWithCredential(credential)
+        .catchError((error) {
+      print(error);
+    });
 
     if (userCredential != null) {
       // Sign in successful
       // ignore: use_build_context_synchronously
-      if(userCredential.user?.displayName == null){
+      if (userCredential.user?.displayName == null) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => RegisterPage(phoneNumber: widget.phoneNumber,)),
+          MaterialPageRoute(
+              builder: (context) => RegisterPage(
+                    phoneNumber: widget.phoneNumber,
+                  )),
         );
-      }else{
+      } else {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const MainPage()),
@@ -125,6 +135,9 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
       }
     } else {
       Fluttertoast.showToast(msg: 'Invalid OTP code');
+      setState(() {
+        otpStatusColor = Colors.red;
+      });
     }
   }
 
@@ -135,17 +148,20 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
 
     void verificationCompleted(PhoneAuthCredential credential) async {
       final userCredential =
-      await _phoneAuthService.signInWithCredential(credential);
+          await _phoneAuthService.signInWithCredential(credential);
 
       if (userCredential != null) {
         // Sign in successful
         // ignore: use_build_context_synchronously
-        if(userCredential.user?.displayName == null){
+        if (userCredential.user?.displayName == null) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => RegisterPage(phoneNumber: phoneNumber,)),
+            MaterialPageRoute(
+                builder: (context) => RegisterPage(
+                      phoneNumber: phoneNumber,
+                    )),
           );
-        }else{
+        } else {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const MainPage()),
@@ -168,9 +184,9 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
         context,
         MaterialPageRoute(
             builder: (context) => OTPVerificationPage(
-              verificationId: verificationId,
-              phoneNumber: phoneNumber,
-            )),
+                  verificationId: verificationId,
+                  phoneNumber: phoneNumber,
+                )),
       );
     }
 
@@ -197,6 +213,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
     return defaultBackgroundScaffold(
         scaffold: Scaffold(
       backgroundColor: Colors.transparent,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -206,10 +223,15 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
               const SizedBox(
                 height: 12,
               ),
-              const Icon(
-                Icons.arrow_back_ios,
-                size: 24,
-                color: Colors.white,
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: const Icon(
+                  Icons.arrow_back_ios,
+                  size: 24,
+                  color: Colors.white,
+                ),
               ),
               const SizedBox(
                 height: 36,
@@ -218,40 +240,43 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
                 // group9ybW (0:135)
                 margin:
                     EdgeInsets.fromLTRB(0.11 * fem, 0 * fem, 0 * fem, 46 * fem),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      // verifytyN (0:136)
-                      margin: EdgeInsets.fromLTRB(
-                          0 * fem, 0 * fem, 0 * fem, 2 * fem),
-                      child: Text(
-                        'Verify',
-                        style: SafeGoogleFont(
-                          'Saira',
-                          fontSize: 24 * ffem,
-                          fontWeight: FontWeight.w500,
-                          height: 1.575 * ffem / fem,
-                          color: const Color(0xffffffff),
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        // verifytyN (0:136)
+                        margin: EdgeInsets.fromLTRB(
+                            0 * fem, 0 * fem, 0 * fem, 2 * fem),
+                        child: Text(
+                          'Verify',
+                          style: SafeGoogleFont(
+                            'Saira',
+                            fontSize: 24 * ffem,
+                            fontWeight: FontWeight.w500,
+                            height: 1.575 * ffem / fem,
+                            color: const Color(0xffffffff),
+                          ),
                         ),
                       ),
-                    ),
-                    Container(
-                      constraints: BoxConstraints(
-                        maxWidth: 315 * fem,
-                      ),
-                      child: Text(
-                        'Please verify your phone number by entering the OTP send to you',
-                        style: SafeGoogleFont(
-                          'Saira',
-                          fontSize: 15 * ffem,
-                          fontWeight: FontWeight.w500,
-                          height: 1.575 * ffem / fem,
-                          color: const Color(0xbfaaaaaa),
+                      Container(
+                        constraints: BoxConstraints(
+                          maxWidth: 315 * fem,
+                        ),
+                        child: Text(
+                          'Please verify your phone number by entering the OTP send to you',
+                          style: SafeGoogleFont(
+                            'Saira',
+                            fontSize: 15 * ffem,
+                            fontWeight: FontWeight.w500,
+                            height: 1.575 * ffem / fem,
+                            color: const Color(0xbfaaaaaa),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 46),
@@ -260,39 +285,38 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    otpNumberField(
-                        context, _digitOneController, _digitOneFocusNode, () {
+                    otpNumberField(context, _digitOneController, otpStatusColor,
+                        _digitOneFocusNode, () {
                       //do somethiing
                       FocusScope.of(context).requestFocus(_digitTwoFocusNode);
                     }),
                     const SizedBox(width: 7),
-                    otpNumberField(
-                        context, _digitTwoController, _digitTwoFocusNode, () {
+                    otpNumberField(context, _digitTwoController, otpStatusColor,
+                        _digitTwoFocusNode, () {
                       //do somethiing
                       FocusScope.of(context).requestFocus(_digitThreeFocusNode);
                     }),
                     const SizedBox(width: 7),
-                    otpNumberField(
-                        context, _digitThreeController, _digitThreeFocusNode,
-                        () {
+                    otpNumberField(context, _digitThreeController,
+                        otpStatusColor, _digitThreeFocusNode, () {
                       //do somethiing
                       FocusScope.of(context).requestFocus(_digitFourFocusNode);
                     }),
                     const SizedBox(width: 7),
-                    otpNumberField(
-                        context, _digitFourController, _digitFourFocusNode, () {
+                    otpNumberField(context, _digitFourController,
+                        otpStatusColor, _digitFourFocusNode, () {
                       //do somethiing
                       FocusScope.of(context).requestFocus(_digitFiveFocusNode);
                     }),
                     const SizedBox(width: 7),
-                    otpNumberField(
-                        context, _digitFiveController, _digitFiveFocusNode, () {
+                    otpNumberField(context, _digitFiveController,
+                        otpStatusColor, _digitFiveFocusNode, () {
                       //do somethiing
                       FocusScope.of(context).requestFocus(_digitSixFocusNode);
                     }),
                     const SizedBox(width: 7),
-                    otpNumberField(
-                        context, _digitSixController, _digitSixFocusNode, () {
+                    otpNumberField(context, _digitSixController, otpStatusColor,
+                        _digitSixFocusNode, () {
                       //do somethiing
                       FocusScope.of(context).unfocus();
                     }),

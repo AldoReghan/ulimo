@@ -64,12 +64,15 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
       if (userCredential != null) {
         // Sign in successful
         // ignore: use_build_context_synchronously
-        if(userCredential.user?.displayName == null){
+        if (userCredential.user?.displayName == null) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => RegisterPage(phoneNumber: phoneNumber,)),
+            MaterialPageRoute(
+                builder: (context) => RegisterPage(
+                      phoneNumber: phoneNumber,
+                    )),
           );
-        }else{
+        } else {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const MainPage()),
@@ -87,6 +90,7 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
 
     void codeSent(String verificationId, int? forceResendingToken) {
       // Navigate to OTP verification page
+
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -107,12 +111,17 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
         codeSent,
         codeAutoRetrievalTimeout,
       );
+
+      setState(() {
+        _isLoading = false;
+      });
+
     } catch (e) {
       Fluttertoast.showToast(msg: 'Failed to verify phone number');
+      setState(() {
+        _isLoading = false;
+      });
     }
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   Future<void> _handleOTPVerification(
