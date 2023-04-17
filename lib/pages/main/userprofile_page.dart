@@ -1,18 +1,16 @@
 import 'package:connectivity/connectivity.dart';
-import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
-import 'package:ulimo/base/base_color.dart';
-import 'package:ulimo/pages/profile/edit_profile_page.dart';
 import 'package:ulimo/pages/profile/notification_page.dart';
 
 import '../../base/utils.dart';
 import '../../widget/profile_menu.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_share/flutter_share.dart';
+
+import 'package:intl/intl.dart';
 
 import '../phone_login_pages.dart';
 
@@ -533,10 +531,30 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                   height: 26 * fem,
                                                   child: Text(
                                                     "${_ticketListData.where((element) {
-                                                          return (element[
-                                                                  'status'] ==
-                                                              'paid');
-                                                        }).toList().length}",
+                                                      final timeNow = DateTime.now();
+                                                      final dataDate = element['date'];
+                                                      final DateFormat dateFormat = DateFormat('dd-MM-yyyy');
+                                                      String todayDate = dateFormat.format(DateTime.now());
+
+                                                      if ((todayDate != dataDate) &&
+                                                          element['status'] == 'paid') {
+
+                                                        return (DateFormat('dd-MM-yyyy')
+                                                            .parse(element['date'])
+                                                            .isAfter(timeNow));
+                                                      }else if (todayDate == dataDate && element['status'] == 'paid') {
+                                                        if(element['time'] == ''){
+                                                          return true;
+                                                        }else{
+                                                          final DateTime currentTime =
+                                                          DateFormat('dd-MM-yyyy h:mm a').parse("${element['date']} ${element['time']}");
+
+                                                          return (currentTime.isAfter(timeNow));
+                                                        }
+                                                      } else {
+                                                        return false;
+                                                      }
+                                                    }).toList().length}",
                                                     style: SafeGoogleFont(
                                                       'Saira',
                                                       fontSize: 16 * ffem,
