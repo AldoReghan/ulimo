@@ -26,6 +26,8 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  String? _errorText= "";
+
   void _handleFakeLoginForTest(BuildContext context) async {
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
@@ -48,8 +50,8 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
 
   Future<void> _handleSignIn(BuildContext context) async {
     final phoneNumber = _phoneNumberController.text.trim();
-    final isValid = _formKey.currentState?.validate() ?? false;
-    if (!isValid) return;
+    // final isValid = _formKey.currentState?.validate() ?? false;
+    if (_phoneNumberController.text.isEmpty) return;
 
     setState(() {
       _isLoading = true;
@@ -216,33 +218,54 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
                               flex: 85,
                               child: SizedBox(
                                 height: 50,
-                                child: TextFormField(
-                                  controller: _phoneNumberController,
-                                  keyboardType: TextInputType.phone,
-                                  style: const TextStyle(color: Colors.white),
-                                  cursorColor: yellowPrimary,
-                                  decoration: InputDecoration(
-                                      errorStyle: const TextStyle(
-                                          color: Colors.white, fontSize: 0),
-                                      hintText: '+1 (045) 0000 0025',
-                                      focusColor: yellowPrimary,
-                                      focusedBorder: const OutlineInputBorder(
-                                          borderSide:
-                                              BorderSide(color: yellowPrimary)),
-                                      hintStyle: TextStyle(
-                                          color:
-                                              Colors.white.withOpacity(0.75)),
-                                      filled: true,
-                                      fillColor: const Color(0xFF201F1F),
-                                      border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(6))),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please input your phone number';
-                                    }
-                                    return null;
-                                  },
+                                child: Stack(
+                                  alignment: Alignment.centerRight,
+                                  children: [
+                                    TextFormField(
+                                      controller: _phoneNumberController,
+                                      keyboardType: TextInputType.phone,
+                                      style: const TextStyle(color: Colors.white),
+                                      cursorColor: yellowPrimary,
+                                      onChanged: (value){
+                                        if(value.isEmpty){
+                                          setState(() {
+                                            _errorText = "Enter Phone Number";
+                                          });
+                                        }else{
+                                          setState(() {
+                                            _errorText = null;
+                                          });
+                                        }
+                                      },
+                                      decoration: InputDecoration(
+                                          // errorStyle: const TextStyle(
+                                          //     color: Colors.red),
+                                          hintText: '+1 045 0000 0025',
+                                          focusColor: yellowPrimary,
+                                          focusedBorder: OutlineInputBorder(
+                                              borderSide:
+                                                  BorderSide(color: (_errorText == null)?yellowPrimary: Colors.red)),
+                                          hintStyle: TextStyle(
+                                              color:
+                                                  Colors.white.withOpacity(0.75)),
+                                          filled: true,
+                                          fillColor: const Color(0xFF201F1F),
+                                          border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(6))),
+                                    ),
+                                    if (_errorText != null)
+                                      Positioned(
+                                        right: 10,
+                                        child: Text(
+                                          _errorText??"",
+                                          style: const TextStyle(
+                                            color: Colors.red,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
                                 ),
                               ),
                             ),

@@ -241,10 +241,15 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                   20 * fem, 20 * fem, 0 * fem, 0 * fem),
                               width: 24 * fem,
                               height: 24 * fem,
-                              child: Icon(
-                                Icons.arrow_back_ios,
-                                size: 24 * fem,
-                                color: Colors.white,
+                              child: GestureDetector(
+                                onTap: (){
+                                  Navigator.pop(context);
+                                },
+                                child: Icon(
+                                  Icons.arrow_back_ios,
+                                  size: 24 * fem,
+                                  color: Colors.white,
+                                ),
                               )),
                         ),
                       ],
@@ -467,7 +472,9 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                           fontSize: 14 * ffem,
                                           fontWeight: FontWeight.w500,
                                           height: 1.4285714286 * ffem / fem,
-                                          color: const Color(0xffffffff),
+                                          color: _isRideTicket
+                                              ? yellowPrimary
+                                              : const Color(0xffffffff),
                                         ),
                                       ),
                                     ),
@@ -543,7 +550,9 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                           fontSize: 14 * ffem,
                                           fontWeight: FontWeight.w500,
                                           height: 1.4285714286 * ffem / fem,
-                                          color: const Color(0xffffffff),
+                                          color: _isEntryTicket
+                                              ? yellowPrimary
+                                              : const Color(0xffffffff),
                                         ),
                                       ),
                                     ),

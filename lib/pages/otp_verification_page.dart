@@ -77,12 +77,12 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
     _handleOTPVerification(context, widget.verificationId, otpCode);
 
     // Clear the text fields
-    _digitOneController.clear();
-    _digitTwoController.clear();
-    _digitThreeController.clear();
-    _digitFourController.clear();
-    _digitFiveController.clear();
-    _digitSixController.clear();
+    // _digitOneController.clear();
+    // _digitTwoController.clear();
+    // _digitThreeController.clear();
+    // _digitFourController.clear();
+    // _digitFiveController.clear();
+    // _digitSixController.clear();
   }
 
   @override

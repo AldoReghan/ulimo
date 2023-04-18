@@ -959,7 +959,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
                         PaymentItem(
                           label: 'Total',
                           amount: countTotalPrice(),
-                          status: PaymentItemStatus.final_price,
+                          status: PaymentItemStatus.pending,
                         )
                       ],
                       width: 215.47 * fem,
@@ -980,7 +980,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
                         PaymentItem(
                           label: 'Total',
                           amount: countTotalPrice(),
-                          status: PaymentItemStatus.final_price,
+                          status: PaymentItemStatus.pending,
                         )
                       ],
                       width: 215.47 * fem,

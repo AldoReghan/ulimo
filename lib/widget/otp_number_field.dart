@@ -7,6 +7,7 @@ import '../base/utils.dart';
 
 Widget otpNumberField(BuildContext context, TextEditingController controller, Color statusColor ,
     FocusNode focusNode, Function() onChanged) {
+
   return Flexible(
     child: DottedBorder(
       borderType: BorderType.RRect,
@@ -18,10 +19,18 @@ Widget otpNumberField(BuildContext context, TextEditingController controller, Co
           textAlign: TextAlign.center,
           controller: controller,
           keyboardType: TextInputType.number,
+          maxLength: 1,
           focusNode: focusNode,
+          onTap: (){
+            controller.text = '';
+          },
           onChanged: (String value) {
-            if (value.length == 1) {
-              onChanged.call();
+            if(value.isNotEmpty){
+              if (value.length == 1) {
+                onChanged.call();
+              }else if(value.length >1){
+                controller.text.substring(0, controller.text.length - 1);
+              }
             }
           },
           showCursor: false,
@@ -33,6 +42,7 @@ Widget otpNumberField(BuildContext context, TextEditingController controller, Co
           ),
           decoration: InputDecoration(
             hintText: '0',
+            counterText: '',
             hintStyle: SafeGoogleFont('Gilroy',
                 fontSize: 26,
                 fontWeight: FontWeight.w800,

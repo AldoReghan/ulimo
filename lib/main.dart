@@ -18,8 +18,8 @@ void main() async {
   );
 
   String? token = await FirebaseMessaging.instance.getToken();
-  print("tokeennnn $token");
-  await Clipboard.setData(ClipboardData(text: token));
+  // print("tokeennnn $token");
+  // await Clipboard.setData(ClipboardData(text: token));
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   await messaging.requestPermission(
     alert: true,
