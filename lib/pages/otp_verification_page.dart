@@ -143,8 +143,6 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
 
   Future<void> _handleSignIn(BuildContext context) async {
     final phoneNumber = widget.phoneNumber;
-    final isValid = _formKey.currentState?.validate() ?? false;
-    if (!isValid) return;
 
     void verificationCompleted(PhoneAuthCredential credential) async {
       final userCredential =
@@ -375,6 +373,7 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
                         recognizer: TapGestureRecognizer()
                           ..onTap = () async {
                             _handleSignIn(context);
+                            // print("resend");
                           },
                       ),
                       TextSpan(

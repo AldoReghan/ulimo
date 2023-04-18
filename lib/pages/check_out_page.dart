@@ -63,6 +63,8 @@ class _CheckOutPageState extends State<CheckOutPage> {
   final _databaseRef = FirebaseDatabase.instance.ref();
   final authData = FirebaseAuth.instance;
 
+  String _totalPrice = "0.00";
+
   Future<void> _getCheckoutData() async {
     if (widget.rideType == 'private') {
       setState(() {
@@ -281,6 +283,9 @@ class _CheckOutPageState extends State<CheckOutPage> {
   String countTotalPrice() {
     final totalDiscount = double.parse(_price) * (_discountRate / 100);
     final totalPrice = double.parse(_price) - totalDiscount;
+    setState(() {
+      _totalPrice = totalPrice.toStringAsFixed(2);
+    });
     return totalPrice.toStringAsFixed(2);
   }
 
