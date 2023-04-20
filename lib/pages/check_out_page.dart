@@ -43,6 +43,14 @@ class CheckOutPage extends StatefulWidget {
   State<CheckOutPage> createState() => _CheckOutPageState();
 }
 
+const _paymentItems = [
+  PaymentItem(
+    label: 'Total',
+    amount: '99.99',
+    status: PaymentItemStatus.final_price,
+  )
+];
+
 class _CheckOutPageState extends State<CheckOutPage> {
   String _subtitle = "";
   String _title = "";
@@ -56,6 +64,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
   DateTime _discountExpiredDate = DateTime.now();
   final promoController = TextEditingController();
   final _holderNameController = TextEditingController();
+
   // final cardController = CardFormEditController();
 
   Map<String, dynamic>? paymentIntent;
@@ -64,6 +73,10 @@ class _CheckOutPageState extends State<CheckOutPage> {
   final authData = FirebaseAuth.instance;
 
   String _totalPrice = "0.00";
+
+  late PaymentItem paymentItem;
+
+  late final Pay _payClient;
 
   Future<void> _getCheckoutData() async {
     if (widget.rideType == 'private') {
@@ -124,7 +137,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
     }
   }
 
-  List<PaymentItem> getPaymentItem(){
+  List<PaymentItem> getPaymentItem() {
     return [
       PaymentItem(
         label: 'Total',
@@ -280,6 +293,38 @@ class _CheckOutPageState extends State<CheckOutPage> {
     _checkOutTicket();
   }
 
+  void onGooglePayPressed() async {
+    // final result = await _payClient.showPaymentSelector(
+    await _payClient.showPaymentSelector(
+      PayProvider.google_pay,
+      [
+        PaymentItem(
+            label: 'Total',
+            amount: countTotalPrice(),
+            status: PaymentItemStatus.final_price,
+            type: PaymentItemType.total)
+      ],
+    );
+    // Send the resulting Google Pay token to your server / PSP
+    _checkOutTicket();
+  }
+
+  void onApplePayPressed() async {
+    // final result = await _payClient.showPaymentSelector(
+    await _payClient.showPaymentSelector(
+      PayProvider.apple_pay,
+      [
+        PaymentItem(
+            label: 'Total',
+            amount: countTotalPrice(),
+            status: PaymentItemStatus.final_price,
+            type: PaymentItemType.total)
+      ],
+    );
+    // Send the resulting Google Pay token to your server / PSP
+    _checkOutTicket();
+  }
+
   String countTotalPrice() {
     final totalDiscount = double.parse(_price) * (_discountRate / 100);
     final totalPrice = double.parse(_price) - totalDiscount;
@@ -294,8 +339,14 @@ class _CheckOutPageState extends State<CheckOutPage> {
     // TODO: implement initState
     super.initState();
     _getCheckoutData();
-    _holderNameController.text = authData.currentUser?.displayName??"";
+    _holderNameController.text = authData.currentUser?.displayName ?? "";
 
+    _payClient = Pay({
+      PayProvider.google_pay:
+          PaymentConfiguration.fromJsonString(defaultGooglePay),
+      PayProvider.apple_pay:
+          PaymentConfiguration.fromJsonString(defaultApplePay),
+    });
   }
 
   @override
@@ -506,7 +557,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
                       margin: EdgeInsets.fromLTRB(
                           0 * fem, 0 * fem, 0 * fem, 10 * fem),
                       child: Text(
-                        'Holder Name',
+                        'Name',
                         style: SafeGoogleFont(
                           'Saira',
                           fontSize: 16 * ffem,
@@ -921,6 +972,112 @@ class _CheckOutPageState extends State<CheckOutPage> {
                         ],
                       ),
                     ),
+
+                    FutureBuilder(
+                        future: _payClient.userCanPay(PayProvider.google_pay),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            if (snapshot.data == true) {
+                              return TextButton(
+                                // button8hv (0:1291)
+                                onPressed: () async {
+                                  onGooglePayPressed();
+                                },
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.zero,
+                                ),
+                                child: Container(
+                                  width: 215.47 * fem,
+                                  height: double.infinity,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xfffdcb5b),
+                                    borderRadius:
+                                        BorderRadius.circular(5 * fem),
+                                  ),
+                                  child: Center(
+                                    child: _isLoading
+                                        ? const AspectRatio(
+                                            aspectRatio: 1,
+                                            child: CircularProgressIndicator())
+                                        : Text(
+                                            'Purchase Ticket',
+                                            style: SafeGoogleFont(
+                                              'Saira',
+                                              fontSize: 20 * ffem,
+                                              fontWeight: FontWeight.w500,
+                                              height: 1.575 * ffem / fem,
+                                              color: const Color(0xff000000),
+                                            ),
+                                          ),
+                                  ),
+                                ),
+                              );
+                            } else {
+                              // userCanPay returned false
+                              // Consider showing an alternative payment method
+                              return const SizedBox.shrink();
+                            }
+                          } else {
+                            // The operation hasn't finished loading
+                            // Consider showing a loading indicator
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+                        }),
+                    FutureBuilder(
+                        future: _payClient.userCanPay(PayProvider.apple_pay),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            if (snapshot.data == true) {
+                              return TextButton(
+                                // button8hv (0:1291)
+                                onPressed: () async {
+                                  onGooglePayPressed();
+                                },
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.zero,
+                                ),
+                                child: Container(
+                                  width: 215.47 * fem,
+                                  height: double.infinity,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xfffdcb5b),
+                                    borderRadius:
+                                    BorderRadius.circular(5 * fem),
+                                  ),
+                                  child: Center(
+                                    child: _isLoading
+                                        ? const AspectRatio(
+                                        aspectRatio: 1,
+                                        child: CircularProgressIndicator())
+                                        : Text(
+                                      'Purchase Ticket',
+                                      style: SafeGoogleFont(
+                                        'Saira',
+                                        fontSize: 20 * ffem,
+                                        fontWeight: FontWeight.w500,
+                                        height: 1.575 * ffem / fem,
+                                        color: const Color(0xff000000),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            } else {
+                              // userCanPay returned false
+                              // Consider showing an alternative payment method
+                              return const SizedBox.shrink();
+                            }
+                          } else {
+                            // The operation hasn't finished loading
+                            // Consider showing a loading indicator
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+                        }),
+
                     // TextButton(
                     //   // button8hv (0:1291)
                     //   onPressed: () async {
@@ -957,45 +1114,53 @@ class _CheckOutPageState extends State<CheckOutPage> {
                     //   ),
                     // ),
 
-                    ApplePayButton(
-                      paymentConfiguration:
-                          PaymentConfiguration.fromJsonString(defaultApplePay),
-                      paymentItems: [
-                        PaymentItem(
-                          label: 'Total',
-                          amount: countTotalPrice(),
-                          status: PaymentItemStatus.pending,
-                        )
-                      ],
-                      width: 215.47 * fem,
-                      height: double.infinity,
-                      style: ApplePayButtonStyle.white,
-                      type: ApplePayButtonType.checkout,
-                      margin: const EdgeInsets.only(top: 15.0),
-                      onPaymentResult: onApplePayResult,
-                      loadingIndicator: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-
-                    GooglePayButton(
-                      paymentConfiguration:
-                          PaymentConfiguration.fromJsonString(defaultGooglePay),
-                      paymentItems: [
-                        PaymentItem(
-                          label: 'Total',
-                          amount: countTotalPrice(),
-                          status: PaymentItemStatus.pending,
-                        )
-                      ],
-                      width: 215.47 * fem,
-                      height: double.infinity,
-                      type: GooglePayButtonType.checkout,
-                      onPaymentResult: onGooglePayResult,
-                      loadingIndicator: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
+                    // ApplePayButton(
+                    //   paymentConfiguration:
+                    //       PaymentConfiguration.fromJsonString(defaultApplePay),
+                    //   paymentItems: [
+                    //     PaymentItem(
+                    //       label: 'Total',
+                    //       amount: _totalPrice,
+                    //       status: PaymentItemStatus.final_price,
+                    //     )
+                    //   ],
+                    //   onPressed: (){
+                    //
+                    //   },
+                    //   width: 215.47 * fem,
+                    //   height: double.infinity,
+                    //   style: ApplePayButtonStyle.white,
+                    //   type: ApplePayButtonType.checkout,
+                    //   margin: const EdgeInsets.only(top: 15.0),
+                    //   onPaymentResult: onApplePayResult,
+                    //   loadingIndicator: const Center(
+                    //     child: CircularProgressIndicator(),
+                    //   ),
+                    // ),
+                    //
+                    //
+                    // GooglePayButton(
+                    //   paymentConfiguration: PaymentConfiguration.fromJsonString(
+                    //       defaultGooglePay),
+                    //   paymentItems: [
+                    //     paymentItem
+                    //   ],
+                    //   onPressed: (){
+                    //     paymentItem = PaymentItem(
+                    //         label: 'Total',
+                    //         amount: countTotalPrice(),
+                    //         status: PaymentItemStatus.final_price,
+                    //         type: PaymentItemType.total
+                    //     );
+                    //   },
+                    //   width: 215.47 * fem,
+                    //   height: double.infinity,
+                    //   type: GooglePayButtonType.checkout,
+                    //   onPaymentResult: onGooglePayResult,
+                    //   loadingIndicator: const Center(
+                    //     child: CircularProgressIndicator(),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
@@ -1009,5 +1174,3 @@ class _CheckOutPageState extends State<CheckOutPage> {
     ));
   }
 }
-
-

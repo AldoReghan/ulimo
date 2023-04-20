@@ -146,6 +146,12 @@ class _RegisterPageState extends State<RegisterPage> {
                               fillColor: const Color(0xFF201F1F),
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(6))),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please input your name';
+                            }
+                            return null;
+                          },
                         ),
                         const SizedBox(height: 26),
                         Text(
@@ -229,16 +235,15 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 ElevatedButton(
-                  onPressed: () => {
-                    _isLoading ? null : _updateUserInfo(context)
-                  },
+                  onPressed: () =>
+                      {_isLoading ? null : _updateUserInfo(context)},
                   style: ElevatedButton.styleFrom(
                       backgroundColor: yellowPrimary,
                       padding: const EdgeInsets.all(11.0)),
                   child: const Text(
-                          'Get Started',
-                          style: TextStyle(color: Colors.black, fontSize: 18),
-                        ),
+                    'Get Started',
+                    style: TextStyle(color: Colors.black, fontSize: 18),
+                  ),
                 ),
                 const SizedBox(
                   height: 36,

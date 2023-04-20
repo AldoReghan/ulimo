@@ -721,7 +721,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         ),
                         profileMenu(
                             context: context,
-                            title: 'Instagram',
+                            title: 'ULimo Instagram',
                             iconAsset: "assets/icon/profile_instagram.svg",
                             onTap: () async {
                               final instagramUrl = Uri(

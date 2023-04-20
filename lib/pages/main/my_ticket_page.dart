@@ -257,7 +257,7 @@ class _MyTicketPageState extends State<MyTicketPage> {
             final DateTime currentTime =
             DateFormat('dd-MM-yyyy h:mm a').parse("${element['date']} ${element['time']}");
 
-            return (currentTime.isAfter(timeNow));
+            return (currentTime.isBefore(timeNow));
           }
         }
       }
