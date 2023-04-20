@@ -1034,7 +1034,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
                               return TextButton(
                                 // button8hv (0:1291)
                                 onPressed: () async {
-                                  onGooglePayPressed();
+                                  onApplePayPressed();
                                 },
                                 style: TextButton.styleFrom(
                                   padding: EdgeInsets.zero,
