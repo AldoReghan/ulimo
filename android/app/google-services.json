@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "486657291251-94ovpjmpdmcghrjk90t4bleggd4ifbl8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ulimo",
+            "certificate_hash": "40d896ecfe06d987d2d58a93472e16aa43055f72"
+          }
+        },
+        {
           "client_id": "486657291251-ppkll0k084rp9qmaen627o4bkc98u9op.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -30,6 +38,14 @@
             {
               "client_id": "486657291251-ppkll0k084rp9qmaen627o4bkc98u9op.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "486657291251-9is2qtt0m1vp41b1iv51umfgtnqll0o6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.ulimo",
+                "app_store_id": "12345678"
+              }
             }
           ]
         }

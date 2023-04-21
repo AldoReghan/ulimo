@@ -979,40 +979,50 @@ class _CheckOutPageState extends State<CheckOutPage> {
                           if (snapshot.connectionState ==
                               ConnectionState.done) {
                             if (snapshot.data == true) {
-                              return TextButton(
-                                // button8hv (0:1291)
-                                onPressed: () async {
-                                  onGooglePayPressed();
-                                },
-                                style: TextButton.styleFrom(
-                                  padding: EdgeInsets.zero,
-                                ),
-                                child: Container(
-                                  width: 215.47 * fem,
-                                  height: double.infinity,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xfffdcb5b),
-                                    borderRadius:
-                                        BorderRadius.circular(5 * fem),
-                                  ),
-                                  child: Center(
-                                    child: _isLoading
-                                        ? const AspectRatio(
-                                            aspectRatio: 1,
-                                            child: CircularProgressIndicator())
-                                        : Text(
-                                            'Purchase Ticket',
-                                            style: SafeGoogleFont(
-                                              'Saira',
-                                              fontSize: 20 * ffem,
-                                              fontWeight: FontWeight.w500,
-                                              height: 1.575 * ffem / fem,
-                                              color: const Color(0xff000000),
-                                            ),
-                                          ),
-                                  ),
+                              return SizedBox(
+                                width: 215.47 * fem,
+                                height: double.infinity,
+                                child: RawGooglePayButton(
+                                  onPressed: () {
+                                    onGooglePayPressed();
+                                  },
+                                  type: GooglePayButtonType.checkout,
                                 ),
                               );
+                              // return TextButton(
+                              //   // button8hv (0:1291)
+                              //   onPressed: () async {
+                              //     onGooglePayPressed();
+                              //   },
+                              //   style: TextButton.styleFrom(
+                              //     padding: EdgeInsets.zero,
+                              //   ),
+                              //   child: Container(
+                              //     width: 215.47 * fem,
+                              //     height: double.infinity,
+                              //     decoration: BoxDecoration(
+                              //       color: const Color(0xfffdcb5b),
+                              //       borderRadius:
+                              //           BorderRadius.circular(5 * fem),
+                              //     ),
+                              //     child: Center(
+                              //       child: _isLoading
+                              //           ? const AspectRatio(
+                              //               aspectRatio: 1,
+                              //               child: CircularProgressIndicator())
+                              //           : Text(
+                              //               'Purchase Ticket',
+                              //               style: SafeGoogleFont(
+                              //                 'Saira',
+                              //                 fontSize: 20 * ffem,
+                              //                 fontWeight: FontWeight.w500,
+                              //                 height: 1.575 * ffem / fem,
+                              //                 color: const Color(0xff000000),
+                              //               ),
+                              //             ),
+                              //     ),
+                              //   ),
+                              // );
                             } else {
                               // userCanPay returned false
                               // Consider showing an alternative payment method
@@ -1031,40 +1041,51 @@ class _CheckOutPageState extends State<CheckOutPage> {
                           if (snapshot.connectionState ==
                               ConnectionState.done) {
                             if (snapshot.data == true) {
-                              return TextButton(
-                                // button8hv (0:1291)
-                                onPressed: () async {
-                                  onApplePayPressed();
-                                },
-                                style: TextButton.styleFrom(
-                                  padding: EdgeInsets.zero,
-                                ),
-                                child: Container(
-                                  width: 215.47 * fem,
-                                  height: double.infinity,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xfffdcb5b),
-                                    borderRadius:
-                                    BorderRadius.circular(5 * fem),
-                                  ),
-                                  child: Center(
-                                    child: _isLoading
-                                        ? const AspectRatio(
-                                        aspectRatio: 1,
-                                        child: CircularProgressIndicator())
-                                        : Text(
-                                      'Purchase Ticket',
-                                      style: SafeGoogleFont(
-                                        'Saira',
-                                        fontSize: 20 * ffem,
-                                        fontWeight: FontWeight.w500,
-                                        height: 1.575 * ffem / fem,
-                                        color: const Color(0xff000000),
-                                      ),
-                                    ),
-                                  ),
+                              return SizedBox(
+                                width: 215.47 * fem,
+                                height: double.infinity,
+                                child: RawApplePayButton(
+                                  onPressed: () {
+                                    onApplePayPressed();
+                                  },
+                                  style: ApplePayButtonStyle.white,
+                                  type: ApplePayButtonType.checkout,
                                 ),
                               );
+                              // return TextButton(
+                              //   // button8hv (0:1291)
+                              //   onPressed: () async {
+                              //     onApplePayPressed();
+                              //   },
+                              //   style: TextButton.styleFrom(
+                              //     padding: EdgeInsets.zero,
+                              //   ),
+                              //   child: Container(
+                              //     width: 215.47 * fem,
+                              //     height: double.infinity,
+                              //     decoration: BoxDecoration(
+                              //       color: const Color(0xfffdcb5b),
+                              //       borderRadius:
+                              //       BorderRadius.circular(5 * fem),
+                              //     ),
+                              //     child: Center(
+                              //       child: _isLoading
+                              //           ? const AspectRatio(
+                              //           aspectRatio: 1,
+                              //           child: CircularProgressIndicator())
+                              //           : Text(
+                              //         'Purchase Ticket',
+                              //         style: SafeGoogleFont(
+                              //           'Saira',
+                              //           fontSize: 20 * ffem,
+                              //           fontWeight: FontWeight.w500,
+                              //           height: 1.575 * ffem / fem,
+                              //           color: const Color(0xff000000),
+                              //         ),
+                              //       ),
+                              //     ),
+                              //   ),
+                              // );
                             } else {
                               // userCanPay returned false
                               // Consider showing an alternative payment method
