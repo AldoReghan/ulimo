@@ -20,7 +20,7 @@ void main() async {
   );
 
   Stripe.publishableKey =
-  'pk_test_51N17L3KlJkrr9AMx4FdoTFLTd8Hhe0bGdyQwEGsUlv5LiPcE9zb09O8BSLjPaXTyazfSgaNnJ0nOnTLrgRQT3hqV00Cibdsuvc';
+  'pk_test_FdksvcRe3yMRyJQJ6NuzCEPL';
   await Stripe.instance.applySettings();
 
   String? token = await FirebaseMessaging.instance.getToken();

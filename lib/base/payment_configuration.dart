@@ -52,7 +52,7 @@ const String defaultGooglePay = '''{
           "parameters": {
             "gateway": "stripe",
             "stripe:version": "2022-11-15",
-            "stripe:publishableKey": "pk_test_51N17L3KlJkrr9AMx4FdoTFLTd8Hhe0bGdyQwEGsUlv5LiPcE9zb09O8BSLjPaXTyazfSgaNnJ0nOnTLrgRQT3hqV00Cibdsuvc"
+            "stripe:publishableKey": "pk_test_FdksvcRe3yMRyJQJ6NuzCEPL"
           }
         },
         "parameters": {

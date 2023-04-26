@@ -362,31 +362,37 @@ class _CheckOutPageState extends State<CheckOutPage> {
             type: PaymentItemType.total)
       ],
     );
+
+    print("resultt apple pay method ${result["paymentMethod"]}]");
+
+    _checkOutTicket();
+
     // Send the resulting Google Pay token to your server / PSP
-    final tokenData = result["paymentMethodData"]["tokenizationData"]["token"];
-
-    Map jsonToken = jsonDecode(tokenData);
-
-    String tokenId = jsonToken['id'];
-
-    final response = await StripeService.createPaymentIntent(
-        "${(double.parse(countTotalPrice()) * 100).toInt()}", 'USD');
-
-    final clientSecret = response['client_secret'];
-    final tokenJson = Map.castFrom(json.decode(tokenData));
+    // final tokenData = result["paymentMethod"]["token"];
+    //
+    // Map jsonToken = jsonDecode(tokenData);
+    //
+    // String tokenId = jsonToken['data'];
+    //
+    // final response = await StripeService.createPaymentIntent(
+    //     "${(double.parse(countTotalPrice()) * 100).toInt()}", 'USD');
+    //
+    // final clientSecret = response['client_secret'];
     // final tokenJson = Map.castFrom(json.decode(tokenData));
+    // // final tokenJson = Map.castFrom(json.decode(tokenData));
+    //
+    // final params = flutter_stripe.PaymentMethodParams.cardFromToken(
+    //   paymentMethodData:
+    //   flutter_stripe.PaymentMethodDataCardFromToken(token: tokenId),
+    // );
+    // // Confirm Google pay payment method
+    // final paymentResult = await flutter_stripe.Stripe.instance
+    //     .confirmPayment(paymentIntentClientSecret: clientSecret, data: params);
+    //
+    // if (paymentResult.status == flutter_stripe.PaymentIntentsStatus.Succeeded) {
+    //   _checkOutTicket();
+    // }
 
-    final params = flutter_stripe.PaymentMethodParams.cardFromToken(
-      paymentMethodData:
-      flutter_stripe.PaymentMethodDataCardFromToken(token: tokenId),
-    );
-    // Confirm Google pay payment method
-    final paymentResult = await flutter_stripe.Stripe.instance
-        .confirmPayment(paymentIntentClientSecret: clientSecret, data: params);
-
-    if (paymentResult.status == flutter_stripe.PaymentIntentsStatus.Succeeded) {
-      _checkOutTicket();
-    }
 
     setState(() {
       _isLoading = false;

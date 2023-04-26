@@ -15,7 +15,7 @@ class StripeService{
         Uri.parse('https://api.stripe.com/v1/payment_intents'),
         headers: {
           'Authorization':
-          'Bearer sk_test_51N17L3KlJkrr9AMxgWMRl1ueP5Xj0uASIADk8J2BhS4QhXmqtPfNdE0POuO7qFnwYUQoSdLr7VYHN5sUSvyKgcGH005XyxRz3W',
+          'Bearer sk_test_eAuDQlOXrC8M0VZjJTZhMyL5',
           'Content-Type': 'application/x-www-form-urlencoded'
         },
         body: body,
