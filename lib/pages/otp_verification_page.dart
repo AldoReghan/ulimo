@@ -1,3 +1,5 @@
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -119,6 +121,41 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
     if (userCredential != null) {
       // Sign in successful
       // ignore: use_build_context_synchronously
+
+
+      final token = await FirebaseMessaging.instance.getToken();
+
+      final userSnapshot = await FirebaseDatabase.instance.ref()
+          .child('users')
+          .orderByChild('uid')
+          .equalTo(userCredential.user?.uid)
+          .once();
+
+      final Map<dynamic, dynamic>? userData =
+      userSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+
+      if(userData == null){
+        final databaseRef = FirebaseDatabase.instance.ref('users').push();
+        await databaseRef.set({
+          'uid' : userCredential.user?.uid,
+          'messageToken': token
+        });
+      }else{
+
+        userData.forEach((key, value) async {
+          if(value["messageToken"] != token){
+            await FirebaseDatabase.instance.ref()
+                .child('users')
+                .child(userCredential.user?.uid??"")
+                .update({"messageToken": token});
+          }
+        });
+      }
+
+
+
+
+
       if (userCredential.user?.displayName == null) {
         Navigator.pushReplacement(
           context,

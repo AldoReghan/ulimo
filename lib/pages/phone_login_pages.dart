@@ -53,10 +53,6 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
     // final isValid = _formKey.currentState?.validate() ?? false;
     if (_phoneNumberController.text.isEmpty) return;
 
-    setState(() {
-      _isLoading = true;
-    });
-
     bool isSignInSuccessful = false;
 
     void verificationCompleted(PhoneAuthCredential credential) async {
@@ -106,6 +102,10 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
     void codeAutoRetrievalTimeout(String verificationId) {}
 
     try {
+      setState(() {
+        _isLoading = true;
+      });
+
       await _phoneAuthService.verifyPhoneNumber(
         phoneNumber,
         verificationCompleted,

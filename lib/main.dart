@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:ulimo/base/base_color.dart';
 import 'package:ulimo/firebase_options.dart';
 import 'package:ulimo/pages/main/home_page.dart';
@@ -17,6 +19,10 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform
   );
 
+  Stripe.publishableKey =
+  'pk_test_51N17L3KlJkrr9AMx4FdoTFLTd8Hhe0bGdyQwEGsUlv5LiPcE9zb09O8BSLjPaXTyazfSgaNnJ0nOnTLrgRQT3hqV00Cibdsuvc';
+  await Stripe.instance.applySettings();
+
   String? token = await FirebaseMessaging.instance.getToken();
   // print("tokeennnn $token");
   // await Clipboard.setData(ClipboardData(text: token));
@@ -27,7 +33,9 @@ void main() async {
     sound: true,
   );
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    print('Received message: ${message.notification?.title}');
+    if (kDebugMode) {
+      print('Received message: ${message.notification?.title}');
+    }
   });
   // SystemUiOverlayStyle systemUiOverlayStyle = const SystemUiOverlayStyle(
   //   systemNavigationBarColor: darkPrimary, // Change navigation bar color here

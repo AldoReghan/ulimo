@@ -1,15 +1,19 @@
+import 'dart:convert';
+
 import 'package:connectivity/connectivity.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_stripe/flutter_stripe.dart' as flutter_stripe;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pay/pay.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
 import 'package:ulimo/base/payment_configuration.dart';
 import 'package:ulimo/pages/payment_success_page.dart';
+import 'package:ulimo/services/stripe_service.dart';
 
 import '../base/base_color.dart';
 import '../base/utils.dart';
@@ -294,8 +298,11 @@ class _CheckOutPageState extends State<CheckOutPage> {
   }
 
   void onGooglePayPressed() async {
-    // final result = await _payClient.showPaymentSelector(
-    await _payClient.showPaymentSelector(
+    setState(() {
+      _isLoading = true;
+    });
+    final result = await _payClient.showPaymentSelector(
+      // await _payClient.showPaymentSelector(
       PayProvider.google_pay,
       [
         PaymentItem(
@@ -305,13 +312,47 @@ class _CheckOutPageState extends State<CheckOutPage> {
             type: PaymentItemType.total)
       ],
     );
+
+    final tokenData = result["paymentMethodData"]["tokenizationData"]["token"];
+
+    Map jsonToken = jsonDecode(tokenData);
+
+    String tokenId = jsonToken['id'];
+
+    final response = await StripeService.createPaymentIntent(
+        "${(double.parse(countTotalPrice()) * 100).toInt()}", 'USD');
+
+    final clientSecret = response['client_secret'];
+    final tokenJson = Map.castFrom(json.decode(tokenData));
+    // final tokenJson = Map.castFrom(json.decode(tokenData));
+
+    final params = flutter_stripe.PaymentMethodParams.cardFromToken(
+      paymentMethodData:
+          flutter_stripe.PaymentMethodDataCardFromToken(token: tokenId),
+    );
+    // Confirm Google pay payment method
+    final paymentResult = await flutter_stripe.Stripe.instance
+        .confirmPayment(paymentIntentClientSecret: clientSecret, data: params);
+
+    if (paymentResult.status == flutter_stripe.PaymentIntentsStatus.Succeeded) {
+      _checkOutTicket();
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+
     // Send the resulting Google Pay token to your server / PSP
-    _checkOutTicket();
   }
 
   void onApplePayPressed() async {
-    // final result = await _payClient.showPaymentSelector(
-    await _payClient.showPaymentSelector(
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    final result = await _payClient.showPaymentSelector(
+      // await _payClient.showPaymentSelector(
       PayProvider.apple_pay,
       [
         PaymentItem(
@@ -322,7 +363,34 @@ class _CheckOutPageState extends State<CheckOutPage> {
       ],
     );
     // Send the resulting Google Pay token to your server / PSP
-    _checkOutTicket();
+    final tokenData = result["paymentMethodData"]["tokenizationData"]["token"];
+
+    Map jsonToken = jsonDecode(tokenData);
+
+    String tokenId = jsonToken['id'];
+
+    final response = await StripeService.createPaymentIntent(
+        "${(double.parse(countTotalPrice()) * 100).toInt()}", 'USD');
+
+    final clientSecret = response['client_secret'];
+    final tokenJson = Map.castFrom(json.decode(tokenData));
+    // final tokenJson = Map.castFrom(json.decode(tokenData));
+
+    final params = flutter_stripe.PaymentMethodParams.cardFromToken(
+      paymentMethodData:
+      flutter_stripe.PaymentMethodDataCardFromToken(token: tokenId),
+    );
+    // Confirm Google pay payment method
+    final paymentResult = await flutter_stripe.Stripe.instance
+        .confirmPayment(paymentIntentClientSecret: clientSecret, data: params);
+
+    if (paymentResult.status == flutter_stripe.PaymentIntentsStatus.Succeeded) {
+      _checkOutTicket();
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   String countTotalPrice() {
@@ -982,12 +1050,16 @@ class _CheckOutPageState extends State<CheckOutPage> {
                               return SizedBox(
                                 width: 215.47 * fem,
                                 height: double.infinity,
-                                child: RawGooglePayButton(
-                                  onPressed: () {
-                                    onGooglePayPressed();
-                                  },
-                                  type: GooglePayButtonType.checkout,
-                                ),
+                                child: _isLoading
+                                    ? const Center(
+                                        child: CircularProgressIndicator(),
+                                      )
+                                    : RawGooglePayButton(
+                                        onPressed: () {
+                                          onGooglePayPressed();
+                                        },
+                                        type: GooglePayButtonType.checkout,
+                                      ),
                               );
                               // return TextButton(
                               //   // button8hv (0:1291)
@@ -1044,13 +1116,16 @@ class _CheckOutPageState extends State<CheckOutPage> {
                               return SizedBox(
                                 width: 215.47 * fem,
                                 height: double.infinity,
-                                child: RawApplePayButton(
-                                  onPressed: () {
-                                    onApplePayPressed();
-                                  },
-                                  style: ApplePayButtonStyle.white,
-                                  type: ApplePayButtonType.checkout,
-                                ),
+                                child: _isLoading
+                                    ? const Center(
+                                        child: CircularProgressIndicator())
+                                    : RawApplePayButton(
+                                        onPressed: () {
+                                          onApplePayPressed();
+                                        },
+                                        style: ApplePayButtonStyle.white,
+                                        type: ApplePayButtonType.checkout,
+                                      ),
                               );
                               // return TextButton(
                               //   // button8hv (0:1291)

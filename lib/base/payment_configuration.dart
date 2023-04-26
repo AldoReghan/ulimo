@@ -25,34 +25,14 @@
 const String defaultApplePay = '''{
   "provider": "apple_pay",
   "data": {
-    "merchantIdentifier": "merchant.com.sams.fish",
-    "displayName": "Sam's Fish",
+    "merchantIdentifier": "merchant.ulimomvp",
+    "displayName": "ULimo Inc.",
     "merchantCapabilities": ["3DS", "debit", "credit"],
     "supportedNetworks": ["amex", "visa", "discover", "masterCard"],
     "countryCode": "US",
     "currencyCode": "USD",
     "requiredBillingContactFields": ["emailAddress", "name", "phoneNumber", "postalAddress"],
-    "requiredShippingContactFields": [],
-    "shippingMethods": [
-      {
-        "amount": "0.00",
-        "detail": "Available within an hour",
-        "identifier": "in_store_pickup",
-        "label": "In-Store Pickup"
-      },
-      {
-        "amount": "4.99",
-        "detail": "5-8 Business Days",
-        "identifier": "flat_rate_shipping_id_2",
-        "label": "UPS Ground"
-      },
-      {
-        "amount": "29.99",
-        "detail": "1-3 Business Days",
-        "identifier": "flat_rate_shipping_id_1",
-        "label": "FedEx Priority Mail"
-      }
-    ]
+    "requiredShippingContactFields": []
   }
 }''';
 
@@ -70,8 +50,9 @@ const String defaultGooglePay = '''{
         "tokenizationSpecification": {
           "type": "PAYMENT_GATEWAY",
           "parameters": {
-            "gateway": "example",
-            "gatewayMerchantId": "gatewayMerchantId"
+            "gateway": "stripe",
+            "stripe:version": "2022-11-15",
+            "stripe:publishableKey": "pk_test_51N17L3KlJkrr9AMx4FdoTFLTd8Hhe0bGdyQwEGsUlv5LiPcE9zb09O8BSLjPaXTyazfSgaNnJ0nOnTLrgRQT3hqV00Cibdsuvc"
           }
         },
         "parameters": {
@@ -86,8 +67,8 @@ const String defaultGooglePay = '''{
       }
     ],
     "merchantInfo": {
-      "merchantId": "01234567890123456789",
-      "merchantName": "Example Merchant Name"
+      "merchantId": "600732547059901524",
+      "merchantName": "ULimo Inc."
     },
     "transactionInfo": {
       "countryCode": "US",
