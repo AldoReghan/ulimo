@@ -66,7 +66,7 @@ class _MyTicketPageState extends State<MyTicketPage> {
           rideShareBusOrderSnapshot.snapshot.value as Map<dynamic, dynamic>?;
       final List tempRideShareBusOrderList = [];
 
-      if (privateRideData != null || rideShareBusOrderData != null) {
+      if (privateRideData != null || rideShareBusOrderData != null || nightlifeOrderData != null) {
         privateRideData?.forEach((key, value) async {
           final privateRideMap = {
             'id': key,

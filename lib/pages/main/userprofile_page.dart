@@ -70,7 +70,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
           rideShareBusOrderSnapshot.snapshot.value as Map<dynamic, dynamic>?;
       final List tempRideShareBusOrderList = [];
 
-      if (privateRideData != null || rideShareBusOrderData != null) {
+      if (privateRideData != null ||
+          rideShareBusOrderData != null ||
+          nightlifeOrderData != null) {
         privateRideData?.forEach((key, value) async {
           final privateRideMap = {
             'id': key,
@@ -531,30 +533,53 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                   height: 26 * fem,
                                                   child: Text(
                                                     "${_ticketListData.where((element) {
-                                                      final timeNow = DateTime.now();
-                                                      final dataDate = element['date'];
-                                                      final DateFormat dateFormat = DateFormat('dd-MM-yyyy');
-                                                      String todayDate = dateFormat.format(DateTime.now());
+                                                          final timeNow =
+                                                              DateTime.now();
+                                                          final dataDate =
+                                                              element['date'];
+                                                          final DateFormat
+                                                              dateFormat =
+                                                              DateFormat(
+                                                                  'dd-MM-yyyy');
+                                                          String todayDate =
+                                                              dateFormat.format(
+                                                                  DateTime
+                                                                      .now());
 
-                                                      if ((todayDate != dataDate) &&
-                                                          element['status'] == 'paid') {
+                                                          if ((todayDate !=
+                                                                  dataDate) &&
+                                                              element['status'] ==
+                                                                  'paid') {
+                                                            return (DateFormat(
+                                                                    'dd-MM-yyyy')
+                                                                .parse(element[
+                                                                    'date'])
+                                                                .isAfter(
+                                                                    timeNow));
+                                                          } else if (todayDate ==
+                                                                  dataDate &&
+                                                              element['status'] ==
+                                                                  'paid') {
+                                                            if (element[
+                                                                    'time'] ==
+                                                                '') {
+                                                              return true;
+                                                            } else {
+                                                              final DateTime
+                                                                  currentTime =
+                                                                  DateFormat(
+                                                                          'dd-MM-yyyy h:mm a')
+                                                                      .parse(
+                                                                          "${element['date']} ${element['time']}");
 
-                                                        return (DateFormat('dd-MM-yyyy')
-                                                            .parse(element['date'])
-                                                            .isAfter(timeNow));
-                                                      }else if (todayDate == dataDate && element['status'] == 'paid') {
-                                                        if(element['time'] == ''){
-                                                          return true;
-                                                        }else{
-                                                          final DateTime currentTime =
-                                                          DateFormat('dd-MM-yyyy h:mm a').parse("${element['date']} ${element['time']}");
-
-                                                          return (currentTime.isAfter(timeNow));
-                                                        }
-                                                      } else {
-                                                        return false;
-                                                      }
-                                                    }).toList().length}",
+                                                              return (currentTime
+                                                                  .isAfter(
+                                                                      timeNow));
+                                                            }
+                                                          } else {
+                                                            return false;
+                                                          }
+                                                        }).toList().length}",
                                                     style: SafeGoogleFont(
                                                       'Saira',
                                                       fontSize: 16 * ffem,
