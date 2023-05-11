@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -11,21 +13,30 @@ import 'package:ulimo/pages/main/home_page.dart';
 import 'package:ulimo/pages/main/main_page.dart';
 import 'package:ulimo/pages/phone_login_pages.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 void main() async {
+
   // Initialize Firebase app
   WidgetsFlutterBinding.ensureInitialized();
+  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform
   );
 
   Stripe.publishableKey =
   'pk_test_FdksvcRe3yMRyJQJ6NuzCEPL';
+
+
+  Stripe.merchantIdentifier =
+  'merchant.ulimomvp';
+
   await Stripe.instance.applySettings();
 
-  String? token = await FirebaseMessaging.instance.getToken();
+  // String? token = await FirebaseMessaging.instance.getToken();
   // print("tokeennnn $token");
   // await Clipboard.setData(ClipboardData(text: token));
+  // FlutterNativeSplash.remove();
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   await messaging.requestPermission(
     alert: true,
@@ -41,6 +52,13 @@ void main() async {
   //   systemNavigationBarColor: darkPrimary, // Change navigation bar color here
   // );
   // SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
+
+  if(Platform.isIOS){
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light.copyWith(
+      statusBarColor: Colors.white, // set status bar color
+      statusBarIconBrightness: Brightness.light, // set status bar icons color to dark
+    ));
+  }
 
   runApp(const MyApp());
 }
@@ -87,7 +105,6 @@ class _MyAppState extends State<MyApp> {
         fontFamily: 'Saira',
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      // home: StripePay(documentId: "123213", name: "aldo", email: "aldo@gmail.com", amount: "150000", currency: "USD", description: "payment for car"),
       home: isLogin ? const MainPage() : const PhoneLoginPage(),
     );
   }

@@ -49,60 +49,61 @@ Widget ticketPendingItem(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Container(
-                // group15oHS (1:1385)
-                margin:
-                    EdgeInsets.fromLTRB(0 * fem, 0 * fem, 27.6 * fem, 0 * fem),
-                width: 177 * fem,
-                height: double.infinity,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      // privaterideYF2 (1:1386)
-                      margin: EdgeInsets.fromLTRB(
-                          0 * fem, 0 * fem, 0 * fem, 1 * fem),
-                      child: Text(
-                        'PRIVATE RIDE',
-                        style: SafeGoogleFont(
-                          'Saira',
-                          fontSize: 16 * ffem,
-                          fontWeight: FontWeight.w500,
-                          height: 1.575 * ffem / fem,
-                          color: const Color(0xffffffff),
+              Expanded(
+                child: Container(
+                  // group15oHS (1:1385)
+                  margin:
+                      EdgeInsets.fromLTRB(0 * fem, 0 * fem, 27.6 * fem, 0 * fem),
+                  height: double.infinity,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        // privaterideYF2 (1:1386)
+                        margin: EdgeInsets.fromLTRB(
+                            0 * fem, 0 * fem, 0 * fem, 1 * fem),
+                        child: Text(
+                          'PRIVATE RIDE',
+                          style: SafeGoogleFont(
+                            'Saira',
+                            fontSize: 16 * ffem,
+                            fontWeight: FontWeight.w500,
+                            height: 1.575 * ffem / fem,
+                            color: const Color(0xffffffff),
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      // group14eor (1:1387)
-                      width: double.infinity,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                              // frameowe (1:1389)
-                              margin: EdgeInsets.fromLTRB(
-                                  0 * fem, 0 * fem, 5 * fem, 0 * fem),
-                              width: 14 * fem,
-                              height: 14 * fem,
-                              child:
-                                  SvgPicture.asset("assets/icon/location.svg")),
-                          Text(
-                            // wplattsttampafl33606LRn (1:1388)
-                            address,
-                            overflow: TextOverflow.ellipsis,
-                            style: SafeGoogleFont(
-                              'Saira',
-                              fontSize: 10 * ffem,
-                              fontWeight: FontWeight.w500,
-                              height: 1.4 * ffem / fem,
-                              color: const Color(0xff3586ff),
+                      SizedBox(
+                        // group14eor (1:1387)
+                        width: double.infinity,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                                // frameowe (1:1389)
+                                margin: EdgeInsets.fromLTRB(
+                                    0 * fem, 0 * fem, 5 * fem, 0 * fem),
+                                width: 14 * fem,
+                                height: 14 * fem,
+                                child:
+                                    SvgPicture.asset("assets/icon/location.svg")),
+                            Text(
+                              // wplattsttampafl33606LRn (1:1388)
+                              address,
+                              overflow: TextOverflow.ellipsis,
+                              style: SafeGoogleFont(
+                                'Saira',
+                                fontSize: 10 * ffem,
+                                fontWeight: FontWeight.w500,
+                                height: 1.4 * ffem / fem,
+                                color: const Color(0xff3586ff),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               Container(

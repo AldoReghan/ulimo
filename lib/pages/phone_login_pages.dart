@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:sms_autofill/sms_autofill.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
 import 'package:ulimo/base/base_color.dart';
 import 'package:ulimo/pages/register_page.dart';
@@ -20,36 +21,17 @@ class PhoneLoginPage extends StatefulWidget {
 class _PhoneLoginPageState extends State<PhoneLoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _phoneNumberController = TextEditingController();
+  final _phoneNumberFocusNode = FocusNode();
   final _otpController = TextEditingController();
   final _phoneAuthService = PhoneAuthService();
   bool _isLoading = false;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  String? _errorText= "";
-
-  void _handleFakeLoginForTest(BuildContext context) async {
-    try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: 'fafirmansyah20@gmail.com',
-        password: 'ulimo123',
-      );
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const MainPage()));
-      // User account created successfully
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        print('No user found for that email.');
-      } else if (e.code == 'wrong-password') {
-        print('Wrong password provided for that user.');
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
+  String? _errorText = "";
 
   Future<void> _handleSignIn(BuildContext context) async {
-    final phoneNumber = _phoneNumberController.text.trim();
+    final phoneNumber = '+1${_phoneNumberController.text.trim()}';
     // final isValid = _formKey.currentState?.validate() ?? false;
     if (_phoneNumberController.text.isEmpty) return;
 
@@ -84,6 +66,10 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
     void verificationFailed(FirebaseAuthException exception) {
       Fluttertoast.showToast(
           msg: 'Failed to verify phone number: ${exception.message}');
+
+      setState(() {
+        _isLoading = false;
+      });
     }
 
     void codeSent(String verificationId, int? forceResendingToken) {
@@ -97,9 +83,17 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
                   phoneNumber: phoneNumber,
                 )),
       );
+
+      setState(() {
+        _isLoading = false;
+      });
     }
 
-    void codeAutoRetrievalTimeout(String verificationId) {}
+    void codeAutoRetrievalTimeout(String verificationId) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
 
     try {
       setState(() {
@@ -113,39 +107,11 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
         codeSent,
         codeAutoRetrievalTimeout,
       );
-
-      setState(() {
-        _isLoading = false;
-      });
-
     } catch (e) {
       Fluttertoast.showToast(msg: 'Failed to verify phone number');
       setState(() {
         _isLoading = false;
       });
-    }
-  }
-
-  Future<void> _handleOTPVerification(
-      BuildContext context, String verificationId) async {
-    final otpCode = _otpController.text.trim();
-    final isValid = _formKey.currentState?.validate() ?? false;
-    if (!isValid) return;
-
-    final credential = PhoneAuthProvider.credential(
-        verificationId: verificationId, smsCode: otpCode);
-    final userCredential =
-        await _phoneAuthService.signInWithCredential(credential);
-
-    if (userCredential != null) {
-      // Sign in successful
-      // ignore: use_build_context_synchronously
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const MainPage()),
-      );
-    } else {
-      Fluttertoast.showToast(msg: 'Invalid OTP code');
     }
   }
 
@@ -224,30 +190,41 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
                                     TextFormField(
                                       controller: _phoneNumberController,
                                       keyboardType: TextInputType.phone,
-                                      style: const TextStyle(color: Colors.white),
+                                      textInputAction: TextInputAction.done,
+                                      style:
+                                          const TextStyle(color: Colors.white),
                                       cursorColor: yellowPrimary,
-                                      onChanged: (value){
-                                        if(value.isEmpty){
+                                      onChanged: (value) {
+                                        if (value.isEmpty) {
                                           setState(() {
                                             _errorText = "Enter Phone Number";
                                           });
-                                        }else{
+                                        } else {
                                           setState(() {
                                             _errorText = null;
                                           });
                                         }
                                       },
+                                      focusNode: _phoneNumberFocusNode,
+                                      onTapOutside: (pointerDownEvent) {
+                                        _phoneNumberFocusNode.unfocus();
+                                      },
                                       decoration: InputDecoration(
                                           // errorStyle: const TextStyle(
                                           //     color: Colors.red),
-                                          hintText: '+1 045 0000 0025',
+                                          hintText: '045 0000 0025',
+                                          prefixText: '+1 ',
+                                          prefixStyle: const TextStyle(
+                                              color: Colors.white),
                                           focusColor: yellowPrimary,
                                           focusedBorder: OutlineInputBorder(
-                                              borderSide:
-                                                  BorderSide(color: (_errorText == null)?yellowPrimary: Colors.red)),
+                                              borderSide: BorderSide(
+                                                  color: (_errorText == null)
+                                                      ? yellowPrimary
+                                                      : Colors.red)),
                                           hintStyle: TextStyle(
-                                              color:
-                                                  Colors.white.withOpacity(0.75)),
+                                              color: Colors.white
+                                                  .withOpacity(0.75)),
                                           filled: true,
                                           fillColor: const Color(0xFF201F1F),
                                           border: OutlineInputBorder(
@@ -258,7 +235,7 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
                                       Positioned(
                                         right: 10,
                                         child: Text(
-                                          _errorText??"",
+                                          _errorText ?? "",
                                           style: const TextStyle(
                                             color: Colors.red,
                                             fontSize: 12,
@@ -276,36 +253,41 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
                   ),
                 ),
               ),
-              Flexible(
-                flex: 1,
-                child: ElevatedButton(
-                  onPressed: () => {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(builder: (context) => const HomePage()),
-                    // )
-                    _isLoading ? null : _handleSignIn(context)
-                    // _isLoading ? null : _handleFakeLoginForTest(context)
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //       builder: (context) => OTPVerificationPage(
-                    //         phoneNumber: _phoneNumberController.text.trim(),
-                    //       )),
-                    // )
-                  },
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: yellowPrimary,
-                      padding: const EdgeInsets.all(11.0)),
-                  child: _isLoading
-                      ? const AspectRatio(
-                          aspectRatio: 1, child: CircularProgressIndicator())
-                      : const Text(
+              _isLoading
+                  ? const Center(
+                      child: SizedBox(
+                        height: 50,
+                        child: AspectRatio(
+                            aspectRatio: 1, child: CircularProgressIndicator()),
+                      ),
+                    )
+                  : Flexible(
+                      flex: 1,
+                      child: ElevatedButton(
+                        onPressed: () => {
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(builder: (context) => const HomePage()),
+                          // )
+                          _isLoading ? null : _handleSignIn(context)
+                          // _isLoading ? null : _handleFakeLoginForTest(context)
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //       builder: (context) => OTPVerificationPage(
+                          //         phoneNumber: _phoneNumberController.text.trim(),
+                          //       )),
+                          // )
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: yellowPrimary,
+                            padding: const EdgeInsets.all(11.0)),
+                        child: const Text(
                           'Get Started',
                           style: TextStyle(color: Colors.black, fontSize: 18),
                         ),
-                ),
-              ),
+                      ),
+                    ),
               const SizedBox(
                 height: 36,
               ),
@@ -330,7 +312,7 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
                                     final termOfUseUrl = Uri(
                                         scheme: 'https',
                                         host: 'www.ulimo.co',
-                                        path: '/terms-of-use');
+                                        path: '/privacy-policy');
                                     if (await canLaunchUrl(termOfUseUrl)) {
                                       await launchUrl(termOfUseUrl);
                                     } else {

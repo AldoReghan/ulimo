@@ -1,9 +1,13 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:sms_autofill/sms_autofill.dart';
+
+// import 'package:sms_autofill/sms_autofill.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
 import 'package:ulimo/base/base_color.dart';
 import 'package:ulimo/pages/register_page.dart';
@@ -23,7 +27,7 @@ class OTPVerificationPage extends StatefulWidget {
   _OTPVerificationPageState createState() => _OTPVerificationPageState();
 }
 
-class _OTPVerificationPageState extends State<OTPVerificationPage> {
+class _OTPVerificationPageState extends State<OTPVerificationPage> with CodeAutoFill {
   final _formKey = GlobalKey<FormState>();
   final _otpController = TextEditingController();
   final _phoneAuthService = PhoneAuthService();
@@ -34,6 +38,8 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
   final TextEditingController _digitFiveController = TextEditingController();
   final TextEditingController _digitSixController = TextEditingController();
 
+  final  _pinFieldController = TextEditingController();
+
   final FocusNode _digitOneFocusNode = FocusNode();
   final FocusNode _digitTwoFocusNode = FocusNode();
   final FocusNode _digitThreeFocusNode = FocusNode();
@@ -41,7 +47,33 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
   final FocusNode _digitFiveFocusNode = FocusNode();
   final FocusNode _digitSixFocusNode = FocusNode();
   late String _verificationId;
+  String codeOtpForAutoFill = '';
   Color otpStatusColor = yellowPrimary;
+  bool _isLoading = false;
+
+  String otpCode = '';
+
+
+  @override
+  void codeUpdated() {
+    setState(() {
+      otpCode = code??'';
+    });
+
+    if(code?.length == 6){
+      if (kDebugMode) {
+        print(code);
+      }
+
+      _digitOneController.text = code?[0]??'';
+      _digitTwoController.text = code?[1]??'';
+      _digitThreeController.text = code?[2]??'';
+      _digitFourController.text = code?[3]??'';
+      _digitFiveController.text = code?[4]??'';
+      _digitSixController.text = code?[5]??'';
+
+    }
+  }
 
   @override
   void dispose() {
@@ -58,6 +90,9 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
     _digitFourFocusNode.dispose();
     _digitFiveFocusNode.dispose();
     _digitSixFocusNode.dispose();
+    // SmsAutoFill().unregisterListener();
+    cancel();
+    unregisterListener();
     super.dispose();
   }
 
@@ -100,15 +135,30 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
 
     // _handleSignIn(context);
 
+
+
+    listenForCode();
+
+    getAppsignature();
+
     super.initState();
 
     // _handleSignIn(context);
+  }
+
+  Future<void> getAppsignature() async {
+    final appSignature = await SmsAutoFill().getAppSignature;
+    print("app signatureee $appSignature");
   }
 
   Future<void> _handleOTPVerification(
       BuildContext context, String verificationId, String otpCode) async {
     // final isValid = _formKey.currentState?.validate() ?? false;
     // if (!isValid) return;
+
+    setState(() {
+      _isLoading = true;
+    });
 
     final credential = PhoneAuthProvider.credential(
         verificationId: verificationId, smsCode: otpCode);
@@ -122,39 +172,33 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
       // Sign in successful
       // ignore: use_build_context_synchronously
 
-
       final token = await FirebaseMessaging.instance.getToken();
 
-      final userSnapshot = await FirebaseDatabase.instance.ref()
+      final userSnapshot = await FirebaseDatabase.instance
+          .ref()
           .child('users')
           .orderByChild('uid')
           .equalTo(userCredential.user?.uid)
           .once();
 
       final Map<dynamic, dynamic>? userData =
-      userSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+          userSnapshot.snapshot.value as Map<dynamic, dynamic>?;
 
-      if(userData == null){
+      if (userData == null) {
         final databaseRef = FirebaseDatabase.instance.ref('users').push();
-        await databaseRef.set({
-          'uid' : userCredential.user?.uid,
-          'messageToken': token
-        });
-      }else{
-
+        await databaseRef
+            .set({'uid': userCredential.user?.uid, 'messageToken': token});
+      } else {
         userData.forEach((key, value) async {
-          if(value["messageToken"] != token){
-            await FirebaseDatabase.instance.ref()
+          if (value["messageToken"] != token) {
+            await FirebaseDatabase.instance
+                .ref()
                 .child('users')
-                .child(userCredential.user?.uid??"")
+                .child(key)
                 .update({"messageToken": token});
           }
         });
       }
-
-
-
-
 
       if (userCredential.user?.displayName == null) {
         Navigator.pushReplacement(
@@ -165,7 +209,8 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
                   )),
         );
       } else {
-        Navigator.pushReplacement(
+        Navigator.of(context).popUntil((route) => false);
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const MainPage()),
         );
@@ -176,6 +221,10 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
         otpStatusColor = Colors.red;
       });
     }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> _handleSignIn(BuildContext context) async {
@@ -320,11 +369,25 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    otpNumberField(context, _digitOneController, otpStatusColor,
-                        _digitOneFocusNode, () {
-                      //do somethiing
-                      FocusScope.of(context).requestFocus(_digitTwoFocusNode);
-                    }),
+                    otpNumberField(
+                        context,
+                        _digitOneController,
+                        otpStatusColor,
+                        _digitOneFocusNode,
+                        () {
+                          //do somethiing
+                          FocusScope.of(context)
+                              .requestFocus(_digitTwoFocusNode);
+                        },
+                        isFirst: true,
+                        onPasteCode: (code) {
+                          _digitOneController.text = code[0];
+                          _digitTwoController.text = code[1];
+                          _digitThreeController.text = code[2];
+                          _digitFourController.text = code[3];
+                          _digitFiveController.text = code[4];
+                          _digitSixController.text = code[5];
+                        }),
                     const SizedBox(width: 7),
                     otpNumberField(context, _digitTwoController, otpStatusColor,
                         _digitTwoFocusNode, () {
@@ -437,82 +500,52 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
                   ),
                 ),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => const MainPage()),
-                  // );
-                  _submitOtp();
-                },
-                style: ElevatedButton.styleFrom(backgroundColor: yellowPrimary),
-                child: Container(
-                  // buttonB4c (0:161)
-                  width: double.infinity,
-                  height: 50 * fem,
-                  decoration: BoxDecoration(
-                    color: const Color(0xfffdcb5b),
-                    borderRadius: BorderRadius.circular(5 * fem),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Continue',
-                      style: SafeGoogleFont(
-                        'Saira',
-                        fontSize: 20 * ffem,
-                        fontWeight: FontWeight.w500,
-                        height: 1.575 * ffem / fem,
-                        color: const Color(0xff000000),
+              _isLoading
+                  ? const Center(
+                      child: SizedBox(
+                        height: 50,
+                        child: AspectRatio(
+                            aspectRatio: 1, child: CircularProgressIndicator()),
+                      ),
+                    )
+                  : ElevatedButton(
+                      onPressed: () {
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(builder: (context) => const MainPage()),
+                        // );
+                        _isLoading ? null : _submitOtp();
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: yellowPrimary),
+                      child: Container(
+                        // buttonB4c (0:161)
+                        width: double.infinity,
+                        height: 50 * fem,
+                        decoration: BoxDecoration(
+                          color: const Color(0xfffdcb5b),
+                          borderRadius: BorderRadius.circular(5 * fem),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Continue',
+                            style: SafeGoogleFont(
+                              'Saira',
+                              fontSize: 20 * ffem,
+                              fontWeight: FontWeight.w500,
+                              height: 1.575 * ffem / fem,
+                              color: const Color(0xff000000),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              ),
             ],
           ),
         ),
       ),
     ));
-
-    // return Scaffold(
-    //   appBar: AppBar(
-    //     title: const Text('OTP Verification'),
-    //   ),
-    //   body: Padding(
-    //     padding: const EdgeInsets.all(16.0),
-    //     child: Form(
-    //       key: _formKey,
-    //       child: Column(
-    //         mainAxisAlignment: MainAxisAlignment.center,
-    //         children: [
-    //           const Text(
-    //             'Please enter the OTP code sent to your phone number',
-    //             textAlign: TextAlign.center,
-    //           ),
-    //           const SizedBox(height: 32.0),
-    //           TextFormField(
-    //             controller: _otpController,
-    //             keyboardType: TextInputType.number,
-    //             decoration: const InputDecoration(
-    //               hintText: 'Enter OTP code',
-    //               border: OutlineInputBorder(),
-    //             ),
-    //             validator: (value) {
-    //               if (value == null || value.isEmpty) {
-    //                 return 'Please enter OTP code';
-    //               }
-    //               return null;
-    //             },
-    //           ),
-    //           const SizedBox(height: 32.0),
-    //           ElevatedButton(
-    //             onPressed: () => _handleSignIn(context),
-    //             child: const Text('Verify OTP'),
-    //           ),
-    //         ],
-    //       ),
-    //     ),
-    //   ),
-    // );
   }
+
+
 }

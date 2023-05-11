@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -76,8 +77,10 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
       'date': DateFormat('yyyy-MM-dd').format(_pickupDate),
       'return_date':
           _isRoundTrip ? DateFormat('yyyy-MM-dd').format(_returnDate) : '',
-      'pickup_time': _pickupTime.format(context),
-      'return_time': _isRoundTrip ? _returnTime.format(context) : '',
+      'pickup_time':
+          '${_pickupTime.hour.toString().padLeft(2, '0')}:${_pickupTime.minute.toString().padLeft(2, '0')}',
+      'return_time':
+          '${_returnTime.hour.toString().padLeft(2, '0')}:${_returnTime.minute.toString().padLeft(2, '0')}',
       'pickup_address': _pickupAddressController.text,
       'destination': _destinationController.text,
       'phone_number': authData.currentUser?.phoneNumber,
@@ -142,7 +145,8 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                     height: 200.0,
                     width: MediaQuery.of(context).size.width * 0.8,
                     child: CupertinoDatePicker(
-                      initialDateTime: _pickupDate,
+                      minimumDate: DateTime.now(),
+                      initialDateTime: DateTime.now(),
                       mode: CupertinoDatePickerMode.date,
                       onDateTimeChanged: (value) {
                         setState(() {
@@ -217,7 +221,8 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                     height: 200.0,
                     width: MediaQuery.of(context).size.width * 0.8,
                     child: CupertinoDatePicker(
-                      initialDateTime: _returnDate,
+                      minimumDate: DateTime.now(),
+                      initialDateTime: DateTime.now(),
                       mode: CupertinoDatePickerMode.date,
                       onDateTimeChanged: (value) {
                         setState(() {
@@ -290,7 +295,12 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                     height: 200.0,
                     width: MediaQuery.of(context).size.width * 0.8,
                     child: CupertinoDatePicker(
-                      initialDateTime: _pickupDate,
+                      minimumDate: (_pickupDate.day == DateTime.now().day &&
+                              _pickupDate.month == DateTime.now().month &&
+                              _pickupDate.year == DateTime.now().year)
+                          ? DateTime.now()
+                          : null,
+                      initialDateTime: DateTime.now(),
                       mode: CupertinoDatePickerMode.time,
                       onDateTimeChanged: (value) {
                         setState(() {
@@ -342,7 +352,12 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                     height: 200.0,
                     width: MediaQuery.of(context).size.width * 0.8,
                     child: CupertinoDatePicker(
-                      initialDateTime: _returnDate,
+                      minimumDate: (_returnDate.day == DateTime.now().day &&
+                              _returnDate.month == DateTime.now().month &&
+                              _returnDate.year == DateTime.now().year)
+                          ? DateTime.now()
+                          : null,
+                      initialDateTime: DateTime.now(),
                       mode: CupertinoDatePickerMode.time,
                       onDateTimeChanged: (value) {
                         setState(() {
@@ -643,40 +658,49 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                                 strokeWidth: 1,
                                 child: SizedBox(
                                   height: double.infinity,
-                                  child: SizedBox(
-                                    // group7535hLk (0:1167)
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 15),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () => _selectDate(context),
-                                            child: Text(
-                                              DateFormat('dd MMM yyyy')
-                                                  .format(_pickupDate),
-                                              style: SafeGoogleFont(
-                                                'Saira',
-                                                fontSize: 14 * ffem,
-                                                fontWeight: FontWeight.w500,
-                                                height:
-                                                    1.4285714286 * ffem / fem,
-                                                color: const Color(0xfffdcb5b),
+                                  child: GestureDetector(
+                                    onTap: () => _selectDate(context),
+                                    child: Container(
+                                      // group7535hLk (0:1167)
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      decoration: BoxDecoration(
+                                          color: Colors.transparent),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 15),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            GestureDetector(
+                                              onTap: () => _selectDate(context),
+                                              child: Text(
+                                                DateFormat('dd MMM yyyy')
+                                                    .format(_pickupDate),
+                                                style: SafeGoogleFont(
+                                                  'Saira',
+                                                  fontSize: 14 * ffem,
+                                                  fontWeight: FontWeight.w500,
+                                                  height:
+                                                      1.4285714286 * ffem / fem,
+                                                  color:
+                                                      const Color(0xfffdcb5b),
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          Icon(
-                                            Icons.keyboard_arrow_down,
-                                            size: 20 * fem,
-                                            color: Colors.white,
-                                          ),
-                                        ],
+                                            GestureDetector(
+                                              onTap: () => _selectDate(context),
+                                              child: Icon(
+                                                Icons.keyboard_arrow_down,
+                                                size: 20 * fem,
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -693,45 +717,55 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                                 color: const Color(0xFFFDCB5B),
                                 strokeWidth: 1,
                                 child: SizedBox(
-                                  height: double.infinity,
-                                  child: SizedBox(
-                                    // group7537o2Q (0:1175)
-                                    width: double.infinity,
                                     height: double.infinity,
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 15),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () =>
-                                                _selectPickupTime(context),
-                                            child: Text(
-                                              _pickupTime.format(context),
-                                              style: SafeGoogleFont(
-                                                'Saira',
-                                                fontSize: 14 * ffem,
-                                                fontWeight: FontWeight.w500,
-                                                height:
-                                                    1.4285714286 * ffem / fem,
-                                                color: const Color(0xfffdcb5b),
+                                    child: GestureDetector(
+                                      onTap: () => _selectPickupTime(context),
+                                      child: Container(
+                                        // group7537o2Q (0:1175)
+                                        width: double.infinity,
+                                        height: double.infinity,
+                                        decoration: BoxDecoration(
+                                            color: Colors.transparent),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 15),
+                                          child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              GestureDetector(
+                                                onTap: () =>
+                                                    _selectPickupTime(context),
+                                                child: Text(
+                                                  _pickupTime.format(context),
+                                                  style: SafeGoogleFont(
+                                                    'Saira',
+                                                    fontSize: 14 * ffem,
+                                                    fontWeight: FontWeight.w500,
+                                                    height: 1.4285714286 *
+                                                        ffem /
+                                                        fem,
+                                                    color:
+                                                        const Color(0xfffdcb5b),
+                                                  ),
+                                                ),
                                               ),
-                                            ),
+                                              GestureDetector(
+                                                onTap: () =>
+                                                    _selectPickupTime(context),
+                                                child: Icon(
+                                                  Icons.keyboard_arrow_down,
+                                                  size: 20 * fem,
+                                                  color: Colors.white,
+                                                ),
+                                              )
+                                            ],
                                           ),
-                                          Icon(
-                                            Icons.keyboard_arrow_down,
-                                            size: 20 * fem,
-                                            color: Colors.white,
-                                          ),
-                                        ],
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                ),
+                                    )),
                               ),
                             ),
                           ],
@@ -777,6 +811,10 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                         child: TextFormField(
                           cursorColor: yellowPrimary,
                           keyboardType: TextInputType.number,
+                          onTapOutside: (pointerDown){
+                            FocusScope.of(context).unfocus();
+                          },
+                          textInputAction: TextInputAction.done,
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             focusedBorder: InputBorder.none,
@@ -901,47 +939,55 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                                   color: const Color(0xFFFDCB5B),
                                   strokeWidth: 1,
                                   child: SizedBox(
-                                    height: double.infinity,
-                                    child: SizedBox(
-                                      // group7535hLk (0:1167)
-                                      width: double.infinity,
                                       height: double.infinity,
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 15),
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            GestureDetector(
-                                              onTap: () =>
-                                                  _selectReturnDate(context),
-                                              child: Text(
-                                                DateFormat('dd MMM yyyy')
-                                                    .format(_returnDate),
-                                                style: SafeGoogleFont(
-                                                  'Saira',
-                                                  fontSize: 14 * ffem,
-                                                  fontWeight: FontWeight.w500,
-                                                  height:
-                                                      1.4285714286 * ffem / fem,
-                                                  color:
-                                                      const Color(0xfffdcb5b),
+                                      child: GestureDetector(
+                                        onTap: () => _selectReturnDate(context),
+                                        child: Container(
+                                          // group7535hLk (0:1167)
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                          decoration: BoxDecoration(
+                                              color: Colors.transparent),
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 15),
+                                            child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: () =>
+                                                      _selectReturnDate(
+                                                          context),
+                                                  child: Text(
+                                                    DateFormat('dd MMM yyyy')
+                                                        .format(_returnDate),
+                                                    style: SafeGoogleFont(
+                                                      'Saira',
+                                                      fontSize: 14 * ffem,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      height: 1.4285714286 *
+                                                          ffem /
+                                                          fem,
+                                                      color: const Color(
+                                                          0xfffdcb5b),
+                                                    ),
+                                                  ),
                                                 ),
-                                              ),
+                                                Icon(
+                                                  Icons.keyboard_arrow_down,
+                                                  size: 20 * fem,
+                                                  color: Colors.white,
+                                                ),
+                                              ],
                                             ),
-                                            Icon(
-                                              Icons.keyboard_arrow_down,
-                                              size: 20 * fem,
-                                              color: Colors.white,
-                                            ),
-                                          ],
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                                  ),
+                                      )),
                                 ),
                               ),
                               const SizedBox(
@@ -954,46 +1000,54 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                                   color: const Color(0xFFFDCB5B),
                                   strokeWidth: 1,
                                   child: SizedBox(
-                                    height: double.infinity,
-                                    child: SizedBox(
-                                      // group7537o2Q (0:1175)
-                                      width: double.infinity,
                                       height: double.infinity,
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 15),
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            GestureDetector(
-                                              onTap: () =>
-                                                  _selectReturnTime(context),
-                                              child: Text(
-                                                _returnTime.format(context),
-                                                style: SafeGoogleFont(
-                                                  'Saira',
-                                                  fontSize: 14 * ffem,
-                                                  fontWeight: FontWeight.w500,
-                                                  height:
-                                                      1.4285714286 * ffem / fem,
-                                                  color:
-                                                      const Color(0xfffdcb5b),
+                                      child: GestureDetector(
+                                        onTap: () => _selectReturnTime(context),
+                                        child: Container(
+                                          // group7537o2Q (0:1175)
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                          decoration: BoxDecoration(
+                                              color: Colors.transparent),
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 15),
+                                            child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: () =>
+                                                      _selectReturnTime(
+                                                          context),
+                                                  child: Text(
+                                                    _returnTime.format(context),
+                                                    style: SafeGoogleFont(
+                                                      'Saira',
+                                                      fontSize: 14 * ffem,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      height: 1.4285714286 *
+                                                          ffem /
+                                                          fem,
+                                                      color: const Color(
+                                                          0xfffdcb5b),
+                                                    ),
+                                                  ),
                                                 ),
-                                              ),
+                                                Icon(
+                                                  Icons.keyboard_arrow_down,
+                                                  size: 20 * fem,
+                                                  color: Colors.white,
+                                                ),
+                                              ],
                                             ),
-                                            Icon(
-                                              Icons.keyboard_arrow_down,
-                                              size: 20 * fem,
-                                              color: Colors.white,
-                                            ),
-                                          ],
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                                  ),
+                                      )),
                                 ),
                               ),
                             ],

@@ -60,12 +60,12 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBgaK5q0Mvwt8P3_u_v_QuYbc0j6VGvusQ',
-    appId: '1:486657291251:ios:cd67c68ba9a889240c9886',
+    appId: '1:486657291251:ios:6d54a876d226b1d40c9886',
     messagingSenderId: '486657291251',
     projectId: 'ulimo-30934',
     databaseURL: 'https://ulimo-30934-default-rtdb.firebaseio.com',
     storageBucket: 'ulimo-30934.appspot.com',
-    iosClientId: '486657291251-ti5f7sisqe6087b3d2drniurjtrbn3qv.apps.googleusercontent.com',
-    iosBundleId: 'com.example.ulimo',
+    iosClientId: '486657291251-22o50pb7q5l3pg4aop5i0slmuiu6n32v.apps.googleusercontent.com',
+    iosBundleId: 'com.ulimo.inc',
   );
 }

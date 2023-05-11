@@ -9,10 +9,12 @@ class CustomBottomNavigationBar extends StatefulWidget {
   final List<String> selectedIcons;
   final Function(int) onTap;
 
-  const CustomBottomNavigationBar({super.key, required this.icons,
-    required this.onTap,
-    required this.labels,
-    required this.selectedIcons});
+  const CustomBottomNavigationBar(
+      {super.key,
+      required this.icons,
+      required this.onTap,
+      required this.labels,
+      required this.selectedIcons});
 
   @override
   _CustomBottomNavigationBarState createState() =>
@@ -22,16 +24,11 @@ class CustomBottomNavigationBar extends StatefulWidget {
 class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
   int _selectedIndex = 0;
 
-
-
-
   Widget changeIconSelected(int index, String icons, String selectedIcon) {
     if (_selectedIndex == index) {
-      return SvgPicture.asset(
-          selectedIcon);
+      return SvgPicture.asset(selectedIcon);
     } else {
-      return SvgPicture.asset(
-          icons);
+      return SvgPicture.asset(icons);
     }
   }
 
@@ -43,6 +40,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
         height: double.infinity,
         decoration: const BoxDecoration(color: darkPrimary),
         child: Row(
+          mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: List.generate(widget.icons.length, (index) {
             return GestureDetector(
@@ -52,31 +50,37 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                 });
                 widget.onTap.call(index);
               },
-              child: Stack(
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+              child: Container(
+                color: Colors.transparent,
+                width: MediaQuery.of(context).size.width / 3.1,
+                child: Center(
+                  child: Stack(
                     children: [
-                      changeIconSelected(index, widget.icons[index],
-                          widget.selectedIcons[index]),
-                      Text(
-                        widget.labels[index],
-                        style: SafeGoogleFont(
-                          'Saira',
-                          fontSize: 12,
-                          color: _selectedIndex == index
-                              ? yellowPrimary
-                              : Colors.grey,
-                        ),
-                      )
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          changeIconSelected(index, widget.icons[index],
+                              widget.selectedIcons[index]),
+                          Text(
+                            widget.labels[index],
+                            style: SafeGoogleFont(
+                              'Saira',
+                              fontSize: 12,
+                              color: _selectedIndex == index
+                                  ? yellowPrimary
+                                  : Colors.grey,
+                            ),
+                          )
+                        ],
+                      ),
+                      if (_selectedIndex == index)
+                        Positioned(
+                            top: 0,
+                            child: SvgPicture.asset(
+                                'assets/icon/bottom_navigation_indicator.svg')),
                     ],
                   ),
-                  if (_selectedIndex == index)
-                    Positioned(
-                        top: 0,
-                        child: SvgPicture.asset(
-                            'assets/icon/bottom_navigation_indicator.svg')),
-                ],
+                ),
               ),
             );
           }),

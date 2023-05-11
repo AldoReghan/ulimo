@@ -5,8 +5,16 @@ import 'package:ulimo/base/base_color.dart';
 
 import '../base/utils.dart';
 
-Widget otpNumberField(BuildContext context, TextEditingController controller, Color statusColor ,
-    FocusNode focusNode, Function() onChanged) {
+Widget otpNumberField(BuildContext context, TextEditingController controller,
+    Color statusColor, FocusNode focusNode, Function() onChanged,
+    {String code = '',
+    isFirst = false,
+    Function(String) onPasteCode = onPasteCodeDefault}) {
+  focusNode.addListener(() {
+    if (focusNode.hasFocus) {
+      // TextField has focus
+    }
+  });
 
   return Flexible(
     child: DottedBorder(
@@ -19,21 +27,40 @@ Widget otpNumberField(BuildContext context, TextEditingController controller, Co
           textAlign: TextAlign.center,
           controller: controller,
           keyboardType: TextInputType.number,
-          maxLength: 1,
-          focusNode: focusNode,
-          onTap: (){
-            controller.text = '';
+          onTapOutside: (pointerDown) {
+            focusNode.unfocus();
           },
+          onTap: () {
+            controller.selection = TextSelection.fromPosition(
+              TextPosition(offset: controller.text.length),
+            );
+          },
+          focusNode: focusNode,
           onChanged: (String value) {
-            if(value.isNotEmpty){
+            if (value.isNotEmpty) {
               if (value.length == 1) {
                 onChanged.call();
-              }else if(value.length >1){
-                controller.text.substring(0, controller.text.length - 1);
+              } else if (value.length > 1) {
+                if (value.length == 6) {
+                  //paste detected
+                  controller.text = value[0];
+                  onPasteCode.call(value);
+                  focusNode.unfocus();
+                } else {
+                  controller.value = TextEditingValue(
+                    text: value.substring(value.length - 1),
+                    selection: TextSelection.fromPosition(
+                      const TextPosition(offset: 1),
+                    ),
+                  );
+                  onChanged.call();
+                }
               }
+            } else {
+              focusNode.previousFocus();
             }
           },
-          showCursor: false,
+          // showCursor: false,
           style: SafeGoogleFont(
             'Gilroy',
             fontSize: 26,
@@ -41,17 +68,16 @@ Widget otpNumberField(BuildContext context, TextEditingController controller, Co
             color: const Color(0xffffffff),
           ),
           decoration: InputDecoration(
-            hintText: '0',
-            counterText: '',
-            hintStyle: SafeGoogleFont('Gilroy',
-                fontSize: 26,
-                fontWeight: FontWeight.w800,
-                color: const Color(0xffffffff).withOpacity(0.5)),
+              hintText: '0',
+              counterText: '',
+              hintStyle: SafeGoogleFont('Gilroy',
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xffffffff).withOpacity(0.5)),
               filled: true,
               fillColor: Colors.transparent,
               focusColor: Colors.transparent,
-              focusedBorder: InputBorder.none
-          ),
+              focusedBorder: InputBorder.none),
         ),
         // child: Text(
         //   '2',
@@ -66,3 +92,5 @@ Widget otpNumberField(BuildContext context, TextEditingController controller, Co
     ),
   );
 }
+
+void onPasteCodeDefault(String code) {}

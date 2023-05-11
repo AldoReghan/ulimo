@@ -89,7 +89,9 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
                         // text2LUQ (1:1209)
                         margin: EdgeInsets.fromLTRB(
                             0 * fem, 24 * fem, 0 * fem, 3.08 * fem),
+                        width: double.infinity,
                         child: RichText(
+                          textAlign: TextAlign.start,
                           text: TextSpan(
                             style: SafeGoogleFont(
                               'Saira',
@@ -100,7 +102,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
                             ),
                             children: [
                               TextSpan(
-                                text: 'Your Private Ride Ticket has been ',
+                                text: 'Your Ticket has been ',
                                 style: SafeGoogleFont(
                                   'Saira',
                                   fontSize: 16 * ffem,

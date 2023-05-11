@@ -42,7 +42,8 @@ class _RegisterPageState extends State<RegisterPage> {
     setState(() {
       _isLoading = false;
     });
-    Navigator.pushReplacement(
+    Navigator.of(context).popUntil((route) => false);
+    Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const MainPage()),
     );

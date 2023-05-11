@@ -191,7 +191,8 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                     height: 200.0,
                     width: MediaQuery.of(context).size.width * 0.8,
                     child: CupertinoDatePicker(
-                      initialDateTime: _date,
+                      minimumDate: DateTime.now(),
+                      initialDateTime: DateTime.now(),
                       mode: CupertinoDatePickerMode.date,
                       onDateTimeChanged: (value) {
                         setState(() {
@@ -202,6 +203,7 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                   ),
                   TextButton(
                       onPressed: () {
+                        updateAvailableSeat();
                         Navigator.pop(context);
                       },
                       child: const Text(
@@ -312,7 +314,7 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                               width: 24 * fem,
                               height: 24 * fem,
                               child: GestureDetector(
-                                onTap: (){
+                                onTap: () {
                                   Navigator.pop(context);
                                 },
                                 child: Icon(
@@ -666,39 +668,47 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                               strokeWidth: 1,
                               child: SizedBox(
                                 height: double.infinity,
-                                child: SizedBox(
-                                  // group7535hLk (0:1167)
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 15),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () => _selectDate(context),
-                                          child: Text(
-                                            DateFormat('dd MMM yyyy')
-                                                .format(_date),
-                                            style: SafeGoogleFont(
-                                              'Saira',
-                                              fontSize: 14 * ffem,
-                                              fontWeight: FontWeight.w500,
-                                              height: 1.4285714286 * ffem / fem,
-                                              color: const Color(0xfffdcb5b),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    _selectDate(context);
+                                  },
+                                  child: Container(
+                                    // group7535hLk (0:1167)
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    decoration: const BoxDecoration(
+                                        color: Colors.transparent),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () => _selectDate(context),
+                                            child: Text(
+                                              DateFormat('dd MMM yyyy')
+                                                  .format(_date),
+                                              style: SafeGoogleFont(
+                                                'Saira',
+                                                fontSize: 14 * ffem,
+                                                fontWeight: FontWeight.w500,
+                                                height:
+                                                    1.4285714286 * ffem / fem,
+                                                color: const Color(0xfffdcb5b),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        Icon(
-                                          Icons.keyboard_arrow_down,
-                                          size: 20 * fem,
-                                          color: Colors.white,
-                                        ),
-                                      ],
+                                          Icon(
+                                            Icons.keyboard_arrow_down,
+                                            size: 20 * fem,
+                                            color: Colors.white,
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -1109,32 +1119,36 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                           TextButton(
                             // button8hv (0:1291)
                             onPressed: () {
-                              if ((_isRideTicket || _isEntryTicket) &&
-                                  !(_availableEntry == 0 &&
-                                      _availableRide == 0)) {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        // CartPage(user_id: "user_id")));
-                                        CheckOutPage(
-                                          price: countTotalPrice(
-                                              _rideSubTotalPrice,
-                                              _entrySubTotalPrice),
-                                          date: DateFormat("dd-MM-yyyy")
-                                              .format(_date),
-                                          time: '',
-                                          rideType: 'nightlife',
-                                          orderId:
-                                              widget.nightlifeDestinationId,
-                                          destinationName:
-                                              _destinationData['name'],
-                                          destinationAddress:
-                                              _destinationData['address'],
-                                          rideQuantity:
-                                              _isRideTicket ? _selectedRide : 0,
-                                          entryQuantity: _isEntryTicket
-                                              ? _selectedEntry
-                                              : 0,
-                                        )));
+                              if (!((_isRideTicket && _availableRide == 0) ||
+                                  (_isEntryTicket && _availableEntry == 0))) {
+                                if ((_isRideTicket || _isEntryTicket) &&
+                                    !(_availableEntry == 0 &&
+                                        _availableRide == 0)) {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          // CartPage(user_id: "user_id")));
+                                          CheckOutPage(
+                                            price: countTotalPrice(
+                                                _rideSubTotalPrice,
+                                                _entrySubTotalPrice),
+                                            date: DateFormat("dd-MM-yyyy")
+                                                .format(_date),
+                                            time: '',
+                                            rideType: 'nightlife',
+                                            orderId:
+                                                widget.nightlifeDestinationId,
+                                            destinationName:
+                                                _destinationData['name'],
+                                            destinationAddress:
+                                                _destinationData['address'],
+                                            rideQuantity: _isRideTicket
+                                                ? _selectedRide
+                                                : 0,
+                                            entryQuantity: _isEntryTicket
+                                                ? _selectedEntry
+                                                : 0,
+                                          )));
+                                }
                               }
                             },
                             style: TextButton.styleFrom(
@@ -1147,9 +1161,14 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                 color: (_availableEntry == 0 &&
                                         _availableRide == 0)
                                     ? const Color(0xFFFB1B1B)
-                                    : (_isRideTicket || _isEntryTicket)
-                                        ? const Color(0xfffdcb5b)
-                                        : Colors.grey,
+                                    // : (_isRideTicket || _isEntryTicket)
+                                    : ((_isRideTicket && _availableRide == 0) ||
+                                            (_isEntryTicket &&
+                                                _availableEntry == 0))
+                                        ? Colors.grey
+                                        : (_isRideTicket || _isEntryTicket)
+                                            ? const Color(0xfffdcb5b)
+                                            : Colors.grey,
                                 borderRadius: BorderRadius.circular(5 * fem),
                               ),
                               child: Center(
