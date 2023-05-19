@@ -106,8 +106,7 @@ Widget ticketActiveItem(
                   children: [
                     Text(
                       // pmQwS (1:1394)
-                      time == ''? '' : DateFormat("h:mm a")
-                          .format(DateFormat("H:mm").parse(time)),
+                      time == ''? '' : time,
                       style: SafeGoogleFont(
                         'Saira',
                         fontSize: 12 * ffem,
@@ -118,8 +117,8 @@ Widget ticketActiveItem(
                     ),
                     Text(
                       // feb2023kkQ (1:1393)
-                      DateFormat("dd MMM yyyy")
-                          .format(DateFormat("dd-MM-yyyy").parse(date)),
+                      DateFormat("MMM dd yyyy")
+                          .format(DateFormat("MM/dd/yyyy").parse(date)),
                       style: SafeGoogleFont(
                         'Saira',
                         fontSize: 12 * ffem,

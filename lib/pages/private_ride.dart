@@ -11,6 +11,8 @@ import 'package:flutter/scheduler.dart';
 
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
 import 'package:ulimo/base/base_color.dart';
 import 'package:connectivity/connectivity.dart';
@@ -71,16 +73,22 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
     });
 
     // Send data to Firebase
+
+    final time24Format = DateFormat('H:mm');
+    final amPmTimeFormat = DateFormat('h:mm a');
+
     final rideDetails = {
       'name': authData.currentUser?.displayName,
       'user_id': authData.currentUser?.uid,
-      'date': DateFormat('yyyy-MM-dd').format(_pickupDate),
+      'date': DateFormat('MM/dd/yyyy').format(_pickupDate),
       'return_date':
-          _isRoundTrip ? DateFormat('yyyy-MM-dd').format(_returnDate) : '',
-      'pickup_time':
-          '${_pickupTime.hour.toString().padLeft(2, '0')}:${_pickupTime.minute.toString().padLeft(2, '0')}',
-      'return_time':
-          '${_returnTime.hour.toString().padLeft(2, '0')}:${_returnTime.minute.toString().padLeft(2, '0')}',
+          _isRoundTrip ? DateFormat('MM/dd/yyyy').format(_returnDate) : '',
+      'pickup_time': amPmTimeFormat.format(time24Format.parse(
+          '${_pickupTime.hour.toString().padLeft(2, '0')}:${_pickupTime.minute.toString().padLeft(2, '0')}')),
+      'return_time': _isRoundTrip
+          ? amPmTimeFormat.format(time24Format.parse(
+              '${_returnTime.hour.toString().padLeft(2, '0')}:${_returnTime.minute.toString().padLeft(2, '0')}'))
+          : '',
       'pickup_address': _pickupAddressController.text,
       'destination': _destinationController.text,
       'phone_number': authData.currentUser?.phoneNumber,
@@ -89,37 +97,66 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
       'extra_info': _extraInfoController.text,
       'is_round_trip': _isRoundTrip,
       'price': '',
-      'status': 'pending'
+      'status': 'pending',
+      'created_at':
+          DateFormat("MM/dd/yyyy H:mm:ss a").format(DateTime.now().toUtc())
     };
 
     try {
-      // await makePayment();
-
       final databaseRef = FirebaseDatabase.instance.ref('privateRide').push();
       await databaseRef.set(rideDetails);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Private ride details submitted successfully'),
-          backgroundColor: Colors.green,
-        ),
-      );
-      Navigator.of(context).pop();
+      String username = 'info@ulimotech.com';
+      String password = '!Summer2024';
+
+      final smtpServer = SmtpServer('mail.ulimotech.com',
+          username: username, password: password, port: 465, ssl: true);
+
+      // Create our message.
+      final message = Message()
+        ..from = Address(username, 'Email from ulimotech.com')
+        ..recipients.add('john@ulimo.co')
+        ..subject = 'Private Ride Order Confirmation'
+        ..html = "<h2>Private Ride Order Confirmation</h2>"
+            "<p>a user has placed an order for a Private Ride. We would like to provide you with the details of the order for your reference:</p>"
+            "<li><strong>Name: </strong>${authData.currentUser?.displayName}</li>"
+            "<li><strong>Pickup Address: </strong>${_pickupAddressController.text}</li>"
+            "<li><strong>Pickup Time: </strong>${DateFormat('MMM dd yyyy').format(_pickupDate)}, ${amPmTimeFormat.format(time24Format.parse('${_pickupTime.hour.toString().padLeft(2, '0')}:${_pickupTime.minute.toString().padLeft(2, '0')}'))} </li>"
+            "<li><strong>Destination: </strong>${_destinationController.text}</li>"
+            "<li><strong>Return Time: </strong>${_isRoundTrip ? '${DateFormat('MMM dd yyyy').format(_returnDate)}, ${amPmTimeFormat.format(time24Format.parse('${_returnTime.hour.toString().padLeft(2, '0')}:${_returnTime.minute.toString().padLeft(2, '0')}'))}' : 'Not a round trip'}</li>"
+            "<li><strong>Passenger: </strong>${_passengersController.text.trim()}</li>"
+            "<li><strong>Extra Info: </strong>${_extraInfoController.text}</li>"
+            "</body>";
+
+      try {
+        final sendReport = await send(message, smtpServer);
+        if (kDebugMode) {
+          print('Message sent: $sendReport');
+        }
+      } on MailerException catch (e) {
+        if (kDebugMode) {
+          print('Message not sent.');
+        }
+        for (var p in e.problems) {
+          if (kDebugMode) {
+            print('Problem: ${p.code}: ${p.msg}');
+          }
+        }
+      }
 
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        _formKey.currentState!.reset();
-        // Navigator.pushReplacement(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) =>
-        //         CheckOutPage(privateRideId: databaseRef.key ?? ""),
-        //   ),
-        // );
-        // Fluttertoast.showToast(msg: 'Invalid OTP code');
-        // Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Private ride details submitted successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.of(context).pop();
       });
     } catch (e) {
-      print('makePayment() was canceled');
+      if (kDebugMode) {
+        print("error $e");
+      }
     }
 
     setState(() {
@@ -811,7 +848,7 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                         child: TextFormField(
                           cursorColor: yellowPrimary,
                           keyboardType: TextInputType.number,
-                          onTapOutside: (pointerDown){
+                          onTapOutside: (pointerDown) {
                             FocusScope.of(context).unfocus();
                           },
                           textInputAction: TextInputAction.done,
@@ -946,7 +983,7 @@ class _PrivateRidePageState extends State<PrivateRidePage> {
                                           // group7535hLk (0:1167)
                                           width: double.infinity,
                                           height: double.infinity,
-                                          decoration: BoxDecoration(
+                                          decoration: const BoxDecoration(
                                               color: Colors.transparent),
                                           child: Padding(
                                             padding: const EdgeInsets.symmetric(

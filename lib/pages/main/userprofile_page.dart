@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:connectivity/connectivity.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
 import 'package:ulimo/pages/profile/notification_page.dart';
 
@@ -199,8 +203,156 @@ class _UserProfilePageState extends State<UserProfilePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    checkUserIsLogin();
     _ticketListData = [];
     _fetchData();
+  }
+
+  Future<void> deleteAccount(
+      ) async{
+
+    if(Platform.isIOS){
+      showCupertinoDialog(
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+          title: const Text("Delete Account"),
+          content: const Text("Are you sure you want to delete this account?"),
+          actions: <Widget>[
+
+            CupertinoDialogAction(
+              isDestructiveAction: true,
+              child: const Text("Yes"),
+              onPressed: () async {
+                try{
+                  await authData.currentUser?.delete();
+                  Navigator.of(context).pop(true);
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                        builder: (_) => const PhoneLoginPage()),
+                  );
+                }catch(e){
+                  Navigator.of(context).pop(true);
+                  showCupertinoDialog(
+                    context: context,
+                    builder: (context) => CupertinoAlertDialog(
+                      title: const Text("Delete Account Failed", style: TextStyle(color: Colors.red),),
+                      content: const Text("Login again and try to delete your account again"),
+                      actions: <Widget>[
+
+                        CupertinoDialogAction(
+                          isDestructiveAction: true,
+                          child: const Text("Ok"),
+                          onPressed: () async {
+                            try{
+                              await authData.signOut();
+                              Navigator.of(context).pop(true);
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                    builder: (_) => const PhoneLoginPage()),
+                              );
+                            }catch(e){
+
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              },
+            ),
+
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              child: const Text("No"),
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
+
+          ],
+        ),
+      );
+    }else{
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Delete Account"),
+            content: const Text("Are you sure you want to delete this account?"),
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  try{
+                    await authData.currentUser?.delete();
+                    Navigator.of(context).pop(true);
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                          builder: (_) => const PhoneLoginPage()),
+                    );
+                  }catch(e){
+                    Navigator.of(context).pop(true);
+                    showDialog(context: context, builder: (BuildContext context){
+                      return AlertDialog(
+                        title: const Text("Delete Account Failed", style: TextStyle(color: Colors.red),),
+                        content: const Text("Login again and try to delete your account again"),
+                        actions: [
+                          TextButton(
+                            onPressed: () async {
+                              await authData.signOut();
+                              Navigator.of(context).pop(true);
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                    builder: (_) => const PhoneLoginPage()),
+                              );
+                            },
+                            child: const Text("Ok"),
+                          ),
+                        ],
+                      );
+                    });
+                  }
+                },
+                child: const Text("Yes"),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("Cancel"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+
+  }
+
+  Future<void> checkUserIsLogin() async {
+    final userSnapshot = await FirebaseDatabase.instance
+        .ref()
+        .child('users')
+        .orderByChild('uid')
+        .equalTo(authData.currentUser?.uid)
+        .once();
+
+    final Map<dynamic, dynamic>? userData =
+    userSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+
+    if (userData == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Session expired, please login again'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      Navigator.popUntil(context, (route) => false);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => const PhoneLoginPage()),
+      );
+    }
   }
 
   User? getCurrentUser() {
@@ -260,7 +412,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 child: Container(
                   // autogroupeqgtgYx (B1LFznqT5Bc34g7UgKEQgT)
                   padding: EdgeInsets.fromLTRB(
-                      19.6 * fem, 36 * fem, 20 * fem, 30.21 * fem),
+                      20 * fem, 36 * fem, 20 * fem, 0.21 * fem),
                   width: double.infinity,
                   child: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
@@ -289,8 +441,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                       left: 0 * fem,
                                       top: 0 * fem,
                                       child: Container(
-                                        padding: EdgeInsets.fromLTRB(0 * fem,
-                                            94.55 * fem, 0 * fem, 0 * fem),
                                         width: 335 * fem,
                                         height: 95 * fem,
                                         decoration: BoxDecoration(
@@ -311,183 +461,86 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     ),
                                     Positioned(
                                       // group7584CBr (0:498)
-                                      left: 5.1176757812 * fem,
                                       top: 4.7908935547 * fem,
                                       child: SizedBox(
-                                        width: 228.23 * fem,
+                                        width: 335 * fem,
                                         height: 85.42 * fem,
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Container(
-                                              // rectangle2iR6 (0:499)
-                                              margin: EdgeInsets.fromLTRB(
-                                                  0 * fem,
-                                                  0 * fem,
-                                                  10 * fem,
-                                                  0 * fem),
-                                              width: 84.23 * fem,
-                                              height: 85.42 * fem,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        6 * fem),
-                                                // color: const Color(0xff6e6e6e),
-                                              ),
-                                              child: SvgPicture.asset(
-                                                  'assets/icon/bottom_nav_profile_selected.svg'),
-                                            ),
-                                            Container(
-                                              // group7578oBe (0:500)
-                                              margin: EdgeInsets.fromLTRB(
-                                                  0 * fem,
-                                                  2.21 * fem,
-                                                  0 * fem,
-                                                  2.21 * fem),
-                                              width: 134 * fem,
-                                              height: double.infinity,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        2 * fem),
-                                              ),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Container(
-                                                    // group75767y2 (0:501)
-                                                    margin: EdgeInsets.fromLTRB(
-                                                        0 * fem,
-                                                        0 * fem,
-                                                        0 * fem,
-                                                        10 * fem),
-                                                    width: double.infinity,
-                                                    height: 47 * fem,
-                                                    child: Stack(
-                                                      children: [
-                                                        Positioned(
-                                                          // danielbdaltonT1J (0:502)
-                                                          left: 0 * fem,
-                                                          top: 0 * fem,
-                                                          child: Align(
-                                                            child: SizedBox(
-                                                              width: 134 * fem,
-                                                              height: 29 * fem,
-                                                              child: Text(
-                                                                getCurrentUser()
-                                                                            ?.displayName ==
-                                                                        ""
-                                                                    ? "Set Your Name"
-                                                                    : getCurrentUser()
-                                                                            ?.displayName ??
-                                                                        "",
-                                                                style:
-                                                                    SafeGoogleFont(
-                                                                  'Saira',
-                                                                  fontSize:
-                                                                      18 * ffem,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  height:
-                                                                      1.575 *
-                                                                          ffem /
-                                                                          fem,
-                                                                  color: const Color(
-                                                                      0xffffffff),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        Positioned(
-                                                          // Y2k (0:503)
-                                                          left: 0 * fem,
-                                                          top: 28 * fem,
-                                                          child: Align(
-                                                            child: SizedBox(
-                                                              width: 114 * fem,
-                                                              height: 19 * fem,
-                                                              child: Text(
-                                                                authData.currentUser
-                                                                        ?.phoneNumber ??
-                                                                    "",
-                                                                style:
-                                                                    SafeGoogleFont(
-                                                                  'Saira',
-                                                                  fontSize:
-                                                                      12 * ffem,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  height:
-                                                                      1.575 *
-                                                                          ffem /
-                                                                          fem,
-                                                                  color: const Color(
-                                                                      0xa5aaaaaa),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
+                                        child: Container(
+                                          // group7578oBe (0:500)
+                                          margin: EdgeInsets.fromLTRB(
+                                              0 * fem,
+                                              2.21 * fem,
+                                              0 * fem,
+                                              2.21 * fem),
+                                          width: 134 * fem,
+                                          height: double.infinity,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(
+                                                    2 * fem),
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              SizedBox(
+                                                width: double.infinity,
+                                                height: 29 * fem,
+                                                child: Text(
+                                                  getCurrentUser()
+                                                      ?.displayName ==
+                                                      ""
+                                                      ? "Set Your Name"
+                                                      : getCurrentUser()
+                                                      ?.displayName ??
+                                                      "",
+                                                  textAlign: TextAlign.center,
+                                                  style:
+                                                  SafeGoogleFont(
+                                                    'Saira',
+                                                    fontSize:
+                                                    18 * ffem,
+                                                    fontWeight:
+                                                    FontWeight
+                                                        .w500,
+                                                    height:
+                                                    1.575 *
+                                                        ffem /
+                                                        fem,
+                                                    color: const Color(
+                                                        0xffffffff),
                                                   ),
-                                                  // GestureDetector(
-                                                  //   onTap: () {
-                                                  //     //do something when edit profile clicked
-                                                  //     Navigator.push(
-                                                  //         context,
-                                                  //         MaterialPageRoute(
-                                                  //             builder: (context) =>
-                                                  //                 const EditProfilePage()));
-                                                  //   },
-                                                  //   child: Container(
-                                                  //     width: 68.46 * fem,
-                                                  //     height: 24 * fem,
-                                                  //     decoration: BoxDecoration(
-                                                  //       color: const Color(
-                                                  //           0x0cfdcb5b),
-                                                  //       borderRadius:
-                                                  //           BorderRadius
-                                                  //               .circular(
-                                                  //                   2 * fem),
-                                                  //     ),
-                                                  //     child: DottedBorder(
-                                                  //       color: yellowPrimary,
-                                                  //       borderType:
-                                                  //           BorderType.RRect,
-                                                  //       radius: const Radius
-                                                  //           .circular(6),
-                                                  //       child: Center(
-                                                  //         child: Text(
-                                                  //           'Edit profile',
-                                                  //           style:
-                                                  //               SafeGoogleFont(
-                                                  //             'Saira',
-                                                  //             fontSize:
-                                                  //                 10 * ffem,
-                                                  //             fontWeight:
-                                                  //                 FontWeight
-                                                  //                     .w500,
-                                                  //             height: 1.575 *
-                                                  //                 ffem /
-                                                  //                 fem,
-                                                  //             color: const Color(
-                                                  //                 0xfffdcb5b),
-                                                  //           ),
-                                                  //         ),
-                                                  //       ),
-                                                  //     ),
-                                                  //   ),
-                                                  // ),
-                                                ],
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                              SizedBox(
+                                                width: double.infinity,
+                                                height: 19 * fem,
+                                                child: Text(
+                                                  authData.currentUser
+                                                      ?.phoneNumber ??
+                                                      "",
+                                                  textAlign: TextAlign.center,
+                                                  style:
+                                                  SafeGoogleFont(
+                                                    'Saira',
+                                                    fontSize:
+                                                    12 * ffem,
+                                                    fontWeight:
+                                                    FontWeight
+                                                        .w500,
+                                                    height:
+                                                    1.575 *
+                                                        ffem /
+                                                        fem,
+                                                    color: const Color(
+                                                        0xa5aaaaaa),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -540,7 +593,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                           final DateFormat
                                                               dateFormat =
                                                               DateFormat(
-                                                                  'dd-MM-yyyy');
+                                                                  'MM/dd/yyyy');
                                                           String todayDate =
                                                               dateFormat.format(
                                                                   DateTime
@@ -551,7 +604,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                               element['status'] ==
                                                                   'paid') {
                                                             return (DateFormat(
-                                                                    'dd-MM-yyyy')
+                                                                    'MM/dd/yyyy')
                                                                 .parse(element[
                                                                     'date'])
                                                                 .isAfter(
@@ -568,7 +621,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                               final DateTime
                                                                   currentTime =
                                                                   DateFormat(
-                                                                          'dd-MM-yyyy h:mm a')
+                                                                          'MM/dd/yyyy h:mm a')
                                                                       .parse(
                                                                           "${element['date']} ${element['time']}");
 
@@ -788,8 +841,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               }
                             }),
                         GestureDetector(
-                          onTap: () {
-                            authData.signOut();
+                          onTap: () async {
+                            await authData.signOut();
                             Navigator.of(context).pushReplacement(
                               MaterialPageRoute(
                                   builder: (_) => const PhoneLoginPage()),
@@ -814,6 +867,41 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                   fontWeight: FontWeight.w500,
                                   height: 1.575 * ffem / fem,
                                   color: const Color(0xffffffff),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: GestureDetector(
+                            onTap: () async {
+                              // await authData.currentUser?.delete();
+                              // Navigator.of(context).pushReplacement(
+                              //   MaterialPageRoute(
+                              //       builder: (_) => const PhoneLoginPage()),
+                              // );
+                              deleteAccount();
+                            },
+                            child: Container(
+                              // logoutbutton8tg (0:559)
+                              margin: EdgeInsets.fromLTRB(
+                                  0.4 * fem, 0 * fem, 0 * fem, 0 * fem),
+                              width: double.infinity,
+                              height: 50 * fem,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5 * fem),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  'Delete Account',
+                                  style: SafeGoogleFont(
+                                    'Saira',
+                                    fontSize: 20 * ffem,
+                                    fontWeight: FontWeight.w500,
+                                    height: 1.575 * ffem / fem,
+                                    color: Colors.red,
+                                  ),
                                 ),
                               ),
                             ),

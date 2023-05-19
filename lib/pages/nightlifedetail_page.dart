@@ -7,7 +7,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
 import 'package:ulimo/base/base_color.dart';
-import 'package:ulimo/pages/cart_page.dart';
 import 'package:ulimo/pages/thank_you_page.dart';
 import 'package:ulimo/widget/date_available_item.dart';
 
@@ -38,6 +37,8 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
   double _entrySubTotalPrice = 0.00;
   double _rideSubTotalPrice = 0.00;
   String? _selectedTime;
+  String? _selectedDate;
+  int _selectedDateIndex = 0;
   late List<String> nightlifeOrderId;
   late String _totalRideQuantity = "";
   late String _totalEntryQuantity = "";
@@ -68,10 +69,29 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
         .equalTo(nightlifeDestinationId)
         .once();
 
+    final nightlifeDateSnapshot = await FirebaseDatabase.instance
+        .ref('nightlifeDate')
+        .orderByChild("destination_id")
+        .equalTo(nightlifeDestinationId)
+        .once();
+
     final Map<dynamic, dynamic>? destinationData =
         destinationDataSnapshot.snapshot.value as Map<dynamic, dynamic>?;
 
+    final Map<dynamic, dynamic>? nightlifeDateData =
+        nightlifeDateSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+
     if (destinationData != null) {
+      final availableDate = [];
+
+      if (nightlifeDateData != null) {
+        nightlifeDateData.forEach((dateKey, dateValue) {
+          availableDate.add(dateValue['date']);
+        });
+      }
+
+      availableDate.sort((a,b) => a.compareTo(b));
+
       Map<String, dynamic> tempDestinationData;
       destinationData.forEach((dataKey, dataValue) async {
         tempDestinationData = {
@@ -83,10 +103,12 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
           'entry_quantity': dataValue['entry_quantity'],
           'ride_price': dataValue['ride_price'],
           'ride_quantity': dataValue['ride_quantity'],
+          'available_date': availableDate
         };
 
         setState(() {
           _destinationData = tempDestinationData;
+          _selectedDate = availableDate[0];
         });
 
         updateAvailableSeat();
@@ -110,7 +132,7 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
         .ref('nightlifeOrder')
         // .child(widget.nightlifeDestinationId)
         .orderByChild('date')
-        .equalTo(DateFormat('dd-MM-yyyy').format(_date))
+        .equalTo(_selectedDate)
         .once();
 
     final Map<dynamic, dynamic>? ticketOrderData =
@@ -384,39 +406,40 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                         ],
                       ),
                     ),
-                    Container(
-                      // group7442XgL (0:1213)
-                      margin: EdgeInsets.fromLTRB(
-                          19.89 * fem, 0 * fem, 20.11 * fem, 36 * fem),
-                      width: double.infinity,
-                      height: 85 * fem,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Description',
-                            style: SafeGoogleFont(
-                              'Saira',
-                              fontSize: 18 * ffem,
-                              fontWeight: FontWeight.w500,
-                              height: 1.575 * ffem / fem,
-                              color: const Color(0xffffffff),
-                            ),
-                          ),
-                          Flexible(
-                            child: Text(
-                              _destinationData['description'] ?? "",
+                    IntrinsicHeight(
+                      child: Container(
+                        // group7442XgL (0:1213)
+                        margin: EdgeInsets.fromLTRB(
+                            19.89 * fem, 0 * fem, 20.11 * fem, 36 * fem),
+                        width: double.infinity,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Description',
                               style: SafeGoogleFont(
                                 'Saira',
-                                fontSize: 12 * ffem,
-                                fontWeight: FontWeight.w400,
+                                fontSize: 18 * ffem,
+                                fontWeight: FontWeight.w500,
                                 height: 1.575 * ffem / fem,
                                 color: const Color(0xffffffff),
                               ),
-                              textAlign: TextAlign.justify,
                             ),
-                          ),
-                        ],
+                            Flexible(
+                              child: Text(
+                                _destinationData['description'] ?? "",
+                                style: SafeGoogleFont(
+                                  'Saira',
+                                  fontSize: 12 * ffem,
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.575 * ffem / fem,
+                                  color: const Color(0xffffffff),
+                                ),
+                                textAlign: TextAlign.justify,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     Container(
@@ -489,6 +512,9 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                     Expanded(
                                       child: IntrinsicHeight(
                                         child: CheckboxListTile(
+                                            enabled: (_destinationData[
+                                                    'ride_quantity'] !=
+                                                "0"),
                                             value: _isRideTicket,
                                             onChanged: (value) {
                                               setState(() {
@@ -566,6 +592,9 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                     Expanded(
                                       child: IntrinsicHeight(
                                         child: CheckboxListTile(
+                                            enabled: (_destinationData[
+                                                    'entry_quantity'] !=
+                                                "0"),
                                             value: _isEntryTicket,
                                             onChanged: (value) {
                                               setState(() {
@@ -668,47 +697,85 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                               strokeWidth: 1,
                               child: SizedBox(
                                 height: double.infinity,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    _selectDate(context);
-                                  },
-                                  child: Container(
-                                    // group7535hLk (0:1167)
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    decoration: const BoxDecoration(
-                                        color: Colors.transparent),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 15),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () => _selectDate(context),
-                                            child: Text(
-                                              DateFormat('dd MMM yyyy')
-                                                  .format(_date),
-                                              style: SafeGoogleFont(
-                                                'Saira',
-                                                fontSize: 14 * ffem,
-                                                fontWeight: FontWeight.w500,
-                                                height:
-                                                    1.4285714286 * ffem / fem,
-                                                color: const Color(0xfffdcb5b),
-                                              ),
+                                child: Container(
+                                  // group7535hLk (0:1167)
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  decoration: const BoxDecoration(
+                                      color: Colors.transparent),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 15),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        // Text(
+                                        //   DateFormat('dd MMM yyyy')
+                                        //       .format(_date),
+                                        //   style: SafeGoogleFont(
+                                        //     'Saira',
+                                        //     fontSize: 14 * ffem,
+                                        //     fontWeight: FontWeight.w500,
+                                        //     height:
+                                        //         1.4285714286 * ffem / fem,
+                                        //     color: const Color(0xfffdcb5b),
+                                        //   ),
+                                        // ),
+                                        Expanded(
+                                          child: DropdownButtonHideUnderline(
+                                            child: DropdownButton<int>(
+                                              value: _selectedDateIndex,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              icon: const SizedBox.shrink(),
+                                              dropdownColor: darkPrimary,
+                                              items: List.generate(
+                                                  _destinationData[
+                                                          'available_date']
+                                                      .length, (index) {
+                                                return DropdownMenuItem<int>(
+                                                    value: index,
+                                                    child: Text(
+                                                      _destinationData[
+                                                              'available_date']
+                                                          [index],
+                                                      style: SafeGoogleFont(
+                                                        'Saira',
+                                                        fontSize: 14 * ffem,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        height: 1.4285714286 *
+                                                            ffem /
+                                                            fem,
+                                                        color: const Color(
+                                                            0xfffdcb5b),
+                                                      ),
+                                                    ));
+                                              }),
+                                              onChanged: (int? value) {
+                                                setState(() {
+                                                  _selectedDateIndex =
+                                                      value ?? 0;
+
+                                                  _selectedDate =
+                                                      _destinationData[
+                                                              'available_date']
+                                                          [value];
+                                                });
+                                                updateAvailableSeat();
+                                              },
                                             ),
                                           ),
-                                          Icon(
-                                            Icons.keyboard_arrow_down,
-                                            size: 20 * fem,
-                                            color: Colors.white,
-                                          ),
-                                        ],
-                                      ),
+                                        ),
+                                        Icon(
+                                          Icons.keyboard_arrow_down,
+                                          size: 20 * fem,
+                                          color: Colors.white,
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -752,17 +819,6 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
                                           children: [
-                                            Container(
-                                                // frameGwz (0:1244)
-                                                margin: EdgeInsets.fromLTRB(
-                                                    0 * fem,
-                                                    0 * fem,
-                                                    4 * fem,
-                                                    0 * fem),
-                                                width: 20 * fem,
-                                                height: 20 * fem,
-                                                child: SvgPicture.asset(
-                                                    "assets/icon/checkbox.svg")),
                                             Text(
                                               // entryticket9Vz (0:1243)
                                               'Ride ticket',
@@ -810,7 +866,7 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                     children: [
                                       Text(
                                         // of15ticketsavailableWE4 (0:1250)
-                                        '$_availableRide of $_totalRideQuantity tickets available ',
+                                        '$_availableRide of ${_destinationData['ride_quantity']} tickets available ',
                                         style: SafeGoogleFont(
                                           'Saira',
                                           fontSize: 12 * ffem,
@@ -860,7 +916,7 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                         // seatxrk (0:1251)
                                         _availableRide == 0
                                             ? ""
-                                            : '$_selectedRide Seat',
+                                            : '$_selectedRide Seat(s)',
                                         style: SafeGoogleFont(
                                           'Saira',
                                           fontSize: 12 * ffem,
@@ -922,17 +978,6 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
                                           children: [
-                                            Container(
-                                                // frameGwz (0:1244)
-                                                margin: EdgeInsets.fromLTRB(
-                                                    0 * fem,
-                                                    0 * fem,
-                                                    4 * fem,
-                                                    0 * fem),
-                                                width: 20 * fem,
-                                                height: 20 * fem,
-                                                child: SvgPicture.asset(
-                                                    "assets/icon/checkbox.svg")),
                                             Text(
                                               // entryticket9Vz (0:1243)
                                               'Entry ticket',
@@ -980,7 +1025,7 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                     children: [
                                       Text(
                                         // of15ticketsavailableWE4 (0:1250)
-                                        '$_availableEntry of $_totalEntryQuantity tickets available ',
+                                        '$_availableEntry of ${_destinationData['entry_quantity']} tickets available ',
                                         style: SafeGoogleFont(
                                           'Saira',
                                           fontSize: 12 * ffem,
@@ -1027,7 +1072,7 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                         // seatxrk (0:1251)
                                         _availableEntry == 0
                                             ? ""
-                                            : '$_selectedEntry Seat',
+                                            : '$_selectedEntry Ticket(s)',
                                         style: SafeGoogleFont(
                                           'Saira',
                                           fontSize: 12 * ffem,
@@ -1131,8 +1176,7 @@ class _NightLifePageDetailPageState extends State<NightLifePageDetailPage> {
                                             price: countTotalPrice(
                                                 _rideSubTotalPrice,
                                                 _entrySubTotalPrice),
-                                            date: DateFormat("dd-MM-yyyy")
-                                                .format(_date),
+                                            date: _selectedDate ?? '',
                                             time: '',
                                             rideType: 'nightlife',
                                             orderId:

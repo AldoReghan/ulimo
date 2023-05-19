@@ -7,7 +7,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
 import 'package:ulimo/base/base_color.dart';
-import 'package:ulimo/pages/cart_page.dart';
 import 'package:ulimo/pages/thank_you_page.dart';
 import 'package:ulimo/widget/date_available_item.dart';
 
@@ -37,7 +36,9 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
   double _entrySubTotalPrice = 0.00;
   double _rideSubTotalPrice = 0.00;
   String? _selectedTime;
+  String? _selectedDate;
   int _selectedTimeIndex = 0;
+  int _selectedDateIndex = 0;
   late List<String> _rideShareBusTicketOrderId;
   late String _totalRideQuantity = "";
   late String _totalEntryQuantity = "";
@@ -66,21 +67,30 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
         .ref('rideShareBusDestination')
         .orderByKey()
         .equalTo(destinationId)
-        // .equalTo("-as7dadjkkldsa")
         .once();
 
     final destinationTicketSnapshot = await FirebaseDatabase.instance
         .ref('rideShareBusTicket')
         .orderByChild('destination_id')
         .equalTo(destinationId)
-        // .equalTo("-as7dadjkkldsa")
+        .once();
+
+    final destinationDateSnapshot = await FirebaseDatabase.instance
+        .ref('rideShareBusDate')
+        .orderByChild('destination_id')
+        .equalTo(destinationId)
         .once();
 
     final Map<dynamic, dynamic>? ticketData =
         destinationTicketSnapshot.snapshot.value as Map<dynamic, dynamic>?;
 
+    // print("ticket dataaaa $ticketData");
+
     final Map<dynamic, dynamic>? destinationData =
         destinationDataSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+
+    final Map<dynamic, dynamic>? destinationDateData =
+        destinationDateSnapshot.snapshot.value as Map<dynamic, dynamic>?;
 
     if (destinationData != null) {
       Map<String, dynamic> tempDestinationData;
@@ -92,22 +102,35 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
           ticketData.forEach((ticketKey, ticketValue) {
             availableTime.add(ticketValue['time']);
             ticketPriceList.add(ticketValue);
-
             tempRideShareBusOrderIds.add(ticketKey);
           });
+
+          final availableDate = [];
+
+          if (destinationDateData != null) {
+            destinationDateData.forEach((dateKey, dateValue) {
+              availableDate.add(dateValue['date']);
+            });
+          }
+
+          availableDate.sort((a,b) => a.compareTo(b));
 
           tempDestinationData = {
             'name': dataValue['destination_name'],
             'address': dataValue['destination_address'],
             'image_url': dataValue['destination_image_url'],
             'description': dataValue['destination_description'],
+            'entry_price': dataValue['entry_price'],
+            'entry_quantity': dataValue['entry_quantity'],
             'available_time': availableTime,
+            'available_date': availableDate,
             'ticket_price': ticketPriceList
           };
 
           setState(() {
             _destinationData = tempDestinationData;
             _rideShareBusTicketOrderId = (tempRideShareBusOrderIds);
+            _selectedDate = availableDate[0];
           });
 
           updateAvailableSeat();
@@ -120,11 +143,9 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
       _ridePrice =
           _destinationData['ticket_price'][_selectedTimeIndex]['ride_price'];
 
-      _entryPrice =
-          _destinationData['ticket_price'][_selectedTimeIndex]['entry_price'];
+      _entryPrice = _destinationData['entry_price'];
 
-      _totalEntryQuantity = _destinationData['ticket_price'][_selectedTimeIndex]
-          ['entry_quantity'];
+      _totalEntryQuantity = _destinationData['entry_quantity'];
 
       _totalRideQuantity =
           _destinationData['ticket_price'][_selectedTimeIndex]['ride_quantity'];
@@ -136,7 +157,7 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
         .ref('rideShareBusTicketOrder')
         // .child(_rideShareBusTicketOrderId[_selectedTimeIndex])
         .orderByChild('date')
-        .equalTo(DateFormat('dd-MM-yyyy').format(_date))
+        .equalTo(_selectedDate)
         .once();
 
     final Map<dynamic, dynamic>? ticketOrderData =
@@ -312,39 +333,40 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                         ],
                       ),
                     ),
-                    Container(
-                      // group7442XgL (0:1213)
-                      margin: EdgeInsets.fromLTRB(
-                          19.89 * fem, 0 * fem, 20.11 * fem, 36 * fem),
-                      width: double.infinity,
-                      height: 85 * fem,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Description',
-                            style: SafeGoogleFont(
-                              'Saira',
-                              fontSize: 18 * ffem,
-                              fontWeight: FontWeight.w500,
-                              height: 1.575 * ffem / fem,
-                              color: const Color(0xffffffff),
-                            ),
-                          ),
-                          Flexible(
-                            child: Text(
-                              _destinationData['description'] ?? "",
+                    IntrinsicHeight(
+                      child: Container(
+                        // group7442XgL (0:1213)
+                        margin: EdgeInsets.fromLTRB(
+                            19.89 * fem, 0 * fem, 20.11 * fem, 36 * fem),
+                        width: double.infinity,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Description',
                               style: SafeGoogleFont(
                                 'Saira',
-                                fontSize: 12 * ffem,
-                                fontWeight: FontWeight.w400,
+                                fontSize: 18 * ffem,
+                                fontWeight: FontWeight.w500,
                                 height: 1.575 * ffem / fem,
                                 color: const Color(0xffffffff),
                               ),
-                              textAlign: TextAlign.justify,
                             ),
-                          ),
-                        ],
+                            Flexible(
+                              child: Text(
+                                _destinationData['description'] ?? "",
+                                style: SafeGoogleFont(
+                                  'Saira',
+                                  fontSize: 12 * ffem,
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.575 * ffem / fem,
+                                  color: const Color(0xffffffff),
+                                ),
+                                textAlign: TextAlign.justify,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     Container(
@@ -603,54 +625,106 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                     strokeWidth: 1,
                                     child: SizedBox(
                                       height: double.infinity,
-                                      child: GestureDetector(
-                                        onTap: () => _selectDate(context),
-                                        child: Container(
-                                          // group7535hLk (0:1167)
-                                          width: double.infinity,
-                                          height: double.infinity,
-                                          decoration: const BoxDecoration(
-                                              color: Colors.transparent),
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 15),
-                                            child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                GestureDetector(
-                                                  onTap: () =>
-                                                      _selectDate(context),
-                                                  child: Text(
-                                                    DateFormat('dd MMM yyyy')
-                                                        .format(_date),
-                                                    // _destinationData[
-                                                    //         'available_date']
-                                                    //     .elementAt(
-                                                    //         _selectedDateIndex),
-                                                    style: SafeGoogleFont(
-                                                      'Saira',
-                                                      fontSize: 14 * ffem,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      height: 1.4285714286 *
-                                                          ffem /
-                                                          fem,
-                                                      color: const Color(
-                                                          0xfffdcb5b),
-                                                    ),
+                                      child: Container(
+                                        // group7535hLk (0:1167)
+                                        width: double.infinity,
+                                        height: double.infinity,
+                                        decoration: const BoxDecoration(
+                                            color: Colors.transparent),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 15),
+                                          child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment
+                                                    .spaceBetween,
+                                            children: [
+                                              // GestureDetector(
+                                              //   onTap: () =>
+                                              //       _selectDate(context),
+                                              //   child: Text(
+                                              //     DateFormat('dd MMM yyyy')
+                                              //         .format(_date),
+                                              //     // _destinationData[
+                                              //     //         'available_date']
+                                              //     //     .elementAt(
+                                              //     //         _selectedDateIndex),
+                                              //     style: SafeGoogleFont(
+                                              //       'Saira',
+                                              //       fontSize: 14 * ffem,
+                                              //       fontWeight:
+                                              //           FontWeight.w500,
+                                              //       height: 1.4285714286 *
+                                              //           ffem /
+                                              //           fem,
+                                              //       color: const Color(
+                                              //           0xfffdcb5b),
+                                              //     ),
+                                              //   ),
+                                              // ),
+                                              Expanded(
+                                                child:
+                                                    DropdownButtonHideUnderline(
+                                                  child: DropdownButton<int>(
+                                                    value: _selectedDateIndex,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
+                                                    icon: const SizedBox
+                                                        .shrink(),
+                                                    dropdownColor:
+                                                        darkPrimary,
+                                                    items: List.generate(
+                                                        _destinationData[
+                                                                'available_date']
+                                                            .length, (index) {
+                                                      return DropdownMenuItem<
+                                                              int>(
+                                                          value: index,
+                                                          child: Text(
+                                                            _destinationData[
+                                                                    'available_date']
+                                                                [index],
+                                                            style:
+                                                                SafeGoogleFont(
+                                                              'Saira',
+                                                              fontSize:
+                                                                  14 * ffem,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              height:
+                                                                  1.4285714286 *
+                                                                      ffem /
+                                                                      fem,
+                                                              color: const Color(
+                                                                  0xfffdcb5b),
+                                                            ),
+                                                          ));
+                                                    }),
+                                                    onChanged: (int? value) {
+                                                      setState(() {
+                                                        _selectedDateIndex =
+                                                            value ?? 0;
+
+                                                        _selectedDate =
+                                                            _destinationData[
+                                                                    'available_date']
+                                                                [value];
+                                                      });
+                                                      updateAvailableSeat();
+                                                    },
                                                   ),
                                                 ),
-                                                Icon(
-                                                  Icons.keyboard_arrow_down,
-                                                  size: 20 * fem,
-                                                  color: Colors.white,
-                                                ),
-                                              ],
-                                            ),
+                                              ),
+                                              Icon(
+                                                Icons.keyboard_arrow_down,
+                                                size: 20 * fem,
+                                                color: Colors.white,
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ),
@@ -729,10 +803,19 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                                                 [
                                                                 _selectedTimeIndex]
                                                             ['ride_price'];
+
                                                         _selectedTime =
                                                             _destinationData[
                                                                     'available_time']
                                                                 [value];
+
+                                                        _totalRideQuantity =
+                                                            _destinationData[
+                                                                        'ticket_price']
+                                                                    [
+                                                                    _selectedTimeIndex]
+                                                                [
+                                                                'ride_quantity'];
                                                       });
                                                       updateAvailableSeat();
                                                     },
@@ -791,17 +874,6 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
                                           children: [
-                                            Container(
-                                                // frameGwz (0:1244)
-                                                margin: EdgeInsets.fromLTRB(
-                                                    0 * fem,
-                                                    0 * fem,
-                                                    4 * fem,
-                                                    0 * fem),
-                                                width: 20 * fem,
-                                                height: 20 * fem,
-                                                child: SvgPicture.asset(
-                                                    "assets/icon/checkbox.svg")),
                                             Text(
                                               // entryticket9Vz (0:1243)
                                               'Ride ticket',
@@ -899,7 +971,7 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                         // seatxrk (0:1251)
                                         _availableRide == 0
                                             ? ""
-                                            : '$_selectedRide Seat',
+                                            : '$_selectedRide Seat(s)',
                                         style: SafeGoogleFont(
                                           'Saira',
                                           fontSize: 12 * ffem,
@@ -961,17 +1033,6 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
                                           children: [
-                                            Container(
-                                                // frameGwz (0:1244)
-                                                margin: EdgeInsets.fromLTRB(
-                                                    0 * fem,
-                                                    0 * fem,
-                                                    4 * fem,
-                                                    0 * fem),
-                                                width: 20 * fem,
-                                                height: 20 * fem,
-                                                child: SvgPicture.asset(
-                                                    "assets/icon/checkbox.svg")),
                                             Text(
                                               // entryticket9Vz (0:1243)
                                               'Entry ticket',
@@ -1066,7 +1127,7 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                         // seatxrk (0:1251)
                                         _availableEntry == 0
                                             ? ""
-                                            : '$_selectedEntry Seat',
+                                            : '$_selectedEntry Ticket(s)',
                                         style: SafeGoogleFont(
                                           'Saira',
                                           fontSize: 12 * ffem,
@@ -1168,9 +1229,11 @@ class _RideShareBusDetailPageState extends State<RideShareBusDetailPage> {
                                             price: countTotalPrice(
                                                 _rideSubTotalPrice,
                                                 _entrySubTotalPrice),
-                                            date: DateFormat("dd-MM-yyyy")
-                                                .format(_date),
-                                            time: '',
+                                            date: _selectedDate??"",
+                                            time: _destinationData[
+                                                        'available_time']
+                                                    [_selectedTimeIndex] ??
+                                                '',
                                             rideType: 'ridesharebus',
                                             orderId: _rideShareBusTicketOrderId[
                                                 _selectedTimeIndex],

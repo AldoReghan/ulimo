@@ -13,7 +13,7 @@ Widget rideItem(
     required Function() onTap}) {
   return IntrinsicHeight(
     child: GestureDetector(
-      onTap: (){
+      onTap: () {
         onTap.call();
       },
       child: Container(
@@ -100,18 +100,20 @@ Widget rideItem(
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Container(
-                                    // ellipse3Kqr (0:333)
-                                    margin: EdgeInsets.fromLTRB(
-                                        0 * fem, 0 * fem, 4 * fem, 0 * fem),
-                                    width: 5.49 * fem,
-                                    height: 5.49 * fem,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(
-                                          2.7470855713 * fem),
-                                      color: const Color(0xfffdcb5b),
-                                    ),
-                                  ),
+                                  (ticketType == '' || ticketType2 == '')
+                                      ? const SizedBox.shrink()
+                                      : Container(
+                                          // ellipse3Kqr (0:333)
+                                          margin: EdgeInsets.fromLTRB(0 * fem,
+                                              0 * fem, 4 * fem, 0 * fem),
+                                          width: 5.49 * fem,
+                                          height: 5.49 * fem,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                                2.7470855713 * fem),
+                                            color: const Color(0xfffdcb5b),
+                                          ),
+                                        ),
                                   Text(
                                     // entryticket3Wx (0:332)
                                     ticketType2,

@@ -24,7 +24,7 @@ Widget ticketCheckoutItem(
     decoration: const BoxDecoration(
       image: DecorationImage(
         fit: BoxFit.fitHeight,
-        image: AssetImage("assets/ticket_pending_background.png"),
+        image: AssetImage("assets/ticket_active_background.png"),
       ),
     ),
     child: Column(
@@ -111,8 +111,7 @@ Widget ticketCheckoutItem(
                       // pmQwS (1:1394)
                       time == ''
                           ? ''
-                          : DateFormat("h:mm a")
-                              .format(DateFormat("H:mm").parse(time)),
+                          : time,
                       style: SafeGoogleFont(
                         'Saira',
                         fontSize: 12 * ffem,
@@ -124,8 +123,8 @@ Widget ticketCheckoutItem(
                     Text(
                       // feb2023kkQ (1:1393)
                       // date,
-                      DateFormat("dd MMM yyyy")
-                          .format(DateFormat("dd-MM-yyyy").parse(date)),
+                      DateFormat("MMM dd yyyy")
+                          .format(DateFormat("MM/dd/yyyy").parse(date)),
                       style: SafeGoogleFont(
                         'Saira',
                         fontSize: 12 * ffem,
@@ -143,7 +142,7 @@ Widget ticketCheckoutItem(
         Padding(
           padding: EdgeInsets.only(bottom: 24.6 * fem),
           child: const DottedLine(
-            dashColor: yellowPrimary,
+            dashColor: Color(0xff0B7E00),
           ),
         ),
         Container(
@@ -183,7 +182,7 @@ Widget ticketCheckoutItem(
                           fontSize: 12 * ffem,
                           fontWeight: FontWeight.w500,
                           height: 1.1666666667 * ffem / fem,
-                          color: yellowPrimary,
+                          color: const Color(0xff0B7E00),
                         ),
                       ),
                     ),

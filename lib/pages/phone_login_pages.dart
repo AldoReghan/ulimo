@@ -1,15 +1,13 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:sms_autofill/sms_autofill.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
 import 'package:ulimo/base/base_color.dart';
-import 'package:ulimo/pages/register_page.dart';
 import 'package:ulimo/services/phone_auth_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'otp_verification_page.dart';
-import 'main/main_page.dart';
 
 class PhoneLoginPage extends StatefulWidget {
   const PhoneLoginPage({Key? key}) : super(key: key);
@@ -107,6 +105,20 @@ class _PhoneLoginPageState extends State<PhoneLoginPage> {
         codeSent,
         codeAutoRetrievalTimeout,
       );
+    }on FirebaseAuthException catch (e) {
+      if (e.code == 'invalid-phone-number') {
+        if (kDebugMode) {
+          print('Invalid phone number');
+        }
+      } else if (e.code == 'too-many-requests') {
+        if (kDebugMode) {
+          print('Too many authentication requests');
+        }
+      } else {
+        if (kDebugMode) {
+          print('Phone authentication failed. Error: ${e.code}');
+        }
+      }
     } catch (e) {
       Fluttertoast.showToast(msg: 'Failed to verify phone number');
       setState(() {

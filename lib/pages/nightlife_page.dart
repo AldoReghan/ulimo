@@ -6,6 +6,7 @@ import 'package:ulimo/pages/ridesharebusdetail_page.dart';
 import 'package:ulimo/widget/ride_item.dart';
 
 import '../base/base_background_scaffold.dart';
+import '../base/base_color.dart';
 import '../base/utils.dart';
 
 class NightLifePage extends StatefulWidget {
@@ -21,11 +22,79 @@ class _NightLifePageState extends State<NightLifePage> {
 
   bool _isLoading = true;
 
+  late List _marketSectionList;
+  int? selectedMarketChip;
+
   @override
   void initState() {
     super.initState();
     _destinationList = [];
+    _marketSectionList = [];
+    _fetchMarketSection();
     _fetchData();
+  }
+
+  Future<void> _fetchMarketSection() async {
+    final marketSectionSnapshot =
+        await _databaseRef.child('marketSection').once();
+
+    final Map<dynamic, dynamic>? marketSectionData =
+        marketSectionSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+    final List tempMarketSectionList = [];
+
+    if (marketSectionData != null) {
+      marketSectionData.forEach((key, value) async {
+        final marketSectionMap = {
+          'id': key,
+          'market_section': value['market_section_name'],
+        };
+        tempMarketSectionList.add(marketSectionMap);
+      });
+    }
+
+    setState(() {
+      _marketSectionList = tempMarketSectionList.reversed.toList();
+    });
+
+    // _fetchDestinationByMarket();
+  }
+
+  Future<void> _fetchDestinationByMarket() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final nightlifeSnapshot = await _databaseRef
+        .child('nightlifeDestination')
+        .orderByChild("market_section")
+        .equalTo(_marketSectionList[selectedMarketChip ?? 0]['id'])
+        .once();
+
+    final Map<dynamic, dynamic>? nightlifeData =
+        nightlifeSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+
+    final List tempDestinationByMarket = [];
+
+    if (nightlifeData != null) {
+      nightlifeData.forEach((key, value) async {
+        final nightlifeMap = {
+          'id': key,
+          'name': value['destination_name'],
+          'type': 'nightlife',
+          'image_url': value['destination_image_url'],
+          'address': value['destination_address'],
+        };
+        tempDestinationByMarket.add(nightlifeMap);
+      });
+    }
+
+    setState(() {
+      _destinationList = tempDestinationByMarket.reversed.toList();
+    });
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> _fetchData() async {
@@ -52,6 +121,8 @@ class _NightLifePageState extends State<NightLifePage> {
             'name': value['destination_name'],
             // 'description': value['destination_description'],
             'image_url': value['destination_image_url'],
+            'entry_quantity': value['entry_quantity'],
+            'ride_quantity': value['ride_quantity'],
             // 'address': value['destination_address'],
             // 'type': value['destination_type'],
           };
@@ -60,7 +131,7 @@ class _NightLifePageState extends State<NightLifePage> {
       }
 
       setState(() {
-        _destinationList = tempList;
+        _destinationList = tempList.reversed.toList();
       });
     } else {
       // ignore: use_build_context_synchronously
@@ -97,74 +168,113 @@ class _NightLifePageState extends State<NightLifePage> {
         scaffold: Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
-        child: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(),
-              )
-            : Column(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(
+              height: 55,
+            ),
+            Container(
+              // group7560fov (0:367)
+              margin:
+                  EdgeInsets.fromLTRB(20 * fem, 0 * fem, 20 * fem, 15.92 * fem),
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(
-                    height: 55,
-                  ),
                   Container(
-                    // group7560fov (0:367)
-                    margin: EdgeInsets.fromLTRB(
-                        20 * fem, 0 * fem, 20 * fem, 5.92 * fem),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      // arrowQFi (0:368)
+                      margin: EdgeInsets.fromLTRB(
+                          0 * fem, 0 * fem, 27 * fem, 0 * fem),
+                      width: 24 * fem,
+                      height: 24 * fem,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Icon(
+                          Icons.arrow_back_ios,
+                          size: 24 * fem,
+                          color: Colors.white,
+                        ),
+                      )),
+                  RichText(
+                    // nightlifedealsK7n (0:372)
+                    text: TextSpan(
+                      style: SafeGoogleFont(
+                        'Saira',
+                        fontSize: 24 * ffem,
+                        fontWeight: FontWeight.w500,
+                        height: 1.575 * ffem / fem,
+                        color: const Color(0xffffffff),
+                      ),
                       children: [
-                        Container(
-                            // arrowQFi (0:368)
-                            margin: EdgeInsets.fromLTRB(
-                                0 * fem, 0 * fem, 27 * fem, 0 * fem),
-                            width: 24 * fem,
-                            height: 24 * fem,
-                            child: GestureDetector(
-                              onTap: (){
-                                Navigator.pop(context);
-                              },
-                              child: Icon(
-                                Icons.arrow_back_ios,
-                                size: 24 * fem,
-                                color: Colors.white,
-                              ),
-                            )),
-                        RichText(
-                          // nightlifedealsK7n (0:372)
-                          text: TextSpan(
-                            style: SafeGoogleFont(
-                              'Saira',
-                              fontSize: 24 * ffem,
-                              fontWeight: FontWeight.w500,
-                              height: 1.575 * ffem / fem,
-                              color: const Color(0xffffffff),
-                            ),
-                            children: [
-                              const TextSpan(
-                                text: 'NightLife ',
-                              ),
-                              TextSpan(
-                                text: 'Deals',
-                                style: SafeGoogleFont(
-                                  'Saira',
-                                  fontSize: 24 * ffem,
-                                  fontWeight: FontWeight.w500,
-                                  height: 1.575 * ffem / fem,
-                                  color: const Color(0xfffdcb5b),
-                                ),
-                              ),
-                            ],
+                        const TextSpan(
+                          text: 'NightLife ',
+                        ),
+                        TextSpan(
+                          text: 'Deals',
+                          style: SafeGoogleFont(
+                            'Saira',
+                            fontSize: 24 * ffem,
+                            fontWeight: FontWeight.w500,
+                            height: 1.575 * ffem / fem,
+                            color: const Color(0xfffdcb5b),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  Expanded(
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 0),
+              child: SingleChildScrollView(
+                //clipBehavior: Clip.antiAliasWithSaveLayer,
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                child: Row(
+                  children:
+                      List<Widget>.generate(_marketSectionList.length, (index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        label: Text(
+                            "${_marketSectionList[index]['market_section']}"),
+                        selected: (selectedMarketChip ?? -1) == index,
+                        onSelected: (selected) {
+                          if (selected) {
+                            setState(() {
+                              selectedMarketChip = index;
+                            });
+                            //refresh data with selected chip
+                            _fetchDestinationByMarket();
+                          }else {
+                            setState(() {
+                              selectedMarketChip = -1;
+                            });
+                            _fetchData();
+                          }
+                        },
+                        selectedColor: yellowPrimary,
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 3,
+            ),
+            _isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : Expanded(
                     child: Container(
                         // autogrouplczqZkt (B1LAVsAXW7wCDsdiquLCZq)
                         padding: EdgeInsets.fromLTRB(
-                            20 * fem, 25.21 * fem, 20 * fem, 3 * fem),
+                            20 * fem, 5.21 * fem, 20 * fem, 3 * fem),
                         child: ListView.builder(
                             physics: const BouncingScrollPhysics(),
                             itemCount: _destinationList.length,
@@ -173,8 +283,16 @@ class _NightLifePageState extends State<NightLifePage> {
                                   fem: fem,
                                   ffem: ffem,
                                   title: _destinationList[index]['name'],
-                                  ticketType: "Ride ticket",
-                                  ticketType2: "Entry ticket",
+                                  ticketType: _destinationList[index]
+                                              ['ride_quantity'] !=
+                                          "0"
+                                      ? "Ride ticket"
+                                      : '',
+                                  ticketType2: _destinationList[index]
+                                              ['entry_quantity'] !=
+                                          "0"
+                                      ? "Entry ticket"
+                                      : '',
                                   imageUrl: _destinationList[index]
                                       ['image_url'],
                                   onTap: () {
@@ -189,8 +307,8 @@ class _NightLifePageState extends State<NightLifePage> {
                                   });
                             })),
                   ),
-                ],
-              ),
+          ],
+        ),
       ),
     ));
   }

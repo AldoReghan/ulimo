@@ -8,51 +8,6 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:486657291251:android:59b63469594750de0c9886",
-        "android_client_info": {
-          "package_name": "com.example.ulimo"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "486657291251-94ovpjmpdmcghrjk90t4bleggd4ifbl8.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.ulimo",
-            "certificate_hash": "40d896ecfe06d987d2d58a93472e16aa43055f72"
-          }
-        },
-        {
-          "client_id": "486657291251-ppkll0k084rp9qmaen627o4bkc98u9op.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyB6KmtdusZJTU10txPmYAKxRBibSG3DAlQ"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "486657291251-ppkll0k084rp9qmaen627o4bkc98u9op.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "486657291251-9is2qtt0m1vp41b1iv51umfgtnqll0o6.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.ulimo",
-                "app_store_id": "12345678"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:486657291251:android:f2bad66dc2f800d70c9886",
         "android_client_info": {
           "package_name": "com.ulimo.inc"
@@ -60,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "486657291251-i9kj75apm3kjidn7crjeecvt5ous0p4e.apps.googleusercontent.com",
+          "client_id": "486657291251-trupo2j72maq9bfp4icps5tfa6s4en82.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.ulimo.inc",
-            "certificate_hash": "40d896ecfe06d987d2d58a93472e16aa43055f72"
+            "certificate_hash": "773a8567bcd4f5a9293313394b490922307eae9d"
           }
         },
         {
@@ -85,11 +40,10 @@
               "client_type": 3
             },
             {
-              "client_id": "486657291251-9is2qtt0m1vp41b1iv51umfgtnqll0o6.apps.googleusercontent.com",
+              "client_id": "486657291251-22o50pb7q5l3pg4aop5i0slmuiu6n32v.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.ulimo",
-                "app_store_id": "12345678"
+                "bundle_id": "com.ulimo.inc"
               }
             }
           ]

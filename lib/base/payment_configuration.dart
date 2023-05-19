@@ -26,7 +26,7 @@ const String defaultApplePay = '''{
   "provider": "apple_pay",
   "data": {
     "merchantIdentifier": "merchant.ulimomvp",
-    "displayName": "ULimo Inc.",
+    "displayName": "Ulimo Inc.",
     "merchantCapabilities": ["3DS", "debit", "credit"],
     "supportedNetworks": ["amex", "visa", "discover", "masterCard"],
     "countryCode": "US",
@@ -41,7 +41,7 @@ const String defaultApplePay = '''{
 const String defaultGooglePay = '''{
   "provider": "google_pay",
   "data": {
-    "environment": "TEST",
+    "environment": "PRODUCTION",
     "apiVersion": 2,
     "apiVersionMinor": 0,
     "allowedPaymentMethods": [
@@ -52,7 +52,7 @@ const String defaultGooglePay = '''{
           "parameters": {
             "gateway": "stripe",
             "stripe:version": "2022-11-15",
-            "stripe:publishableKey": "pk_test_FdksvcRe3yMRyJQJ6NuzCEPL"
+            "stripe:publishableKey": "pk_live_2nYari0BZqmrZXF6KHUotxfV"
           }
         },
         "parameters": {
@@ -68,7 +68,7 @@ const String defaultGooglePay = '''{
     ],
     "merchantInfo": {
       "merchantId": "600732547059901524",
-      "merchantName": "ULimo Inc."
+      "merchantName": "Ulimo Inc."
     },
     "transactionInfo": {
       "countryCode": "US",

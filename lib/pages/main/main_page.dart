@@ -3,7 +3,6 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
-import 'package:ulimo/pages/cart_page.dart';
 import 'package:ulimo/pages/main/my_ticket_page.dart';
 import 'package:ulimo/pages/nightlife_page.dart';
 import 'package:ulimo/pages/phone_login_pages.dart';
@@ -95,36 +94,9 @@ class _MainPageState extends State<MainPage> {
             //do some thing
 
 
-            final userSnapshot = await FirebaseDatabase.instance
-                .ref()
-                .child('users')
-                .orderByChild('uid')
-                .equalTo(auth.currentUser?.uid)
-                .once();
-
-            final Map<dynamic, dynamic>? userData =
-            userSnapshot.snapshot.value as Map<dynamic, dynamic>?;
-
-            if (userData == null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Session expired, please login again'),
-                  backgroundColor: Colors.red,
-                ),
-              );
-              Navigator.popUntil(context, (route) => false);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const PhoneLoginPage()),
-              );
-            }
-
-
             setState(() {
               selectedIndex = index;
             });
-
 
 
           },

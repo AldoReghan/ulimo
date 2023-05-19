@@ -2,13 +2,17 @@ import 'dart:convert';
 
 import 'package:connectivity/connectivity.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_stripe/flutter_stripe.dart' as flutter_stripe;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
 import 'package:pay/pay.dart';
 import 'package:ulimo/base/base_background_scaffold.dart';
 import 'package:ulimo/base/payment_configuration.dart';
@@ -17,7 +21,6 @@ import 'package:ulimo/services/stripe_service.dart';
 
 import '../base/base_color.dart';
 import '../base/utils.dart';
-import 'cart_page.dart';
 
 class CheckOutPage extends StatefulWidget {
   final String orderId;
@@ -47,20 +50,17 @@ class CheckOutPage extends StatefulWidget {
   State<CheckOutPage> createState() => _CheckOutPageState();
 }
 
-const _paymentItems = [
-  PaymentItem(
-    label: 'Total',
-    amount: '99.99',
-    status: PaymentItemStatus.final_price,
-  )
-];
-
 class _CheckOutPageState extends State<CheckOutPage> {
   String _subtitle = "";
   String _title = "";
   String _date = "";
   String _time = "";
   String _price = "0.00";
+  String _pickupTime = "";
+  String _pickupAddress = "";
+  String _destination = "";
+  String _returnTime = "";
+
   double _discountRate = 0.00;
   String _discountName = "";
   bool isCodeValid = false;
@@ -106,6 +106,12 @@ class _CheckOutPageState extends State<CheckOutPage> {
                   "${value['pickup_address']} to ${value['destination']}";
               _time = "${value['pickup_time']}";
               _date = "${value['date']}";
+              _pickupTime = "${value['date']}, ${value['pickup_time']}";
+              _pickupAddress = "${value['pickup_address']}";
+              _returnTime = value["is_round_trip"] as bool
+                  ? "${value['return_date']}, ${value['return_time']}"
+                  : 'Not a round trip';
+              _destination = "${value['destination']}";
               // _price = value['price'];
             });
           });
@@ -201,7 +207,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
     }
   }
 
-  void _checkOutTicket() async {
+  void _checkOutTicket(flutter_stripe.PaymentIntent paymentResult) async {
     setState(() {
       _isLoading = true;
     });
@@ -253,6 +259,52 @@ class _CheckOutPageState extends State<CheckOutPage> {
         'status': 'Paid',
       });
 
+      /*send email to owner if private ride has been paid*/
+
+      if (widget.rideType == "private") {
+        //send email to owner
+
+        String username = 'info@ulimotech.com';
+        String password = '!Summer2024';
+
+        final smtpServer = SmtpServer('mail.ulimotech.com',
+            username: username, password: password, port: 465, ssl: true);
+
+        // Create our message.
+        final message = Message()
+          ..from = Address(username, 'Email from ulimotech.com')
+          ..recipients.add('john@ulimo.co')
+          ..subject = 'Confirmation of Payment for Private Ride'
+          ..html = "<h2>Confirmation of Payment for Private Ride</h2>"
+              "<p>Payment for the "
+              "<strong>Private Ride</strong> "
+              "has been successfully made. <p>Here are the details of the payment:</p>"
+              "<ul><li><strong>Transaction ID: </strong>${paymentResult.id}</li>"
+              "<li><strong>Name: </strong>${authData.currentUser?.displayName}</li>"
+              "<li><strong>Amount Paid: </strong>\$${(paymentResult.amount.toDouble() / 100)}</li>"
+              "<li><strong>Pickup Address: </strong>$_pickupAddress</li>"
+              "<li><strong>Pickup Time: </strong>$_pickupTime</li>"
+              "<li><strong>Destination: </strong>$_destination</li>"
+              "<li><strong>Return Time: </strong>$_returnTime</li>"
+              "</body>";
+
+        try {
+          final sendReport = await send(message, smtpServer);
+          if (kDebugMode) {
+            print('Message sent: $sendReport');
+          }
+        } on MailerException catch (e) {
+          if (kDebugMode) {
+            print('Message not sent.');
+          }
+          for (var p in e.problems) {
+            if (kDebugMode) {
+              print('Problem: ${p.code}: ${p.msg}');
+            }
+          }
+        }
+      }
+
       SchedulerBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (context) => PaymentSuccessPage(
@@ -289,114 +341,168 @@ class _CheckOutPageState extends State<CheckOutPage> {
 
   void onApplePayResult(paymentResult) {
     // Send the resulting Apple Pay token to your server / PSP
-    _checkOutTicket();
+    // _checkOutTicket();
   }
 
   void onGooglePayResult(paymentResult) {
     // Send the resulting Google Pay token to your server / PSP
-    _checkOutTicket();
+    // _checkOutTicket();
   }
 
   void onGooglePayPressed() async {
     setState(() {
       _isLoading = true;
     });
-    final result = await _payClient.showPaymentSelector(
-      // await _payClient.showPaymentSelector(
-      PayProvider.google_pay,
-      [
-        PaymentItem(
-            label: 'Total',
-            amount: countTotalPrice(),
-            status: PaymentItemStatus.final_price,
-            type: PaymentItemType.total)
-      ],
-    );
 
-    final tokenData = result["paymentMethodData"]["tokenizationData"]["token"];
+    try {
 
-    Map jsonToken = jsonDecode(tokenData);
 
-    String tokenId = jsonToken['id'];
 
-    final response = await StripeService.createPaymentIntent(
-        "${(double.parse(countTotalPrice()) * 100).toInt()}", 'USD');
+      final result = await _payClient.showPaymentSelector(
+        // await _payClient.showPaymentSelector(
+        PayProvider.google_pay,
+        [
+          PaymentItem(
+              label: 'Total',
+              amount: countTotalPrice(),
+              status: PaymentItemStatus.final_price,
+              type: PaymentItemType.total)
+        ],
+      );
 
-    final clientSecret = response['client_secret'];
-    final tokenJson = Map.castFrom(json.decode(tokenData));
-    // final tokenJson = Map.castFrom(json.decode(tokenData));
+      final tokenData =
+          result["paymentMethodData"]["tokenizationData"]["token"];
 
-    final params = flutter_stripe.PaymentMethodParams.cardFromToken(
-      paymentMethodData:
-          flutter_stripe.PaymentMethodDataCardFromToken(token: tokenId),
-    );
-    // Confirm Google pay payment method
-    final paymentResult = await flutter_stripe.Stripe.instance
-        .confirmPayment(paymentIntentClientSecret: clientSecret, data: params);
+      final response = await StripeService.createPaymentIntent(
+          "${(double.parse(countTotalPrice()) * 100).toInt()}", 'USD');
 
-    if (paymentResult.status == flutter_stripe.PaymentIntentsStatus.Succeeded) {
-      _checkOutTicket();
+      print("intents respondd $response");
+
+      Map jsonToken = jsonDecode(tokenData);
+
+      String tokenId = jsonToken['id'];
+
+      // final response = await StripeService.createPaymentIntent(
+      //     "${(double.parse(countTotalPrice()) * 100).toInt()}", 'USD');
+      //
+      // print("intents respondd $response");
+
+      final clientSecret = response['client_secret'];
+      final tokenJson = Map.castFrom(json.decode(tokenData));
+      // final tokenJson = Map.castFrom(json.decode(tokenData));
+
+      final params = flutter_stripe.PaymentMethodParams.cardFromToken(
+        paymentMethodData:
+            flutter_stripe.PaymentMethodDataCardFromToken(token: tokenId),
+      );
+
+      // Confirm Google pay payment method
+      final paymentResult = await flutter_stripe.Stripe.instance.confirmPayment(
+          paymentIntentClientSecret: clientSecret, data: params);
+
+      if (paymentResult.status ==
+          flutter_stripe.PaymentIntentsStatus.Succeeded) {
+        _checkOutTicket(paymentResult);
+      }
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (error, stackTrace) {
+      await FirebaseCrashlytics.instance.log("Unknown error $error");
+
+      await FirebaseCrashlytics.instance.recordError(
+        error,
+        stackTrace,
+        reason: 'a non-fatal error',
+      );
+
+      if (kDebugMode) {
+        print("error $error");
+      }
+
+      setState(() {
+        _isLoading = false;
+      });
     }
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    // Send the resulting Google Pay token to your server / PSP
   }
 
   void onApplePayPressed() async {
-
     setState(() {
       _isLoading = true;
     });
 
-    final result = await _payClient.showPaymentSelector(
-      // await _payClient.showPaymentSelector(
-      PayProvider.apple_pay,
-      [
-        PaymentItem(
-            label: 'Total',
-            amount: countTotalPrice(),
-            status: PaymentItemStatus.final_price,
-            type: PaymentItemType.total)
-      ],
-    );
+    try {
+      final result = await _payClient.showPaymentSelector(
+        // await _payClient.showPaymentSelector(
+        PayProvider.apple_pay,
+        [
+          PaymentItem(
+              label: 'Total',
+              amount: countTotalPrice(),
+              status: PaymentItemStatus.final_price,
+              type: PaymentItemType.total)
+        ],
+      );
 
-    print("resultt apple pay method ${result["paymentMethod"]}]");
+      final response = await StripeService.createPaymentIntent(
+          "${(double.parse(countTotalPrice()) * 100).toInt()}", 'USD');
 
-    _checkOutTicket();
+      final clientSecret = response['client_secret'];
 
-    // Send the resulting Google Pay token to your server / PSP
-    // final tokenData = result["paymentMethod"]["token"];
-    //
-    // Map jsonToken = jsonDecode(tokenData);
-    //
-    // String tokenId = jsonToken['data'];
-    //
-    // final response = await StripeService.createPaymentIntent(
-    //     "${(double.parse(countTotalPrice()) * 100).toInt()}", 'USD');
-    //
-    // final clientSecret = response['client_secret'];
-    // final tokenJson = Map.castFrom(json.decode(tokenData));
-    // // final tokenJson = Map.castFrom(json.decode(tokenData));
-    //
-    // final params = flutter_stripe.PaymentMethodParams.cardFromToken(
-    //   paymentMethodData:
-    //   flutter_stripe.PaymentMethodDataCardFromToken(token: tokenId),
-    // );
-    // // Confirm Google pay payment method
-    // final paymentResult = await flutter_stripe.Stripe.instance
-    //     .confirmPayment(paymentIntentClientSecret: clientSecret, data: params);
-    //
-    // if (paymentResult.status == flutter_stripe.PaymentIntentsStatus.Succeeded) {
-    //   _checkOutTicket();
-    // }
+      final tokenApple =
+          await flutter_stripe.Stripe.instance.createApplePayToken(result);
 
+      final params = flutter_stripe.PaymentMethodParams.cardFromToken(
+        paymentMethodData:
+            flutter_stripe.PaymentMethodDataCardFromToken(token: tokenApple.id),
+      );
+      // // Confirm Google pay payment method
+      final paymentResult = await flutter_stripe.Stripe.instance.confirmPayment(
+          paymentIntentClientSecret: clientSecret, data: params);
 
-    setState(() {
-      _isLoading = false;
-    });
+      if (paymentResult.status ==
+          flutter_stripe.PaymentIntentsStatus.Succeeded) {
+        _checkOutTicket(paymentResult);
+      }
+    } on flutter_stripe.StripeException catch (error, stackTrace) {
+      Fluttertoast.showToast(
+          msg: "Payment Error: ${error.error.localizedMessage}",
+          toastLength: Toast.LENGTH_LONG);
+
+      await FirebaseCrashlytics.instance.log("Stripe Payment error $error");
+
+      await FirebaseCrashlytics.instance.recordError(
+        error,
+        stackTrace,
+        reason: 'a non-fatal error',
+        information: [
+          'further diagnostic information about the error',
+          'version 2.0'
+        ],
+      );
+
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (error, stackTrace) {
+      Fluttertoast.showToast(msg: "Payment Error: $error");
+
+      await FirebaseCrashlytics.instance.log("Stripe Payment error $error");
+
+      await FirebaseCrashlytics.instance.recordError(
+        error,
+        stackTrace,
+        reason: 'a non-fatal error',
+        information: [
+          'further diagnostic information about the error',
+          'version 2.0'
+        ],
+      );
+
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   String countTotalPrice() {
@@ -571,7 +677,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
                             Container(
                               // group7609kCQ (1:1139)
                               margin: EdgeInsets.fromLTRB(
-                                  0 * fem, 0 * fem, 115 * fem, 0 * fem),
+                                  0 * fem, 0 * fem, 0 * fem, 0 * fem),
                               width: double.infinity,
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -1110,7 +1216,8 @@ class _CheckOutPageState extends State<CheckOutPage> {
                             // The operation hasn't finished loading
                             // Consider showing a loading indicator
                             return const Center(
-                                child: CircularProgressIndicator());
+                                // child: CircularProgressIndicator()
+                                );
                           }
                         }),
                     FutureBuilder(
@@ -1176,7 +1283,8 @@ class _CheckOutPageState extends State<CheckOutPage> {
                             // The operation hasn't finished loading
                             // Consider showing a loading indicator
                             return const Center(
-                                child: CircularProgressIndicator());
+                                // child: CircularProgressIndicator()
+                                );
                           }
                         }),
 

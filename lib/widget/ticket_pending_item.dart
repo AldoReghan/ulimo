@@ -28,12 +28,12 @@ Widget ticketPendingItem(
   return Container(
     // autogroup8kvhNC8 (B1LcCTg9vHsnNENVyN8kVh)
     padding:
-        EdgeInsets.fromLTRB(22.43 * fem, 16.83 * fem, 21.52 * fem, 8.26 * fem),
+      EdgeInsets.fromLTRB(22.43 * fem, 16.83 * fem, 21.52 * fem, 18.26 * fem),
     margin: const EdgeInsets.only(bottom: 24),
     width: double.infinity,
     decoration: BoxDecoration(
       image: DecorationImage(
-        fit: BoxFit.fitHeight,
+        fit: BoxFit.fitWidth,
         image: backgroundTicket,
       ),
     ),
@@ -116,8 +116,7 @@ Widget ticketPendingItem(
                   children: [
                     Text(
                       // pmQwS (1:1394)
-                      time == ''? '' : DateFormat("h:mm a")
-                          .format(DateFormat("H:mm").parse(time)),
+                      time == ''? '' : time,
                       style: SafeGoogleFont(
                         'Saira',
                         fontSize: 12 * ffem,
@@ -128,8 +127,8 @@ Widget ticketPendingItem(
                     ),
                     Text(
                       // feb2023kkQ (1:1393)
-                      DateFormat("dd MMM yyyy")
-                          .format(DateFormat("yyyy-MM-dd").parse(date)),
+                      DateFormat("MMM dd yyyy")
+                          .format(DateFormat("MM/dd/yyyy").parse(date)),
                       style: SafeGoogleFont(
                         'Saira',
                         fontSize: 12 * ffem,

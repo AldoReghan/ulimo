@@ -17,12 +17,12 @@ Widget ticketExpiredItem(
   return Container(
     // autogroup8kvhNC8 (B1LcCTg9vHsnNENVyN8kVh)
     padding:
-        EdgeInsets.fromLTRB(22.43 * fem, 16.83 * fem, 21.52 * fem, 19.26 * fem),
+    EdgeInsets.fromLTRB(22.43 * fem, 16.83 * fem, 21.52 * fem, 18.26 * fem),
     margin: const EdgeInsets.only(bottom: 24),
     width: double.infinity,
     decoration: const BoxDecoration(
       image: DecorationImage(
-        fit: BoxFit.fitHeight,
+        fit: BoxFit.fitWidth,
         image: AssetImage("assets/ticket_expired_background.png"),
       ),
     ),
@@ -32,7 +32,7 @@ Widget ticketExpiredItem(
         Container(
           // group7607UFA (1:1384)
           margin:
-              EdgeInsets.fromLTRB(8.04 * fem, 0 * fem, 4.41 * fem, 25.6 * fem),
+          EdgeInsets.fromLTRB(8.04 * fem, 0 * fem, 4.41 * fem, 25.6 * fem),
           width: double.infinity,
           height: 41 * fem,
           child: Row(
@@ -106,8 +106,7 @@ Widget ticketExpiredItem(
                   children: [
                     Text(
                       // pmQwS (1:1394)
-                      time == ''? '' : DateFormat("h:mm a")
-                          .format(DateFormat("H:mm").parse(time)),
+                      time == ''? '' : time,
                       style: SafeGoogleFont(
                         'Saira',
                         fontSize: 12 * ffem,
@@ -118,8 +117,8 @@ Widget ticketExpiredItem(
                     ),
                     Text(
                       // feb2023kkQ (1:1393)
-                      DateFormat("dd MMM yyyy")
-                          .format(DateFormat("dd-MM-yyyy").parse(date)),
+                      DateFormat("MMM dd yyyy")
+                          .format(DateFormat("MM/dd/yyyy").parse(date)),
                       style: SafeGoogleFont(
                         'Saira',
                         fontSize: 12 * ffem,
@@ -142,7 +141,7 @@ Widget ticketExpiredItem(
         ),
         Container(
           // ticketstatusEfa (1:1382)
-          margin: EdgeInsets.fromLTRB(6.41 * fem, 0 * fem, 0 * fem, 6 * fem),
+          margin: const EdgeInsets.only(left: 6, right: 6, bottom: 10, top: 3),
           child: Text(
             'Ticket Status',
             style: SafeGoogleFont(
@@ -158,7 +157,8 @@ Widget ticketExpiredItem(
           // confirmedkdv (1:1383)
           margin: EdgeInsets.fromLTRB(8.04 * fem, 0 * fem, 0 * fem, 0 * fem),
           child: Text(
-            toBeginningOfSentenceCase(status) ?? status,
+            // toBeginningOfSentenceCase(status) ?? status,
+            "Expired",
             style: SafeGoogleFont(
               'Saira',
               fontSize: 12 * ffem,

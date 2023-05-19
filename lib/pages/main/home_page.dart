@@ -12,6 +12,7 @@ import '../../base/base_color.dart';
 import '../../widget/home_card.dart';
 import '../../widget/home_place_recomendation_list.dart';
 import '../nightlife_page.dart';
+import '../phone_login_pages.dart';
 import '../private_ride.dart';
 import '../ridesharebus_page.dart';
 
@@ -26,82 +27,212 @@ class _HomePageState extends State<HomePage> {
   FirebaseAuth authData = FirebaseAuth.instance;
 
   bool _isLoading = true;
+  bool _isLoadingDestination = true;
+  bool _isLoadingNightlife = true;
 
-  late List _destinationList;
+  late List _nightlifeList;
+  late List _nightlifeGroupList;
+  late List _destinationByMarketList;
+  late List _marketSectionList;
+  int selectedMarketChip = 0;
+  int selectedNightlifeChip = 0;
   final _databaseRef = FirebaseDatabase.instance.ref();
 
   @override
   void initState() {
     super.initState();
-    _destinationList = [];
-    _fetchData();
+    checkUserIsLogin();
+    _nightlifeList = [];
+    _nightlifeGroupList = [];
+    _destinationByMarketList = [];
+    _marketSectionList = [];
+    _fetchMarketSection();
+    // _fetchDestinationData();
+    // _fetchNightlifeData();
+    // _fetchData();
+  }
+
+  Future<void> checkUserIsLogin() async {
+    final userSnapshot = await FirebaseDatabase.instance
+        .ref()
+        .child('users')
+        .orderByChild('uid')
+        .equalTo(authData.currentUser?.uid)
+        .once();
+
+    final Map<dynamic, dynamic>? userData =
+        userSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+
+    if (userData == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Session expired, please login again'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      Navigator.popUntil(context, (route) => false);
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const PhoneLoginPage()),
+      );
+    }
   }
 
   User? getCurrentUser() {
     return authData.currentUser;
   }
 
-  Future<void> _fetchData() async {
+  Future<void> _fetchMarketSection() async {
+    final marketSectionSnapshot =
+        await _databaseRef.child('marketSection').once();
+
+    final Map<dynamic, dynamic>? marketSectionData =
+        marketSectionSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+    final List tempMarketSectionList = [];
+
+    if (marketSectionData != null) {
+      marketSectionData.forEach((key, value) async {
+        final marketSectionMap = {
+          'id': key,
+          'market_section': value['market_section_name'],
+        };
+        tempMarketSectionList.add(marketSectionMap);
+      });
+    }
+
     setState(() {
-      _isLoading = true;
+      _marketSectionList = tempMarketSectionList.reversed.toList();
     });
 
-    var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult != ConnectivityResult.none) {
-      final destinationSnapshot = await _databaseRef
-          .child('nightlifeDestination')
-          .limitToFirst(15)
-          .once();
+    _fetchDestinationByMarket();
+  }
 
-      final Map<dynamic, dynamic>? destinationData =
-          destinationSnapshot.snapshot.value as Map<dynamic, dynamic>?;
-      final List tempList = [];
-
-      if (destinationData != null) {
-        destinationData.forEach((key, value) async {
-          final destinationMap = {
-            'id': key,
-            'name': value['destination_name'],
-            // 'description': value['destination_description'],
-            'image_url': value['destination_image_url'],
-            'address': value['destination_address'],
-          };
-          tempList.add(destinationMap);
-        });
-      }
-
-      setState(() {
-        _destinationList = tempList;
-      });
-    } else {
-      // ignore: use_build_context_synchronously
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("No Internet Connection"),
-            content: const Text("Please check your internet connection."),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text("OK"),
-              ),
-            ],
-          );
-        },
-      );
-    }
+  Future<void> _fetchDestinationByMarket() async {
     setState(() {
-      _isLoading = false;
+      _isLoadingDestination = true;
+    });
+
+    final rideShareDestinationSnapshot = await _databaseRef
+        .child('rideShareBusDestination')
+        //filter y category
+        .orderByChild("market_section")
+        .equalTo(_marketSectionList[selectedMarketChip]['id'])
+        .once();
+
+    final Map<dynamic, dynamic>? rideShareDestinationData =
+        rideShareDestinationSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+    final List tempDestinationByMarket = [];
+
+    if (rideShareDestinationData != null) {
+      rideShareDestinationData.forEach((key, value) async {
+        final rideShareMap = {
+          'id': key,
+          'name': value['destination_name'],
+          'image_url': value['destination_image_url'],
+          'address': value['destination_address'],
+          'type': 'rideShare',
+          'market_section': value['market_section']
+        };
+        tempDestinationByMarket.add(rideShareMap);
+      });
+    }
+
+    final nightlifeSnapshot = await _databaseRef
+        .child('nightlifeDestination')
+        .orderByChild("market_section")
+        .equalTo(_marketSectionList[selectedMarketChip]['id'])
+        .once();
+
+    final Map<dynamic, dynamic>? nightlifeData =
+        nightlifeSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+
+    if (nightlifeData != null) {
+      nightlifeData.forEach((key, value) async {
+        final nightlifeMap = {
+          'id': key,
+          'name': value['destination_name'],
+          'type': 'nightlife',
+          'image_url': value['destination_image_url'],
+          'address': value['destination_address'],
+        };
+        tempDestinationByMarket.add(nightlifeMap);
+      });
+    }
+
+    tempDestinationByMarket.sort((a,b){
+      return a['name'].compareTo(b['name']);
+    });
+
+    setState(() {
+      _destinationByMarketList = tempDestinationByMarket;
+    });
+
+    setState(() {
+      _isLoadingDestination = false;
     });
   }
+
+  // Future<void> _fetchData() async {
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
+  //
+  //   var connectivityResult = await (Connectivity().checkConnectivity());
+  //   if (connectivityResult != ConnectivityResult.none) {
+  //     final nightlifeSnapshot = await _databaseRef
+  //         .child('nightlifeDestination')
+  //         .limitToLast(15)
+  //         .once();
+  //
+  //     final Map<dynamic, dynamic>? destinationData =
+  //         nightlifeSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+  //     final List tempNightlifeList = [];
+  //
+  //     if (destinationData != null) {
+  //       destinationData.forEach((key, value) async {
+  //         final destinationMap = {
+  //           'id': key,
+  //           'name': value['destination_name'],
+  //           // 'description': value['destination_description'],
+  //           'image_url': value['destination_image_url'],
+  //           'address': value['destination_address']
+  //         };
+  //         tempNightlifeList.add(destinationMap);
+  //       });
+  //     }
+  //
+  //     setState(() {
+  //       _nightlifeList = tempNightlifeList;
+  //     });
+  //   } else {
+  //     // ignore: use_build_context_synchronously
+  //     showDialog(
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return AlertDialog(
+  //           title: const Text("No Internet Connection"),
+  //           content: const Text("Please check your internet connection."),
+  //           actions: [
+  //             TextButton(
+  //               onPressed: () {
+  //                 Navigator.of(context).pop();
+  //               },
+  //               child: const Text("OK"),
+  //             ),
+  //           ],
+  //         );
+  //       },
+  //     );
+  //   }
+  //   setState(() {
+  //     _isLoading = false;
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(
@@ -114,7 +245,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               const SizedBox(height: 24),
               Text(
-                "Hello, ${getCurrentUser()?.displayName != "" ? getCurrentUser()?.displayName : "Set Your Name"}.",
+                "Hello, ${getCurrentUser()?.displayName != "" ? getCurrentUser()?.displayName : "Set Your Name"}",
                 style: const TextStyle(color: Colors.white, fontSize: 18),
                 textAlign: TextAlign.start,
               ),
@@ -150,6 +281,7 @@ class _HomePageState extends State<HomePage> {
                           context,
                           MaterialPageRoute(
                               builder: ((context) => const PrivateRidePage())));
+                      // throw Exception();
                     }
                   }),
               const SizedBox(
@@ -170,7 +302,7 @@ class _HomePageState extends State<HomePage> {
                 height: 10,
               ),
               homeCard(
-                  title: "Nightlife Deals For You",
+                  title: "Nightlife Deals",
                   subtitle: "The best nightlife deals around you",
                   imageAsset: "assets/icon/home_nightlife.svg",
                   onTap: () {
@@ -184,50 +316,89 @@ class _HomePageState extends State<HomePage> {
                 height: 36,
               ),
               const Text(
-                "Nightlife Deals",
+                "Top Destinations",
                 style: TextStyle(fontSize: 18, color: yellowPrimary),
+              ),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                child: Row(
+                  children:
+                      List<Widget>.generate(_marketSectionList.length, (index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        label: Text(
+                            "${_marketSectionList[index]['market_section']}"),
+                        selected: selectedMarketChip == index,
+                        onSelected: (selected) {
+                          if (selected) {
+                            setState(() {
+                              selectedMarketChip = index;
+                            });
+                            //refresh data with selected chip
+                            _fetchDestinationByMarket();
+                          }
+                        },
+                        selectedColor: yellowPrimary,
+                      ),
+                    );
+                  }),
+                ),
               ),
               const SizedBox(
                 height: 3,
               ),
               Align(
                   alignment: Alignment.centerLeft,
-                  child: SvgPicture.asset("assets/icon/home_underline.svg")),
+                  child: SvgPicture.asset(
+                    "assets/icon/home_arrow_continue.svg",
+                    width: 30,
+                  )),
               const SizedBox(
                 height: 15,
               ),
               SizedBox(
                 height: 260,
-                child: _isLoading
+                child: _isLoadingDestination
                     ? const Center(
                         child: CircularProgressIndicator(),
                       )
                     : ListView.builder(
                         physics: const BouncingScrollPhysics(),
                         scrollDirection: Axis.horizontal,
-                        itemCount: _destinationList.length,
+                        itemCount: _destinationByMarketList.length,
                         itemBuilder: (context, index) {
                           return Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: recommendationListLayout(context,
                                   onTap: () {
-                                print(_destinationList[index]['type']);
                                 Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          NightLifePageDetailPage(
-                                              nightlifeDestinationId:
-                                                  _destinationList[index]
-                                                      ['id'])),
-                                );
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            _destinationByMarketList[index]
+                                                        ['type'] ==
+                                                    'rideShare'
+                                                ? RideShareBusDetailPage(
+                                                    destinationId:
+                                                        _destinationByMarketList[
+                                                            index]['id'])
+                                                : NightLifePageDetailPage(
+                                                    nightlifeDestinationId:
+                                                        _destinationByMarketList[
+                                                            index]['id'])));
                               },
-                                  name: _destinationList[index]['name'],
-                                  address: _destinationList[index]['address'],
-                                  imageUrl: _destinationList[index]
+                                  name: _destinationByMarketList[index]['name'],
+                                  address: _destinationByMarketList[index]
+                                      ['address'],
+                                  imageUrl: _destinationByMarketList[index]
                                       ['image_url']));
                         }),
-              )
+              ),
+              const SizedBox(
+                height: 24,
+              ),
             ],
           ),
         ),

@@ -12,6 +12,7 @@ import 'package:ulimo/widget/my_ticket_button.dart';
 import 'package:intl/intl.dart';
 
 import '../../base/utils.dart';
+import '../phone_login_pages.dart';
 
 class MyTicketPage extends StatefulWidget {
   const MyTicketPage({Key? key}) : super(key: key);
@@ -186,8 +187,36 @@ class _MyTicketPageState extends State<MyTicketPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    checkUserIsLogin();
     _ticketListData = [];
     _fetchData();
+  }
+
+  Future<void> checkUserIsLogin() async {
+    final userSnapshot = await FirebaseDatabase.instance
+        .ref()
+        .child('users')
+        .orderByChild('uid')
+        .equalTo(authData.currentUser?.uid)
+        .once();
+
+    final Map<dynamic, dynamic>? userData =
+    userSnapshot.snapshot.value as Map<dynamic, dynamic>?;
+
+    if (userData == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Session expired, please login again'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      Navigator.popUntil(context, (route) => false);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => const PhoneLoginPage()),
+      );
+    }
   }
 
   List<int> getCount() {
@@ -199,46 +228,66 @@ class _MyTicketPageState extends State<MyTicketPage> {
   }
 
   List getActiveData() {
-    return _ticketListData.where((element) {
+
+    List sortedList = _ticketListData.where((element) {
       final timeNow = DateTime.now();
       final dataDate = element['date'];
-      final DateFormat dateFormat = DateFormat('dd-MM-yyyy');
+      final DateFormat dateFormat = DateFormat('MM/dd/yyyy');
       String todayDate = dateFormat.format(DateTime.now());
 
-      if ((todayDate != dataDate) &&
-          element['status'] == 'paid') {
-
-        return (DateFormat('dd-MM-yyyy')
-            .parse(element['date'])
-            .isAfter(timeNow));
-      }else if (todayDate == dataDate && element['status'] == 'paid') {
-        if(element['time'] == ''){
+      if ((todayDate != dataDate) && element['status'] == 'paid') {
+        return (DateFormat('MM/dd/yyyy').parse(element['date']).isAfter(timeNow));
+      } else if (todayDate == dataDate && element['status'] == 'paid') {
+        if (element['time'] == '') {
           return true;
-        }else{
-          final DateTime currentTime =
-          DateFormat('dd-MM-yyyy h:mm a').parse("${element['date']} ${element['time']}");
-
+        } else {
+          final DateTime currentTime = DateFormat('MM/dd/yyyy h:mm a').parse(
+              "${element['date']} ${element['time']}");
           return (currentTime.isAfter(timeNow));
         }
       } else {
         return false;
       }
     }).toList();
+
+    sortedList.sort((b, a) {
+      final DateTime dateA = DateFormat('MM/dd/yyyy')
+          .parse("${a['date']}", true)
+          .toUtc();
+      final DateTime dateB = DateFormat('MM/dd/yyyy')
+          .parse("${b['date']}", true)
+          .toUtc();
+      return dateA.compareTo(dateB);
+    });
+
+    return sortedList;
   }
 
   List getPendingData() {
-    return _ticketListData.where((element) {
+    List sortedList = _ticketListData.where((element) {
       return (element['status'] == 'pending') ||
           (element['status'] == 'approved');
     }).toList();
+
+    sortedList.sort((b, a) {
+      final DateTime dateA = DateFormat('MM/dd/yyyy')
+          .parse("${a['date']}", true)
+          .toUtc();
+      final DateTime dateB = DateFormat('MM/dd/yyyy')
+          .parse("${b['date']}", true)
+          .toUtc();
+      return dateA.compareTo(dateB);
+    });
+
+    return sortedList;
   }
 
   List getExpiredData() {
-    return _ticketListData.where((element) {
+    List sortedList = _ticketListData.where((element) {
 
       final timeNow = DateTime.now();
       final dataDate = element['date'];
-      final DateFormat dateFormat = DateFormat('dd-MM-yyyy');
+      final DateFormat dateFormat = DateFormat('MM/dd/yyyy');
       String todayDate = dateFormat.format(DateTime.now());
 
       if((element['status'] == 'expired') ||
@@ -247,7 +296,7 @@ class _MyTicketPageState extends State<MyTicketPage> {
       }else{
         if ((todayDate != dataDate)) {
 
-          return (DateFormat('dd-MM-yyyy')
+          return (DateFormat('MM/dd/yyyy')
               .parse(element['date'])
               .isBefore(timeNow));
         }else{
@@ -255,13 +304,25 @@ class _MyTicketPageState extends State<MyTicketPage> {
             return false;
           }else{
             final DateTime currentTime =
-            DateFormat('dd-MM-yyyy h:mm a').parse("${element['date']} ${element['time']}");
+            DateFormat('MM/dd/yyyy h:mm a').parse("${element['date']} ${element['time']}");
 
             return (currentTime.isBefore(timeNow));
           }
         }
       }
     }).toList();
+
+    sortedList.sort((b, a) {
+      final DateTime dateA = DateFormat('MM/dd/yyyy')
+          .parse("${a['date']}", true)
+          .toUtc();
+      final DateTime dateB = DateFormat('MM/dd/yyyy')
+          .parse("${b['date']}", true)
+          .toUtc();
+      return dateA.compareTo(dateB);
+    });
+
+    return sortedList;
 
   }
 

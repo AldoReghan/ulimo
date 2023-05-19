@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,7 @@ void main() async {
   );
 
   Stripe.publishableKey =
-  'pk_test_FdksvcRe3yMRyJQJ6NuzCEPL';
+  'pk_live_2nYari0BZqmrZXF6KHUotxfV';
 
 
   Stripe.merchantIdentifier =
@@ -43,6 +44,17 @@ void main() async {
     badge: true,
     sound: true,
   );
+
+  FlutterError.onError = (errorDetails) {
+    // If you wish to record a "non-fatal" exception, please use `FirebaseCrashlytics.instance.recordFlutterError` instead
+    FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    // If you wish to record a "non-fatal" exception, please remove the "fatal" parameter
+    FirebaseCrashlytics.instance.recordError(error, stack);
+    return true;
+  };
+
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     if (kDebugMode) {
       print('Received message: ${message.notification?.title}');
